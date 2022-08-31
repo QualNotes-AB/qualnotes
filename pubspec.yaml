@@ -1,0 +1,34 @@
+name: qualnotes
+description: qualnote app
+publish_to: "none"
+version: 1.0.0
+
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  location: ^4.4.0
+  latlong2: ^0.8.1
+  proj4dart: ^2.0.0
+  positioned_tap_detector_2: ^1.0.4
+  modal_bottom_sheet: ^2.1.0
+  sqflite: ^2.0.3
+  path: ^1.8.1
+  path_provider: ^2.0.11
+  camera: ^0.10.0
+  video_player: ^2.4.5
+  record: ^4.3.2
+  audioplayers: ^1.0.1
+  flutter_map: ^2.2.0
+  firebase_core: ^1.19.0
+  firebase_auth: ^3.4.0
+  google_sign_in: ^5.4.1
+  firebase_storage: ^10.3.0
+  share_plus: ^4.0.10+1
+
+
+flutter:
+  uses-material-design: true
