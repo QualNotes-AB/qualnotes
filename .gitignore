@@ -67,3 +67,10 @@ lib/generated_plugin_registrant.dart
 
 # IntelliJ
 .idea/
+
+# Secrets
+
+**/ios/GoogleService-Info.plist
+/web/index.html
+/android/app/google-services.json
+/lib/keys.dart
