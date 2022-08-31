@@ -74,3 +74,4 @@ lib/generated_plugin_registrant.dart
 /web/index.html
 /android/app/google-services.json
 /lib/keys.dart
+lib/firebase_options.dart
