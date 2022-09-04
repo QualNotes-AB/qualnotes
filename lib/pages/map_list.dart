@@ -1,84 +1,183 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:qualnotes/pages/geonote.dart';
-import 'sahre_test.dart';
+import 'firebase_api.dart';
 import 'db_utils.dart';
 import 'dart:convert';
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
-import 'dart:typed_data';
+import 'package:firebase_core/firebase_core.dart';
+import '../firebase_options.dart';
+
+import 'package:path/path.dart';
+
+// import 'dart:typed_data';
 
 import 'package:share_plus/share_plus.dart';
 
 void main() {
+
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return  MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(
-          child: MyListOfMaps(myMaps: ["Create new","ruta 1","ruta 2","ddd","gaudi ruta secreta","sssss"], username: "oriol user"),
-        ),
-      ),
-    );
-  }
+  _MyAppState createState() => _MyAppState();
 }
 
-upLoadMap  (String map_title, String username ) async {
+class _MyAppState extends State<MyApp> {
+  final Future<FirebaseApp>  _fbApp = Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
 
-  List<GeoNote> myGeoNotes = await getAllNotesFor(map_title);
-  String my_gnotes = base64.encode(utf8.encode(jsonEncode(myGeoNotes)));
-  debugPrint(my_gnotes);
-  final ref = FirebaseStorage.instance.ref();
-  final map_points_json = ref.child( username + "/" + map_title + "/" +  "map_points.json");
-  await map_points_json.putString(my_gnotes, format: PutStringFormat.base64);
-  debugPrint(map_points_json.toString());
+  UploadTask? task;
+    File? file;
 
-  // do this as https://firebase.google.com/docs/firestore/manage-data/transactions#dart_2
-  String html_ul_list = "";
+    Future<File> get _localFile async {
+      final path = await _localPath;
+      return File('$path/ori_test_file.txt');
+    }
+    Future<String> get _localPath async {
+      final directory = await getApplicationDocumentsDirectory();
 
-  myGeoNotes.forEach( (element) async {
-    if (element.imgPath.isNotEmpty) {
-      var file_to_upload = ref.child(username + "/" + map_title + "/" +
-          element.note_index.toString() +
-          "." +
-          element.imgPath
-              .split(".")
-              .last);
-      file_to_upload.putFile(File(element.imgPath));
-      String url = await file_to_upload.getDownloadURL();
-      html_ul_list = html_ul_list + generate_card( element, url );
-    } else {
-      html_ul_list = html_ul_list + generate_card( element,"" );
+      return directory.path;
     }
 
-  });
+    Future<File> createTestFile() async {
+      final file = await _localFile;
+      return file.writeAsString('some random oriol stufff.... :))))))) ');
+    }
 
-  //final ref2 = FirebaseStorage.instance.ref();
-  //final my_map_url = ref.child( username + "/" + map_title);
-  String my_map_cloud_url = await map_points_json.getDownloadURL();
-  debugPrint("download url: " + my_map_cloud_url);
+    Future uploadFile() async {
+      File file = await createTestFile();
+      task  = FireBaseAPI.uploadFile("oritest", file);
+      setState(() {});
 
+      if (task == null) return;
+      final snapshot = await task!.whenComplete(() {});
+      final urlDownload = await snapshot.ref.getDownloadURL();
+      debugPrint('urlDownload: $urlDownload');
+    }
 
-  // pop up and show link to online website for sharing. ??
-  String map_index_html = content_head + html_ul_list + content_tail;
-  debugPrint(map_index_html.toString());
-  final index_html = ref.child( username + "/" + map_title + "/" +  "index.html");
-  String my_encoded_index = base64.encode(utf8.encode(map_index_html));
-  await index_html.putString(my_encoded_index, format: PutStringFormat.base64);
-  String index_url = await index_html.getDownloadURL();
-  debugPrint("download url for index : " + index_url);
-  await Share.share("Hi! checkout my mobile map..." + index_url,  subject: "Check out " +username + "'s " + map_title);
+    Widget spinBuilder( UploadTask task) => StreamBuilder<TaskSnapshot>(
+        stream: task.snapshotEvents,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final snap = snapshot.data!;
+            final progress = 100.0*snap.bytesTransferred/snap.totalBytes;
+            return progress < 100 ? CircularProgressIndicator() : Text("complete!");
+          } else {
+            return Container();
+          }
+        }
+    );
+
+    @override
+    Widget build(BuildContext context) {
+      return MaterialApp(
+          title: 'QualNote',
+          home: Scaffold(body: Container(
+              padding: EdgeInsets.all(32),
+              child: Center(
+                  child: Column(
+                    children: [
+                      ElevatedButton(onPressed: uploadFile,
+                          child: Text("UPLOAD THE FILE")),
+                      task != null ? spinBuilder(task!) : Text("click to upload...")
+                    ],
+
+                  )
+              )
+          )
+          )
+      );
+    }
 }
 
-class MyListOfMaps extends StatelessWidget {
-  List<String>myMaps;
-  String username;
+// test class
+/////////////////////////////////////////////////
+
+
+class MyListOfMaps extends StatefulWidget {
+
+  final List<String>myMaps;
+  final String username;
+
   MyListOfMaps({Key? key, required this.myMaps, required this.username}) : super(key: key);
+
+  @override
+  _MyListOfMapsState createState() => _MyListOfMapsState();
+}
+
+class _MyListOfMapsState extends State<MyListOfMaps> {
+
+  bool isUpLoading = false;
+  List<String> myMaps = [];
+  String username = "testuser";
+  String title_upload = "undefined";
+
+
+  @override
+
+  void initState() {
+    myMaps = widget.myMaps;
+    username = widget.username;
+    super.initState();
+   }
+
+  upLoadMap  (String map_title, String username ) async {
+
+    setState(() { isUpLoading = true; title_upload = map_title;});
+
+    List<GeoNote> myGeoNotes = await getAllNotesFor(map_title);
+    String my_gnotes = base64.encode(utf8.encode(jsonEncode(myGeoNotes)));
+    debugPrint(my_gnotes);
+    final ref = FirebaseStorage.instance.ref();
+    final map_points_json = ref.child( username + "/" + map_title + "/" +  "map_points.json");
+    await map_points_json.putString(my_gnotes, format: PutStringFormat.base64);
+    debugPrint(map_points_json.toString());
+
+    // do this as https://firebase.google.com/docs/firestore/manage-data/transactions#dart_2
+    String html_ul_list = "";
+
+    myGeoNotes.forEach( (element) async {
+      if (element.imgPath.isNotEmpty) {
+        var file_to_upload = ref.child(username + "/" + map_title + "/" +
+            element.note_index.toString() +
+            "." +
+            element.imgPath
+                .split(".")
+                .last);
+
+        file_to_upload.putFile(File(element.imgPath));
+        String url = await file_to_upload.getDownloadURL();
+        html_ul_list = html_ul_list + generate_card( element, url );
+      } else {
+        html_ul_list = html_ul_list + generate_card( element,"" );
+      }
+
+    });
+
+    //final ref2 = FirebaseStorage.instance.ref();
+    //final my_map_url = ref.child( username + "/" + map_title);
+    String my_map_cloud_url = await map_points_json.getDownloadURL();
+    debugPrint("download url: " + my_map_cloud_url);
+
+    setState(() => isUpLoading = false);
+
+
+    // pop up and show link to online website for sharing. ??
+    String map_index_html = content_head + html_ul_list + content_tail;
+    debugPrint(map_index_html.toString());
+    final index_html = ref.child( username + "/" + map_title + "/" +  "index.html");
+    String my_encoded_index = base64.encode(utf8.encode(map_index_html));
+    await index_html.putString(my_encoded_index, format: PutStringFormat.base64);
+    String index_url = await index_html.getDownloadURL();
+    debugPrint("download url for index : " + index_url);
+    await Share.share("Hi! checkout my mobile map..." + index_url,  subject: "Check out " +username + "'s " + map_title);
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,29 +195,34 @@ class MyListOfMaps extends StatelessWidget {
           title: const Text('Maps in your device'),
 
         ),
-        body: Padding(
+        body:  Padding(
             padding: EdgeInsets.all(8.0),
-            child: ListView.builder(
+            child: isUpLoading
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                        CircularProgressIndicator(),
+                        Text('  Uploading your map: $title_upload')])
+                : ListView.builder(
               itemCount: myMaps.length,
               itemBuilder: (BuildContext context, int index) {
                 // debugPrint(myMaps[0]);
-
                 return ListTile(
-                  trailing:
-                  Container(
-                    child: IconButton(
-                      icon: Icon(Icons.cloud_upload_sharp),
-                      onPressed: () => upLoadMap(myMaps[index], username),
-                    ),
-                    margin: EdgeInsets.only(top: 8.0),
-                  ),
-                  leading: myMaps[index] =="Create New" ? const Icon(Icons.add_circle_outline, color: Colors.blueAccent)
-                      : const Icon(Icons.map_outlined, color: Colors.black54 ),
-                  title: Text(myMaps[index] ),
+                      trailing:
+                      Container(
+                        child: IconButton(
+                          icon: Icon(Icons.cloud_upload_sharp),
+                          onPressed: () => upLoadMap(myMaps[index], username),
+                        ),
+                        margin: EdgeInsets.only(top: 8.0),
+                      ),
+                      leading: myMaps[index] =="Create New" ? const Icon(Icons.add_circle_outline, color: Colors.blueAccent)
+                          : const Icon(Icons.map_outlined, color: Colors.black54 ),
+                      title: Text(myMaps[index] ),
 
-                  textColor: myMaps[index] =="Create New" ? Colors.blueAccent:Colors.black54 ,
-                  onTap: () => {Navigator.pop(context,myMaps[index])},
-                );
+                      textColor: myMaps[index] =="Create New" ? Colors.blueAccent:Colors.black54 ,
+                      onTap: () => {Navigator.pop(context,myMaps[index])},
+                    );
               },
             )
         )
@@ -127,7 +231,6 @@ class MyListOfMaps extends StatelessWidget {
 
 
 }
-
 
 String content_head =
     "<!DOCTYPE html>"
