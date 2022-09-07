@@ -19,13 +19,14 @@ import 'package:flutter/widgets.dart';
 import 'map_list.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
-// import '../test_login_page.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
-import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:convert';
-import 'dart:convert';
+String generateMd5(String input) {
+  return md5.convert(utf8.encode(input)).toString();
+}
 
 Future<UserCredential> signInWithGoogle() async {
   // Trigger the authentication flow
@@ -89,14 +90,16 @@ class _LiveLocationPageState extends State<LiveLocationPage>  with TickerProvide
       setState( () {
         _username = _uc!.user!.email.toString().split("@")[0]; // use first part of email as username atm...
         if (_username.isEmpty ) {_username = "username00000";}
+        debugPrint( " _username = $_username");
       });
 
     } catch (error) {
       print(error);
+      print("mega error");
     }
   }
 
-  String _username = "not set user";
+  String _username = "not set user"; // TODO if you already signined in thsi remaisn worng value!!!
   int _index_to_show = 0; // used in playMode only
   bool playMode = false;
   int _selectedIndex = 0;
@@ -218,6 +221,7 @@ class _LiveLocationPageState extends State<LiveLocationPage>  with TickerProvide
 
     } else {
         if ( (_selectedIndex == 4 || _selectedIndex == 3) ) {
+
             if (!kIsWeb && _selectedIndex == 3) {
               // debugPrint(_myRouteTitle);
               _myRouteTitle = await _getRouteTitleForSaving(context);
@@ -228,15 +232,12 @@ class _LiveLocationPageState extends State<LiveLocationPage>  with TickerProvide
                 content: Text('Saving your map as $_myRouteTitle'),
               ));
             }
-
             if (!kIsWeb ) {
               // TODO if kisWeb load assets of a route from the store json.
               List<String> myMaps = await getMyDistinctRoutes();
               myMaps.insert(0, "Create New");
               final selection = await Navigator.push(context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        MyListOfMaps(myMaps: myMaps, username: _username,)),);
+                MaterialPageRoute(builder: (context) => MyListOfMaps(myMaps: myMaps, username: generateMd5(_username),)),);
 
               if (selection != "no changes") {
                 debugPrint("selected route map is $selection");
