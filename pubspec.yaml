@@ -28,7 +28,11 @@ dependencies:
   google_sign_in: ^5.4.1
   firebase_storage: ^10.3.0
   share_plus: ^4.0.10+1
+  hash: ^1.0.4
+  webview_flutter: ^3.0.4
+
 
 
 flutter:
   uses-material-design: true
+

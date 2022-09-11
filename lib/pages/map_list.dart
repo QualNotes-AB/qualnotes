@@ -10,11 +10,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../firebase_options.dart';
 
-import 'package:path/path.dart';
-
-// import 'dart:typed_data';
-
 import 'package:share_plus/share_plus.dart';
+
+
 
 void main() {
 
@@ -116,14 +114,30 @@ class _MyListOfMapsState extends State<MyListOfMaps> {
   List<String> myMaps = [];
   String username = "testuser";
   String title_upload = "undefined";
-
+  List<String> online_maps = [];
 
   @override
 
   void initState() {
+    super.initState();
     myMaps = widget.myMaps;
     username = widget.username;
-    super.initState();
+    debugPrint("aquiii");
+    getUserOnlineMaps();
+   }
+
+   void getUserOnlineMaps() async {
+     final ref = FirebaseStorage.instance.ref();
+     final listRef = ref.child( username );
+     debugPrint("aquiii inside before username = $username");
+     final listResult = await listRef.listAll();
+     debugPrint("aquiii inside before");
+     for (var item in listResult.items) {
+       debugPrint("aquiii inside");
+       online_maps.add(item.fullPath);
+       debugPrint('itemname = $item');
+     }
+
    }
 
   upLoadMap  (String map_title, String username ) async {

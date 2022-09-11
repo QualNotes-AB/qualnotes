@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qualnotes/pages/privacy_policy.dart';
 import './pages/live_location.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -37,6 +38,14 @@ class MyApp extends StatelessWidget {
                 home: const LiveLocationPage(),
                 routes: <String, WidgetBuilder>{
                   LiveLocationPage.route: (context) => const LiveLocationPage(),
+                  MyWebView.route: (context) => MyWebView(),
+                  // PhotoElicitation .... LiveLocationPage.route: (context) => const LiveLocationPage(),
+                  // AutoE .... LiveLocationPage.route: (context) => const LiveLocationPage(),
+                  // About
+                  // Privacy
+                  // Tutorials
+                  // Examples
+                  // My account
                 }
             );
           } else {

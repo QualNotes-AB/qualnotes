@@ -81,7 +81,6 @@ class _LiveLocationPageState extends State<LiveLocationPage>  with TickerProvide
         + googleAuth.idToken.toString());
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
-
   Future<void> _handleSignIn() async {
     try {
       debugPrint("hola 1 before signInWithGoogle");
