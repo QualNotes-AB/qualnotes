@@ -48,15 +48,11 @@ field-based research
 1. Install Android Studio: https://developer.android.com/studio
 2. Install flutter: https://docs.flutter.dev/get-started/install
 3. Install Dart: https://dart.dev/get-dart
-4. Install Firebase CLI: https://firebase.google.com/docs/cli
-5. Create Firebase Options:
+4. Install Flutter plugin in Android Studio: https://docs.flutter.dev/get-started/editor?tab=androidstudio
+5. Install Firebase CLI: https://firebase.google.com/docs/cli
+6. Create Firebase Options:
 ```
 firebase login
 ```
-6. run dart pub global activate flutterfire_cli in your Flutter project
-   run flutterfire configure
-7. Update the lib/firebase_options.dart file with the secrets
-8. Build application:
-```bash
-flutter build appbundle
-```
+7. Create device using the device manager.
+8. Run
