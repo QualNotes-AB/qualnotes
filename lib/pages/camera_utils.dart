@@ -14,7 +14,6 @@ Future<void> main() async {
 
   // Get a specific camera from the list of available cameras.
   final firstCamera = cameras.first;
-  final geoNote1 = GeoNote(99, "photo", 1, 1, "text...");
 
   runApp(
     MaterialApp(
