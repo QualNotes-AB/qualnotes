@@ -1,3 +1,5 @@
+.DS_store
+
 # Created by https://www.toptal.com/developers/gitignore/api/flutter
 # Edit at https://www.toptal.com/developers/gitignore?templates=flutter
 
@@ -74,3 +76,7 @@ lib/generated_plugin_registrant.dart
 /web/index.html
 /android/app/google-services.json
 /lib/keys.dart
+lib/firebase_options.dart
+
+
+
