@@ -56,3 +56,5 @@ firebase login
 ```
 7. Create device using the device manager.
 8. Run
+
+Test
