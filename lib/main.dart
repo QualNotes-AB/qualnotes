@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
                 theme: ThemeData(
                   primarySwatch: mapBoxBlue,
                 ),
-                home: const LiveLocationPage(),
+                home:  MyWebView(),
                 routes: <String, WidgetBuilder>{
                   LiveLocationPage.route: (context) => const LiveLocationPage(),
                   MyWebView.route: (context) => MyWebView(),

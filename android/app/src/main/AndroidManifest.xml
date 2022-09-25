@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.qual_notes">
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
    <application
         android:label="qual_notes"
         android:name="${applicationName}"
