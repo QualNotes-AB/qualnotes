@@ -5,9 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "qualnotes",
+            "name": "qualnotes (debug mode)",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "flutterMode": "debug"
         },
         {
             "name": "qualnotes (profile mode)",
@@ -20,6 +21,12 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
+        },
+        {
+            "name": "qualnote",
+            "cwd": "qualnote",
+            "request": "launch",
+            "type": "dart"
         }
     ]
 }

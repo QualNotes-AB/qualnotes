@@ -1,6 +1,6 @@
 {
-    "name": "qualnotes",
-    "short_name": "qualnotes",
+    "name": "qualnote",
+    "short_name": "qualnote",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -12,8 +13,12 @@ void main() async {
   await Hive.initFlutter();
   runApp(
     GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: 'Archivo'),
       title: "Application",
-      initialRoute: AppPages.INITIAL,
+      initialRoute: FirebaseAuth.instance.currentUser != null
+          ? AppPages.INITIAL
+          : Routes.WELCOME,
       getPages: AppPages.routes,
     ),
   );

@@ -1,9 +1,13 @@
-name: qualnotes
-version: 1.0.0+1
-publish_to: none
+name: qualnote
 description: A new Flutter project.
-environment: 
-  sdk: '>=2.16.2 <3.0.0'
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.18.0 <3.0.0'
+
 
 dependencies: 
   cupertino_icons: ^1.0.2
@@ -16,6 +20,7 @@ dependencies:
   google_sign_in: ^5.4.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  fvm: ^2.3.1
   
 dev_dependencies: 
   build_runner: ^2.2.0
@@ -26,4 +31,19 @@ dev_dependencies:
 
 flutter: 
   uses-material-design: true
+  assets:
+    - assets/images/
 
+  fonts:
+    - family: Archivo
+      fonts:
+        - asset: assets/fonts/Archivo-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Archivo-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Archivo-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Archivo-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Archivo-Bold.ttf
+          weight: 700
