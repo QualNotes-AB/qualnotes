@@ -154,10 +154,12 @@ class TransitionPainter extends CustomPainter {
     final paint = Paint()
       ..style = PaintingStyle.fill
       ..color = mainColor;
+    var maxRadius =
+        size.width > size.height ? size.width + 200 : size.height + 200;
 
     canvas.drawCircle(
       Offset(size.width / 2, (size.height) / 2),
-      (size.height - 250) * animation1Progress,
+      maxRadius * animation1Progress,
       paint,
     );
 
@@ -181,7 +183,7 @@ class TransitionPainter extends CustomPainter {
       paint.color = backgroundColor;
       canvas.drawCircle(
         Offset(size.width / 2, (size.height) / 2),
-        (size.height - 250) * animation4Progress,
+        maxRadius * animation4Progress,
         paint,
       );
     }

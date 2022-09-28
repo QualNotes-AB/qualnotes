@@ -93,6 +93,7 @@ class RegisterView extends GetView<RegisterController> {
                   Obx(
                     () => AuthInputField(
                       hint: 'Enter your password',
+                      obscure: true,
                       isValid: controller.passwordValid.value,
                       onChange: (value) => controller.setPassword(value),
                     ),
@@ -112,6 +113,7 @@ class RegisterView extends GetView<RegisterController> {
                   Obx(
                     () => AuthInputField(
                       hint: 'Confirm your password',
+                      obscure: true,
                       isValid: controller.confirmPasswordValid.value,
                       onChange: (value) => controller.setConfirmPassword(value),
                     ),

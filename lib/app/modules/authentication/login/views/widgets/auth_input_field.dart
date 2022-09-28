@@ -7,6 +7,7 @@ import 'package:qualnote/app/config/text_styles.dart';
 class AuthInputField extends StatefulWidget {
   final String hint;
   final bool isValid;
+  final bool obscure;
   final Function(String) onChange;
 
   const AuthInputField({
@@ -14,6 +15,7 @@ class AuthInputField extends StatefulWidget {
     required this.hint,
     required this.isValid,
     required this.onChange,
+    this.obscure = false,
   }) : super(key: key);
 
   @override
@@ -62,16 +64,30 @@ class _AuthInputFieldState extends State<AuthInputField>
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(2),
-              child: TextField(
-                focusNode: _focus,
-                onChanged: widget.onChange,
-                style: AppTextStyle.regular16DarkGrey,
-                decoration: InputDecoration(
-                  hintText: widget.hint,
-                  hintStyle: AppTextStyle.regular16DarkGrey,
-                  contentPadding: const EdgeInsets.all(15),
-                  border: InputBorder.none,
-                ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      focusNode: _focus,
+                      onChanged: widget.onChange,
+                      obscureText: widget.obscure,
+                      style: AppTextStyle.regular16DarkGrey,
+                      decoration: InputDecoration(
+                        hintText: widget.hint,
+                        hintStyle: AppTextStyle.regular16DarkGrey,
+                        contentPadding: const EdgeInsets.all(15),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  // const Padding(
+                  //   padding: EdgeInsets.symmetric(horizontal: 10),
+                  //   child: Icon(
+                  //     Icons.remove_red_eye_outlined,
+                  //     color: AppColors.lightGrey,
+                  //   ),
+                  // ),
+                ],
               ),
             ),
           ),

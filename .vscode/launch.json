@@ -8,7 +8,13 @@
             "name": "qualnotes (debug mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "debug"
+            "flutterMode": "debug",
+            "args": [
+               "--web-hostname",
+               "localhost",
+               "--web-port",
+               "5000",
+            ]
         },
         {
             "name": "qualnotes (profile mode)",

@@ -59,6 +59,7 @@ class LoginView extends GetView<LoginController> {
                   Obx(
                     () => AuthInputField(
                       hint: 'Enter your password',
+                      obscure: true,
                       isValid: controller.passwordValid.value,
                       onChange: (value) => controller.setPassword(value),
                     ),

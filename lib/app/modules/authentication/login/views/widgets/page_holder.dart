@@ -6,11 +6,20 @@ class PageHolder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width > 500.0
+        ? 500.0
+        : MediaQuery.of(context).size.width;
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: SingleChildScrollView(child: child),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: width,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: SingleChildScrollView(child: child),
+            ),
+          ),
         ),
       ),
     );

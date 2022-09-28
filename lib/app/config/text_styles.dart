@@ -68,4 +68,34 @@ class AppTextStyle {
     fontWeight: FontWeight.w400,
     color: AppColors.red,
   );
+
+  static const regular17Blue = TextStyle(
+    fontSize: 17,
+    fontWeight: FontWeight.w400,
+    color: AppColors.blueText,
+  );
+
+  static const regular17Black = TextStyle(
+    fontSize: 17,
+    fontWeight: FontWeight.w400,
+    color: AppColors.darkGrey,
+  );
+
+  static const regular13White = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+    color: AppColors.white,
+  );
+
+  static const regular16White = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.white,
+  );
+
+  static const regular13Blue = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+    color: AppColors.blueText,
+  );
 }

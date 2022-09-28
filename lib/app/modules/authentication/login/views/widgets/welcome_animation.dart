@@ -28,8 +28,7 @@ class _WelcomeAnimationState extends State<WelcomeAnimation>
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
-    animation =
-        CurveTween(curve: Curves.bounceOut).animate(_animationController);
+    animation = CurveTween(curve: Curves.easeIn).animate(_animationController);
 
     _animationController.forward();
     _animationController.addStatusListener(
@@ -103,11 +102,13 @@ class TransitionPainter extends CustomPainter {
     final paint = Paint()
       ..style = PaintingStyle.fill
       ..color = mainColor;
+    var maxRadius =
+        size.width > size.height ? size.width + 200 : size.height + 200;
 
     if (animationProgress > 0.05) {
       canvas.drawCircle(
         Offset(size.width / 2, (size.height) / 2),
-        (size.height - 250) * animationProgress,
+        maxRadius * animationProgress,
         paint,
       );
     }

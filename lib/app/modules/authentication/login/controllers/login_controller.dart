@@ -119,6 +119,7 @@ class LoginController extends GetxController {
     } catch (e) {
       animationContinue.value = true;
       await Future.delayed(const Duration(milliseconds: 1500));
+
       Get.snackbar('Error', e.toString());
     }
   }
