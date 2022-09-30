@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:developer';
-
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+import 'package:qualnote/app/data/models/photo_note.dart';
 
 class MapGetxController extends GetxController {
   MapController mapController = MapController();
@@ -14,6 +14,8 @@ class MapGetxController extends GetxController {
   RxBool isMapping = false.obs;
   RxList<LatLng> routePoints = <LatLng>[].obs;
   RxList<String> textTags = <String>[].obs;
+  RxList<PhotoNote> photoNotes = <PhotoNote>[].obs;
+  RxList<PhotoNote> videoNotes = <PhotoNote>[].obs;
 
   Future<LatLng> getCurrentLocation() async {
     Location _location = Location();
@@ -40,18 +42,26 @@ class MapGetxController extends GetxController {
     isMapping.value = true;
   }
 
-  Future<void> init() async {
-    currentLocation.value = await getCurrentLocation();
+  void init() {
     locationStream = location.onLocationChanged.asBroadcastStream().listen(
       (LocationData data) {
         var location = LatLng(data.latitude ?? 0, data.longitude ?? 0);
         currentLocation.value = location;
+
         if (isMapping.value) {
           routePoints.add(location);
           log(location.toString());
         }
       },
     );
+  }
+
+  @override
+  void onInit() {
+    //  currentLocation.value = await getCurrentLocation();
+    log('init');
+    init();
+    super.onInit();
   }
 
   @override

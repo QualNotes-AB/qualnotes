@@ -27,8 +27,8 @@ void main() async {
   await Hive.initFlutter();
   await checkForLocationPermission();
 
-  var map = Get.put(MapGetxController());
-  await map.init();
+  Get.put(MapGetxController());
+
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,

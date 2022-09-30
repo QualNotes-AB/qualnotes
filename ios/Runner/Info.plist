@@ -24,6 +24,12 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The app needs access to your photo library for image upload.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The app needs access to your camera to be able to record video and take photos.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The app needs access to record audio for audio logs.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>The app needs access to find your location and the give best result for routes.</string>
 	<key>UIBackgroundModes</key>

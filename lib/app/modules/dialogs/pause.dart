@@ -1,0 +1,43 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:qualnote/app/config/colors.dart';
+import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
+
+pausedDialog() {
+  var mapGetxController = Get.find<MapGetxController>();
+  mapGetxController.stopMapping();
+  Get.dialog(
+    Dialog(
+      insetPadding: EdgeInsets.zero,
+      backgroundColor: AppColors.popupGrey,
+      child: SizedBox(
+        height: 100,
+        width: 180,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(bottom: 15, top: 15),
+              child: Text('All recordings paused.'),
+            ),
+            const Divider(
+              height: 1,
+              thickness: 1,
+              color: AppColors.lightGrey,
+            ),
+            TextButton(
+              onPressed: () {
+                mapGetxController.resumeMapping();
+                Get.back();
+              },
+              child: const Center(
+                child: Text('Click here to resume'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+    barrierDismissible: false,
+  );
+}

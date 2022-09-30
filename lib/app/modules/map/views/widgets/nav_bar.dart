@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
+import 'package:qualnote/app/modules/dialogs/add_media.dart';
+import 'package:qualnote/app/modules/dialogs/finish_mapping.dart';
+import 'package:qualnote/app/modules/dialogs/pause.dart';
+import 'package:qualnote/app/modules/dialogs/start_recording.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/nav_button.dart';
-import 'package:qualnote/app/routes/app_pages.dart';
 
 class NavBar extends StatelessWidget {
   NavBar({
@@ -17,7 +20,7 @@ class NavBar extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
-        height: 81,
+        height: 82,
         width: MediaQuery.of(context).size.width > 500
             ? 500
             : MediaQuery.of(context).size.width,
@@ -33,19 +36,19 @@ class NavBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              NavButton(
+              const NavButton(
                 onPressed: pausedDialog,
                 title: 'Pause',
-                icon: const Icon(
+                icon: Icon(
                   Icons.pause,
                   size: 34,
                   color: AppColors.white,
                 ),
               ),
-              NavButton(
+              const NavButton(
                 onPressed: finishedDialog,
                 title: 'Finish',
-                icon: const Icon(
+                icon: Icon(
                   Icons.stop,
                   size: 34,
                   color: AppColors.white,
@@ -70,10 +73,10 @@ class NavBar extends StatelessWidget {
                   ],
                 ),
               ),
-              NavButton(
-                onPressed: () {},
+              const NavButton(
+                onPressed: addMediaDialog,
                 title: 'Add',
-                icon: const Icon(
+                icon: Icon(
                   Icons.add_circle_outline,
                   size: 34,
                   color: AppColors.white,
@@ -94,183 +97,4 @@ class NavBar extends StatelessWidget {
       ),
     );
   }
-
-  finishedDialog() {
-    mapGetxController.stopMapping();
-    Get.dialog(
-      Dialog(
-        insetPadding: EdgeInsets.zero,
-        backgroundColor: AppColors.popupGrey,
-        child: SizedBox(
-          height: 100,
-          width: 180,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: TextField(
-                  onChanged: (value) {},
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.only(left: 20),
-                    hintText: 'Enter map title',
-                  ),
-                ),
-              ),
-              const Divider(
-                height: 1,
-                thickness: 1,
-                color: AppColors.lightGrey,
-              ),
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          mapGetxController.resumeMapping();
-                          Get.back();
-                        },
-                        child: const Center(
-                          child: Text('Go back'),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 50,
-                      width: 1,
-                      color: AppColors.lightGrey,
-                    ),
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          // mapGetxController.resumeMapping();
-                          // Get.back();
-                          //TODO SAVE ROUTE
-                          Get.toNamed(Routes.HOME);
-                        },
-                        child: const Center(
-                          child: Text('Save'),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  pausedDialog() {
-    mapGetxController.stopMapping();
-    Get.dialog(
-      Dialog(
-        insetPadding: EdgeInsets.zero,
-        backgroundColor: AppColors.popupGrey,
-        child: SizedBox(
-          height: 100,
-          width: 180,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(bottom: 15, top: 15),
-                child: Text('All recordings paused.'),
-              ),
-              const Divider(
-                height: 1,
-                thickness: 1,
-                color: AppColors.lightGrey,
-              ),
-              TextButton(
-                onPressed: () {
-                  mapGetxController.resumeMapping();
-                  Get.back();
-                },
-                child: const Center(
-                  child: Text('Click here to resume'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      barrierDismissible: false,
-    );
-  }
-
-  startRecordingDialog() => Get.dialog(
-        Dialog(
-          insetPadding: EdgeInsets.zero,
-          backgroundColor: AppColors.popupGrey,
-          child: SizedBox(
-            height: 260,
-            width: 260,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text(
-                        'Which method will use?',
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: AppColors.lightGrey,
-                ),
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {},
-                    child: const Center(
-                      child: Text(
-                        'Record audio',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ),
-                const Divider(
-                    height: 1, thickness: 1, color: AppColors.lightGrey),
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {},
-                    child: const Center(
-                      child: Text(
-                        'Record video',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ),
-                const Divider(
-                    height: 1, thickness: 1, color: AppColors.lightGrey),
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      mapGetxController.startMapping();
-                      Get.back();
-                    },
-                    child: const Center(
-                      child: Text(
-                        'Just mapping',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
 }

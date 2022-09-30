@@ -9,6 +9,12 @@ class AppTextStyle {
     color: AppColors.darkGrey,
   );
 
+  static const regular14Grey = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.grey,
+  );
+
   static const regular16Black = TextStyle(
     fontSize: 16,
     height: 1.5,
@@ -35,6 +41,12 @@ class AppTextStyle {
 
   static const semiBold13Black = TextStyle(
     fontSize: 13,
+    fontWeight: FontWeight.w600,
+    color: AppColors.black,
+  );
+
+  static const semiBold16Black = TextStyle(
+    fontSize: 16,
     fontWeight: FontWeight.w600,
     color: AppColors.black,
   );
