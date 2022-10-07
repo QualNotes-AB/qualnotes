@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/audio_recording/bindings/audio_recording_binding.dart';
+import '../modules/audio_recording/views/audio_recording_view.dart';
 import '../modules/authentication/login/bindings/login_binding.dart';
 import '../modules/authentication/login/views/login_view.dart';
 import '../modules/authentication/login/views/widgets/welcome_animation.dart';
@@ -43,6 +45,11 @@ class AppPages {
       name: _Paths.MAP,
       page: () => const MapView(),
       binding: MapBinding(),
+    ),
+    GetPage(
+      name: _Paths.AUDIO_RECORDING,
+      page: () => const AudioRecordingView(),
+      binding: AudioRecordingBinding(),
     ),
   ];
 }

@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/data/errors/auth_failure.dart';
 import 'package:qualnote/app/routes/app_pages.dart';
@@ -89,39 +88,40 @@ class LoginController extends GetxController {
     mainColor = AppColors.darkBlue;
     animationStart.value = true;
     animationContinue.value = false;
-    try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    // try {
+    //   final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-      if (googleUser != null) {
-        final GoogleSignInAuthentication? googleAuth =
-            await googleUser.authentication;
+    //   if (googleUser != null) {
+    //     final GoogleSignInAuthentication? googleAuth =
+    //         await googleUser.authentication;
 
-        if (googleAuth != null) {
-          final credential = GoogleAuthProvider.credential(
-            accessToken: googleAuth.accessToken,
-            idToken: googleAuth.idToken,
-          );
-          try {
-            await FirebaseAuth.instance.signInWithCredential(credential);
+    //     if (googleAuth != null) {
+    //       final credential = GoogleAuthProvider.credential(
+    //         accessToken: googleAuth.accessToken,
+    //         idToken: googleAuth.idToken,
+    //       );
+    //       try {
+    //         await FirebaseAuth.instance.signInWithCredential(credential);
 
-            if (FirebaseAuth.instance.currentUser != null) {
-              animationContinue.value = true;
-              await Future.delayed(const Duration(milliseconds: 1100));
-              Get.offAllNamed(Routes.HOME);
-            }
-          } on FirebaseAuthException catch (exception) {
-            animationContinue.value = true;
-            await Future.delayed(const Duration(milliseconds: 1500));
-            AuthFailure(exception).checkException();
-          }
-        }
-      }
-    } catch (e) {
-      animationContinue.value = true;
-      await Future.delayed(const Duration(milliseconds: 1500));
-
-      Get.snackbar('Error', e.toString());
-    }
+    //         if (FirebaseAuth.instance.currentUser != null) {
+    //           animationContinue.value = true;
+    //           await Future.delayed(const Duration(milliseconds: 1100));
+    //           Get.offAllNamed(Routes.HOME);
+    //         }
+    //       } on FirebaseAuthException catch (exception) {
+    //         animationContinue.value = true;
+    //         await Future.delayed(const Duration(milliseconds: 1500));
+    //         AuthFailure(exception).checkException();
+    //       }
+    //     }
+    //   }
+    // } catch (e) {
+    animationContinue.value = true;
+    await Future.delayed(const Duration(milliseconds: 1500));
+    // log(e.toString());
+    // Get.snackbar('Error', e.toString());
+    Get.snackbar('Sorry', 'Unavailable at the moment!');
+    //}
   }
 
   void resetFields() {

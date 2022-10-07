@@ -32,67 +32,77 @@ class NavBar extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              const NavButton(
-                onPressed: pausedDialog,
-                title: 'Pause',
-                icon: Icon(
-                  Icons.pause,
-                  size: 34,
-                  color: AppColors.white,
-                ),
-              ),
-              const NavButton(
-                onPressed: finishedDialog,
-                title: 'Finish',
-                icon: Icon(
-                  Icons.stop,
-                  size: 34,
-                  color: AppColors.white,
-                ),
-              ),
-              NavButton(
-                onPressed: startRecordingDialog,
-                title: 'REC',
-                icon: Stack(
-                  alignment: Alignment.center,
-                  children: const [
-                    Icon(
-                      Icons.fiber_manual_record_outlined,
-                      color: AppColors.white,
-                      size: 40,
+          child: mapGetxController.isPreview.value
+              ? NavButton(
+                  onPressed: () => Get.back(),
+                  title: 'Return',
+                  icon: const Icon(
+                    Icons.exit_to_app_rounded,
+                    size: 34,
+                    color: AppColors.white,
+                  ),
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const NavButton(
+                      onPressed: pausedDialog,
+                      title: 'Pause',
+                      icon: Icon(
+                        Icons.pause,
+                        size: 34,
+                        color: AppColors.white,
+                      ),
                     ),
-                    Icon(
-                      Icons.fiber_manual_record,
-                      color: AppColors.white,
-                      size: 22,
+                    const NavButton(
+                      onPressed: finishedDialog,
+                      title: 'Finish',
+                      icon: Icon(
+                        Icons.stop,
+                        size: 34,
+                        color: AppColors.white,
+                      ),
+                    ),
+                    NavButton(
+                      onPressed: startRecordingDialog,
+                      title: 'REC',
+                      icon: Stack(
+                        alignment: Alignment.center,
+                        children: const [
+                          Icon(
+                            Icons.fiber_manual_record_outlined,
+                            color: AppColors.white,
+                            size: 40,
+                          ),
+                          Icon(
+                            Icons.fiber_manual_record,
+                            color: AppColors.white,
+                            size: 22,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const NavButton(
+                      onPressed: addMediaDialog,
+                      title: 'Add',
+                      icon: Icon(
+                        Icons.add_circle_outline,
+                        size: 34,
+                        color: AppColors.white,
+                      ),
+                    ),
+                    NavButton(
+                      onPressed: () {},
+                      title: 'My Files',
+                      icon: const Icon(
+                        Icons.file_copy_outlined,
+                        size: 32,
+                        color: AppColors.white,
+                      ),
                     ),
                   ],
                 ),
-              ),
-              const NavButton(
-                onPressed: addMediaDialog,
-                title: 'Add',
-                icon: Icon(
-                  Icons.add_circle_outline,
-                  size: 34,
-                  color: AppColors.white,
-                ),
-              ),
-              NavButton(
-                onPressed: () {},
-                title: 'My Files',
-                icon: const Icon(
-                  Icons.file_copy_outlined,
-                  size: 32,
-                  color: AppColors.white,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

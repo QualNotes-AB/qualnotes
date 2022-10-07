@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
@@ -8,9 +7,9 @@ import 'package:qualnote/app/modules/authentication/login/views/widgets/page_hol
 import 'package:qualnote/app/modules/dialogs/record_method_dialog.dart';
 import 'package:qualnote/app/modules/home/views/widgets/add_button.dart';
 import 'package:qualnote/app/modules/home/views/widgets/home_search.dart';
+import 'package:qualnote/app/modules/home/views/widgets/project_list_tile.dart';
 import 'package:qualnote/app/modules/home/views/widgets/tab_switch.dart';
 import 'package:qualnote/app/routes/app_pages.dart';
-
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -62,40 +61,11 @@ class HomeView extends GetView<HomeController> {
             onPressed: () {},
             title: 'Open from My Files (below)',
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () {},
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: const [
-                      Icon(
-                        Icons.folder_outlined,
-                        size: 25,
-                        color: AppColors.black,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          'Example map project',
-                          style: AppTextStyle.regular17Black,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: const Icon(
-                  Icons.more_horiz,
-                  color: AppColors.black,
-                ),
-              ),
-            ],
+          ListView(
+            shrinkWrap: true,
+            children: controller.projects
+                .map((project) => ProjectListTile(title: project.title!))
+                .toList(),
           )
         ],
       ),

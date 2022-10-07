@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
-import 'package:qualnote/app/routes/app_pages.dart';
+import 'package:qualnote/app/config/colors.dart';
 import 'package:video_player/video_player.dart';
 
 /// Stateful widget to fetch and then display video content.
@@ -23,9 +22,18 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     super.initState();
     _controller = VideoPlayerController.file(File(widget.path))
       ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
         setState(() {});
       });
+    _controller.addListener(() {
+      _controller.value.isPlaying ? setState(() {}) : setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(() {});
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,6 +53,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         children: [
           FloatingActionButton(
             heroTag: 'play',
+            backgroundColor: AppColors.white,
             onPressed: () {
               setState(() {
                 _controller.value.isPlaying
@@ -54,37 +63,24 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             },
             child: Icon(
               _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+              color: AppColors.black,
+              size: 35,
             ),
           ),
           const SizedBox(height: 10),
           FloatingActionButton(
             heroTag: 'save',
-            onPressed: () async {
-              await Get.find<AddMediaController>().addVideo(widget.path);
-              Get.offNamedUntil(Routes.MAP, (route) => false);
-            },
-            child: const Icon(
-              Icons.check,
-            ),
-          ),
-          const SizedBox(height: 10),
-          FloatingActionButton(
-            heroTag: 'retake',
-            onPressed: () async {
+            backgroundColor: AppColors.white,
+            onPressed: () {
               Get.back();
             },
             child: const Icon(
-              Icons.restart_alt,
+              Icons.check,
+              color: AppColors.black,
             ),
           ),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
   }
 }

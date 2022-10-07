@@ -1,152 +1,126 @@
+import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:get/get.dart';
+import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:video_player/video_player.dart';
 
 class CameraGetxController extends GetxController {
   MapGetxController mapGetxController = Get.find<MapGetxController>();
   late List<CameraDescription> cameras;
-  late Rx<CameraController> controller;
-  RxBool isRecording = false.obs;
+  late CameraController cameraController;
+  List<String> videoPaths = [];
+  RxBool minimizedCamera = false.obs;
   Rx<FlashMode> flashMode = FlashMode.off.obs;
   XFile? imageFile;
   XFile? videoFile;
+  Timer? timer;
+  RxInt durationInSeconds = 0.obs;
   VideoPlayerController? videoController;
 
-  FlashMode toggleFlash() {
-    flashMode.value == FlashMode.off
-        ? flashMode.value = FlashMode.torch
-        : flashMode.value = FlashMode.off;
-    return flashMode.value;
+  void toggleMinizedCamera() => minimizedCamera.value = !minimizedCamera.value;
+
+  Future<void> startVideoRecording() async {
+    if (!cameraController.value.isInitialized) {
+      Get.snackbar('Camera', 'Error: select a camera first.');
+      return;
+    }
+    if (cameraController.value.isRecordingVideo) {
+      // A recording is already started, do nothing.
+      return;
+    }
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      durationInSeconds.value++;
+    });
+    await cameraController.startVideoRecording();
   }
 
-  void setRecording(bool value) => isRecording.value = value;
-  void setFlash(value) => flashMode.value = value;
+  Future<XFile?> stopVideoRecording({bool isFinish = false}) async {
+    if (!cameraController.value.isRecordingVideo) {
+      return null;
+    }
+    if (timer != null) {
+      timer!.cancel();
+    }
+    if (isFinish) {
+      durationInSeconds.value = 0;
+    }
+    XFile? video = await cameraController.stopVideoRecording();
+    videoPaths.add(video.path);
+    return video;
+  }
 
-  // Future<void> onPausePreviewButtonPressed() async {
-  //   final CameraController? cameraController = controller.value;
-  //   if (cameraController == null || !cameraController.value.isInitialized) {
-  //     Get.snackbar('Camera', 'Error: select a camera first.');
-  //     return;
-  //   }
+  Future<void> takePicture() async {
+    if (cameraController.value.isTakingPicture) {
+      // A capture is already pending, do nothing.
+      return;
+    }
 
-  //   if (cameraController.value.isPreviewPaused) {
-  //     await cameraController.resumePreview();
-  //     isRecording.value = true;
-  //   } else {
-  //     await cameraController.pausePreview();
-  //   }
-  //   refresh();
-  // }
+    try {
+      final XFile file = await cameraController.takePicture();
+      Get.find<AddMediaController>().addPhoto(file);
+    } on CameraException {
+      return;
+    }
+  }
 
-  // void _showCameraException(CameraException e) {
-  //   Get.snackbar('Error', '${e.code}\n${e.description}');
-  // }
+  Future<void> setFlashMode(FlashMode mode) async {
+    await setFlashMode(mode);
+  }
 
-  // Future<void> startVideoRecording() async {
-  //   isRecording.value = true;
-  //   final CameraController? cameraController = controller.value;
-  //   if (cameraController == null || !cameraController.value.isInitialized) {
-  //     Get.snackbar('Camera', 'Error: select a camera first.');
-  //     return;
-  //   }
-  //   if (cameraController.value.isRecordingVideo) {
-  //     // A recording is already started, do nothing.
-  //     return;
-  //   }
-  //   try {
-  //     await cameraController.startVideoRecording();
-  //   } on CameraException catch (e) {
-  //     _showCameraException(e);
-  //     return;
-  //   }
-  // }
+  Future<void> pauseVideoRecording() async {
+    if (!cameraController.value.isRecordingVideo) {
+      return;
+    }
+    if (timer != null) {
+      timer!.cancel();
+    }
+    await cameraController.pauseVideoRecording();
+  }
 
-  // Future<void> stopVideoRecording() async {
-  //   isRecording.value = false;
-  //   //  log('stop1');
-  //   final CameraController? cameraController = controller.value;
-  //   if (cameraController == null || !cameraController.value.isRecordingVideo) {
-  //     return;
-  //   }
-  //   try {
-  //     videoFile = await cameraController.stopVideoRecording();
-  //     log('stop2');
-  //     print(videoFile!.path);
-  //     if (videoFile != null) {
-  //       Get.to(() => VideoPlayerWidget(path: videoFile!.path));
-  //     }
-  //   } on CameraException catch (e) {
-  //     _showCameraException(e);
-  //     return;
-  //   }
-  // }
+  Future<void> resumeVideoRecording() async {
+    if (!cameraController.value.isRecordingVideo) {
+      return;
+    }
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      durationInSeconds.value++;
+    });
 
-  // Future<void> saveVideo() async {
-  //   await Get.find<AddMediaController>().addVideo(videoFile!.path);
-  // }
+    await cameraController.resumeVideoRecording();
+  }
 
-  // Future<void> pauseVideoRecording() async {
-  //   final CameraController? cameraController = controller.value;
-  //   if (cameraController == null || !cameraController.value.isRecordingVideo) {
-  //     return;
-  //   }
-  //   try {
-  //     await cameraController.pauseVideoRecording();
-  //   } on CameraException catch (e) {
-  //     _showCameraException(e);
-  //     rethrow;
-  //   }
-  // }
-
-  // Future<void> resumeVideoRecording() async {
-  //   final CameraController? cameraController = controller.value;
-  //   if (cameraController == null || !cameraController.value.isRecordingVideo) {
-  //     return;
-  //   }
-  //   try {
-  //     await cameraController.resumeVideoRecording();
-  //   } on CameraException catch (e) {
-  //     _showCameraException(e);
-  //     rethrow;
-  //   }
-  // }
-
-  // Future<void> setFlashMode(FlashMode mode) async {
-  //   try {
-  //     await controller.value.setFlashMode(mode);
-  //   } on CameraException catch (e) {
-  //     _showCameraException(e);
-  //     rethrow;
-  //   }
-  // }
+  Future<void> init() async {
+    cameras = await availableCameras();
+    cameraController = CameraController(
+      cameras.first,
+      ResolutionPreset.high,
+    );
+    await cameraController.initialize();
+  }
 
   @override
   void onInit() async {
-    cameras = await availableCameras();
-    // controller = CameraController(cameras[0], ResolutionPreset.max).obs;
-    // controller.value = CameraController(cameras[0], ResolutionPreset.max);
-
-    // controller.value.initialize().then((_) {
-    //   refresh();
-    // }).catchError((Object e) {
-    //   if (e is CameraException) {
-    //     switch (e.code) {
-    //       case 'CameraAccessDenied':
-    //         print('User denied camera access.');
-    //         break;
-    //       default:
-    //         print('Handle other errors.');
-    //         break;
-    //     }
-    //   }
-    // });
+    await init();
     super.onInit();
   }
 
   @override
+  void onClose() {
+    if (timer != null) {
+      timer!.cancel();
+    }
+    durationInSeconds.value = 0;
+    // cameraController.dispose();
+    super.onClose();
+  }
+
+  @override
   void dispose() {
-    controller.value.dispose();
+    if (timer != null) {
+      timer!.cancel();
+    }
+    cameraController.dispose();
     super.dispose();
   }
 }

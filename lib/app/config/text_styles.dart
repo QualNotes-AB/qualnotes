@@ -15,6 +15,19 @@ class AppTextStyle {
     color: AppColors.grey,
   );
 
+  static const bold12Grey = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w700,
+    color: AppColors.grey,
+  );
+
+  static const regular14GreyHeight = TextStyle(
+    fontSize: 14,
+    height: 1.3,
+    fontWeight: FontWeight.w400,
+    color: AppColors.grey,
+  );
+
   static const regular16Black = TextStyle(
     fontSize: 16,
     height: 1.5,

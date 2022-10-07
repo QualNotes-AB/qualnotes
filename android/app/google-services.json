@@ -1,34 +1,41 @@
 {
   "project_info": {
-    "project_number": "925443941653",
-    "project_id": "qualnotesdev",
-    "storage_bucket": "qualnotesdev.appspot.com"
+    "project_number": "866644776284",
+    "project_id": "qualnotes-2b65a",
+    "storage_bucket": "qualnotes-2b65a.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:925443941653:android:06fc321a56027bd993351c",
+        "mobilesdk_app_id": "1:866644776284:android:b4b822fa2e2ca15d57dd99",
         "android_client_info": {
           "package_name": "com.qualnotes.qualnote"
         }
       },
       "oauth_client": [
         {
-          "client_id": "925443941653-ohc9mhf8pf3t7t7vffa5umackkqftqo6.apps.googleusercontent.com",
+          "client_id": "866644776284-v7vpvuqef9d88tl5bq3071n6qjpt0gb1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAOW-sn5lhSuaoi4vjtiLZ-bRUFFahYiBM"
+          "current_key": "AIzaSyB92iN9y4VlmC_jPXv8RLiF1Slobpbdgy8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "925443941653-ohc9mhf8pf3t7t7vffa5umackkqftqo6.apps.googleusercontent.com",
+              "client_id": "866644776284-v7vpvuqef9d88tl5bq3071n6qjpt0gb1.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "866644776284-i6o2628rk58uqjs852fl6p0mbdij4nna.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.qualnotes.qualnote"
+              }
             }
           ]
         }
