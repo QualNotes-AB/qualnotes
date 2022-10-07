@@ -36,17 +36,24 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
 
   void play() {
     // assert(_mPlayerIsInited);
-    _isPlaying = true;
+    setState(() {
+      _isPlaying = true;
+    });
+
     if (!_mPlayer!.isPaused) {
       _mPlayer!
           .startPlayer(
               fromURI: widget.path,
               //codec: kIsWeb ? Codec.opusWebM : Codec.aacADTS,
               whenFinished: () {
-                _isPlaying = false;
+                setState(() {
+                  _isPlaying = false;
+                });
               })
           .then((value) {
-        setState(() {});
+        // setState(() {
+        //   _isPlaying = false;
+        // });
       });
     } else {
       _mPlayer!.resumePlayer().then((value) {
@@ -58,7 +65,9 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   void stopPlayer() {
     _isPlaying = false;
     _mPlayer!.stopPlayer().then((value) {
-      setState(() {});
+      setState(() {
+        _isPlaying = false;
+      });
     });
   }
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:camera/camera.dart';
 import 'package:get/get.dart';
@@ -33,7 +34,11 @@ class CameraGetxController extends GetxController {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       durationInSeconds.value++;
     });
-    await cameraController.startVideoRecording();
+    try {
+      await cameraController.startVideoRecording();
+    } on Exception catch (e) {
+      log(e.toString());
+    }
   }
 
   Future<XFile?> stopVideoRecording({bool isFinish = false}) async {
@@ -46,9 +51,14 @@ class CameraGetxController extends GetxController {
     if (isFinish) {
       durationInSeconds.value = 0;
     }
-    XFile? video = await cameraController.stopVideoRecording();
-    videoPaths.add(video.path);
-    return video;
+    try {
+      XFile? video = await cameraController.stopVideoRecording();
+      videoPaths.add(video.path);
+      return video;
+    } on Exception catch (e) {
+      log(e.toString());
+    }
+    return null;
   }
 
   Future<void> takePicture() async {

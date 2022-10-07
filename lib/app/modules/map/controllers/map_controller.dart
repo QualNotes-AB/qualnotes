@@ -71,11 +71,16 @@ class MapGetxController extends GetxController {
   void saveRouteLocaly(String title) async {
     final cameraGetx = Get.find<CameraGetxController>();
     final audioGetx = Get.find<AudioRecordingController>();
+    final recordingType = type.value == RecordingType.audio
+        ? 'Audio recording'
+        : type.value == RecordingType.video
+            ? 'Video recording'
+            : 'Map only';
     Project route = Project(
       title: title,
       description: '',
       totalTime: duration,
-      type: 'recording',
+      type: recordingType,
       author: FirebaseAuth.instance.currentUser!.displayName ?? 'No username',
       date: DateTime.now(),
       distance: calculateRouteDistance(routePoints.value),
