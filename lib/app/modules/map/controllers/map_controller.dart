@@ -10,7 +10,7 @@ import 'package:location/location.dart';
 import 'package:qualnote/app/data/models/project_model.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
-import 'package:qualnote/app/modules/map/controllers/camera_controller.dart';
+import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/utils/distance_helper.dart';
 
 class MapGetxController extends GetxController {

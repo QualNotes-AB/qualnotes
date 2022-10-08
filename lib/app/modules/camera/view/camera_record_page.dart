@@ -1,0 +1,260 @@
+import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:qualnote/app/config/colors.dart';
+import 'package:qualnote/app/config/text_styles.dart';
+import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
+import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
+import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
+
+class CameraRecordPage extends StatefulWidget {
+  final bool isPhoto;
+  const CameraRecordPage({super.key, this.isPhoto = false});
+
+  @override
+  State<CameraRecordPage> createState() => _CameraRecordPageState();
+}
+
+class _CameraRecordPageState extends State<CameraRecordPage> {
+  final controller = Get.find<CameraGetxController>();
+  bool secondPress = false;
+  XFile? file;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Obx(() {
+            return controller.isInitialized.value
+                ? controller.cameraController.buildPreview()
+                : Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.camera_alt_outlined),
+                        Text(
+                          'Camera not available',
+                          style: AppTextStyle.bold12Grey,
+                        )
+                      ],
+                    ),
+                  );
+          }),
+          //controller.buildCameraWidget(),
+          Visibility(
+            visible: secondPress && !widget.isPhoto,
+            child: Container(
+              margin: const EdgeInsets.only(top: 30),
+              padding: const EdgeInsets.all(5),
+              decoration: const BoxDecoration(
+                color: AppColors.red,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(5),
+                  bottomRight: Radius.circular(5),
+                ),
+              ),
+              child: const Text(
+                'REC',
+                style: AppTextStyle.regular13White,
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 30, right: 20),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  FloatingActionButton(
+                    heroTag: 'return',
+                    child: const Icon(
+                      Icons.keyboard_arrow_left_rounded,
+                      color: AppColors.black,
+                      size: 30,
+                    ),
+                    backgroundColor: AppColors.white,
+                    onPressed: () {
+                      if (controller.cameraController.value.isRecordingVideo ||
+                          controller.cameraController.value.isTakingPicture) {
+                        return;
+                      }
+                      Get.back();
+                    },
+                  ),
+                  Obx(
+                    () => Padding(
+                      padding: const EdgeInsets.only(bottom: 30),
+                      child: FloatingActionButton(
+                        heroTag: 'flash',
+                        child: Icon(
+                          controller.flashMode.value == FlashMode.off
+                              ? Icons.flash_off
+                              : controller.flashMode.value == FlashMode.torch
+                                  ? Icons.flash_on
+                                  : Icons.flash_auto,
+                          color: AppColors.black,
+                          size: 30,
+                        ),
+                        backgroundColor: AppColors.white,
+                        onPressed: () async {
+                          await controller.toggleFlashMode();
+                        },
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 45),
+                    child: FloatingActionButton(
+                      heroTag: 'record',
+                      child: Icon(
+                        widget.isPhoto
+                            ? Icons.photo_camera
+                            : secondPress
+                                ? Icons.radio_button_on
+                                : Icons.radio_button_off,
+                        color: AppColors.red,
+                        size: widget.isPhoto ? 35 : 55,
+                      ),
+                      backgroundColor: AppColors.white,
+                      onPressed: () async {
+                        if (widget.isPhoto) {
+                          //Take a photo
+                          await controller.takePicture();
+                          Get.back();
+                          if (Get.find<MapGetxController>().type.value ==
+                              RecordingType.video) {
+                            controller.startVideoRecording();
+                          }
+                          return;
+                        }
+                        //Record a video
+                        secondPress
+                            ? {
+                                file = await controller.stopVideoRecording(),
+                                if (file != null)
+                                  {
+                                    Get.find<AddMediaController>()
+                                        .addVideo(file!)
+                                  },
+                                Get.back(),
+                                controller.startVideoRecording(),
+                              }
+                            : controller
+                                .startVideoRecording()
+                                .then((value) => setState(() {
+                                      secondPress = true;
+                                    }));
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 30),
+                    child: FloatingActionButton(
+                      heroTag: 'switch',
+                      child: const Icon(
+                        Icons.autorenew_outlined,
+                        color: AppColors.black,
+                        size: 30,
+                      ),
+                      backgroundColor: AppColors.white,
+                      onPressed: () async {
+                        await controller.switchCamera();
+                      },
+                    ),
+                  ),
+                  FloatingActionButton(
+                    heroTag: 'quality',
+                    child: const Icon(
+                      Icons.camera_enhance,
+                      color: AppColors.black,
+                      size: 30,
+                    ),
+                    backgroundColor: AppColors.white,
+                    onPressed: () async {
+                      Get.dialog(
+                        Dialog(
+                          child: Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text(
+                                  'Change camera quality',
+                                  textAlign: TextAlign.center,
+                                  style: AppTextStyle.regular16Black,
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    controller.changeCameraQuality(
+                                        ResolutionPreset.max);
+                                    Get.back();
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Text('Max'),
+                                    ],
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    controller.changeCameraQuality(
+                                        ResolutionPreset.high);
+                                    Get.back();
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Text('High'),
+                                    ],
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    controller.changeCameraQuality(
+                                        ResolutionPreset.medium);
+                                    Get.back();
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Text('Medium'),
+                                    ],
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    controller.changeCameraQuality(
+                                        ResolutionPreset.low);
+                                    Get.back();
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Text('Low'),
+                                    ],
+                                  ),
+                                ),
+                                const Text(
+                                  'Keep in mind that higher quality will take up more memory',
+                                  textAlign: TextAlign.center,
+                                  style: AppTextStyle.regular12Red,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

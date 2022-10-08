@@ -8,12 +8,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
+import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_details_sheet.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_recorder.dart';
+import 'package:qualnote/app/modules/camera/view/camera_window.dart';
+import 'package:qualnote/app/modules/camera/view/video_player.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
-import 'package:qualnote/app/modules/map/views/widgets/audio_details_sheet.dart';
-import 'package:qualnote/app/modules/map/views/widgets/camera_window.dart';
 import 'package:qualnote/app/modules/map/views/widgets/nav_bar.dart';
-import 'package:qualnote/app/modules/map/views/widgets/video_player.dart';
 
 import '../controllers/map_controller.dart';
 
@@ -68,8 +68,11 @@ class MapView extends GetView<MapGetxController> {
               ],
             );
           }),
-          CameraWindow(controller: controller),
-          const AudioMapping(),
+          Obx(() => controller.type.value == RecordingType.video
+              ? CameraWindow(controller: controller)
+              : controller.type.value == RecordingType.audio
+                  ? const AudioMapping()
+                  : const SizedBox()),
           NavBar(),
         ],
       ),

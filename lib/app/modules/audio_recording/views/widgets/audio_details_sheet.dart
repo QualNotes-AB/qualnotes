@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
+import 'package:qualnote/app/modules/audio_recording/views/widgets/custom_audio_player.dart';
 import 'package:qualnote/app/modules/map/views/widgets/blue_text_button.dart';
-import 'package:qualnote/app/modules/map/views/widgets/custom_audio_player.dart';
 import 'package:qualnote/app/modules/map/views/widgets/custom_checkbox_tile.dart';
 import 'package:qualnote/app/routes/app_pages.dart';
 import 'package:qualnote/app/utils/datetime_helper.dart';
@@ -115,7 +115,10 @@ class AudioDetailsCard extends StatelessWidget {
                           ),
                           BlueTextButton(
                             title: 'RECORD ORAL CONSENT',
-                            onPressed: () {},
+                            onPressed: () {
+                              audioRecordingController.isConsent = true;
+                              Get.toNamed(Routes.AUDIO_RECORDING);
+                            },
                           ),
                         ],
                       ),

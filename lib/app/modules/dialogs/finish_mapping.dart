@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
-import 'package:qualnote/app/modules/map/controllers/camera_controller.dart';
+import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/routes/app_pages.dart';
 

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:qualnote/app/modules/map/controllers/camera_controller.dart';
+import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 
 import '../controllers/home_controller.dart';

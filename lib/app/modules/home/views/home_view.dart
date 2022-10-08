@@ -10,6 +10,7 @@ import 'package:qualnote/app/modules/home/views/widgets/home_search.dart';
 import 'package:qualnote/app/modules/home/views/widgets/project_list_tile.dart';
 import 'package:qualnote/app/modules/home/views/widgets/tab_switch.dart';
 import 'package:qualnote/app/routes/app_pages.dart';
+
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -52,9 +53,7 @@ class HomeView extends GetView<HomeController> {
             title: 'New Qual Notes Project',
           ),
           AddButton(
-            onPressed: () {
-              Get.toNamed(Routes.AUDIO_RECORDING);
-            },
+            onPressed: () {},
             title: 'Upload docx pdf to My Files',
           ),
           AddButton(

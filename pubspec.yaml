@@ -24,7 +24,7 @@ dependencies:
   flutter_map: ^3.0.0
   location: ^4.4.0
   latlong2: ^0.8.1
-  image_picker: ^0.8.5+3
+  #image_picker: ^0.8.5+3
   camera: ^0.10.0+3
   flutter_sound: ^9.2.13
   audioplayers: ^1.1.0

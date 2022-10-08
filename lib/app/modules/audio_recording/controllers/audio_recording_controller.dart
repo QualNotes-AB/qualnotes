@@ -1,16 +1,17 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:audio_session/audio_session.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qualnote/app/data/models/project_model.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_recorder.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:intl/intl.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 
 final dateFormat = DateFormat('yyMMddhhmmss');
@@ -32,7 +33,9 @@ class AudioRecordingController extends GetxController {
   FlutterSoundRecorder? mRecorder = FlutterSoundRecorder();
   bool mRecorderIsInited = false;
   RxBool isRecording = false.obs;
+  bool isConsent = false;
   List<String> audioPaths = [];
+  List<String> consentPaths = [];
   late Directory appDocDir;
 
   void toggleConsentInRecording() =>
@@ -141,6 +144,12 @@ class AudioRecordingController extends GetxController {
           if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
             startRecorder(isMainRecording: true);
           }
+          return;
+        }
+        if (isConsent) {
+          consentPaths.add(_mainPath);
+          _timer.cancel();
+          isConsent = false;
           return;
         }
         _timer.cancel();
