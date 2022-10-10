@@ -6,11 +6,11 @@ For the firebase authentication to work properly on your machine, you will need 
 and add it to the android project settings.
 To generate a debug SHA1 key, depending on you system, 
 
-for Windows you will run this command in your terminal
-keytool -list -v -keystore "\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
+for Windows you will run this command in your terminal 
+"keytool -list -v -keystore "\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android"
 
 for MacOS run 
-keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+"keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android"
 
 in the terminal you should see a section Certificate fingerprints under which is SHA1 labeled
 if you get an error saying that keystore can not be found or something similar, you need to install java sdk from their website
