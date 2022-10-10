@@ -5,18 +5,18 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/text_styles.dart';
-import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
-import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:video_player/video_player.dart';
 
 class CameraGetxController extends GetxController {
-  MapGetxController mapGetxController = Get.find<MapGetxController>();
   late List<CameraDescription> cameras;
   late CameraController cameraController;
 
   List<String> videoPaths = [];
   RxBool minimizedCamera = false.obs;
   RxBool isInitialized = false.obs;
+  RxBool hasConsent = false.obs;
+  RxBool consentInRecording = false.obs;
+  RxBool consentRecorded = false.obs;
   Rx<FlashMode> flashMode = FlashMode.off.obs;
   XFile? imageFile;
   XFile? videoFile;
@@ -24,6 +24,12 @@ class CameraGetxController extends GetxController {
   int cameraId = 0;
   RxInt durationInSeconds = 0.obs;
   VideoPlayerController? videoController;
+
+  void toggleConsentInRecording() =>
+      consentInRecording.value = !consentInRecording.value;
+
+  void toggleConsentRecorded() =>
+      consentRecorded.value = !consentRecorded.value;
 
   void toggleMinizedCamera() => minimizedCamera.value = !minimizedCamera.value;
 
@@ -44,10 +50,23 @@ class CameraGetxController extends GetxController {
           );
   }
 
-  Future<void> startVideoRecording() async {
+  void updateVideoRecording(String path) {
+    if (!consentInRecording.value || !consentRecorded.value) {
+      hasConsent.value = false;
+      return;
+    }
+
+    hasConsent.value = false;
+    consentInRecording.value = false;
+    consentRecorded.value = false;
+    Get.back();
+  }
+
+  Future<void> startVideoRecording({isMainRecording = false}) async {
     if (!isInitialized.value) {
       return;
     }
+
     if (!cameraController.value.isInitialized) {
       //Camera isn't initialised
       Get.snackbar('Camera', 'Error: select a camera first.');
@@ -56,6 +75,9 @@ class CameraGetxController extends GetxController {
     if (cameraController.value.isRecordingVideo) {
       // A recording is already started, do nothing.
       return;
+    }
+    if (isMainRecording) {
+      await changeCameraQuality(ResolutionPreset.high);
     }
 
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -91,21 +113,20 @@ class CameraGetxController extends GetxController {
     }
   }
 
-  Future<void> takePicture() async {
+  Future<XFile?> takePicture() async {
     if (!isInitialized.value) {
-      return;
+      return null;
     }
     if (cameraController.value.isTakingPicture) {
       // A capture is already pending, do nothing.
-      return;
+      return null;
     }
     if (cameraController.value.isRecordingVideo) {
       //If the camera is recording then stop the recording
       await stopVideoRecording();
     }
     try {
-      final XFile file = await cameraController.takePicture();
-      Get.find<AddMediaController>().addPhoto(file);
+      return await cameraController.takePicture();
     } on Exception catch (e) {
       log(e.toString());
       isInitialized.value = false;
@@ -113,6 +134,7 @@ class CameraGetxController extends GetxController {
       Get.back();
       init();
     }
+    return null;
   }
 
   Future<void> toggleFlashMode() async {
@@ -213,7 +235,7 @@ class CameraGetxController extends GetxController {
     cameras = await availableCameras();
     cameraController = CameraController(
       cameras.first,
-      ResolutionPreset.high,
+      ResolutionPreset.medium,
     );
     try {
       await cameraController.initialize();

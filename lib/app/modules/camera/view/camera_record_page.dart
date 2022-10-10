@@ -4,12 +4,13 @@ import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
-import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 
 class CameraRecordPage extends StatefulWidget {
   final bool isPhoto;
-  const CameraRecordPage({super.key, this.isPhoto = false});
+  final Function(String path) onDone;
+  const CameraRecordPage(
+      {super.key, this.isPhoto = false, required this.onDone});
 
   @override
   State<CameraRecordPage> createState() => _CameraRecordPageState();
@@ -40,7 +41,6 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
                     ),
                   );
           }),
-          //controller.buildCameraWidget(),
           Visibility(
             visible: secondPress && !widget.isPhoto,
             child: Container(
@@ -81,6 +81,11 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
                         return;
                       }
                       Get.back();
+
+                      if (Get.find<MapGetxController>().type.value ==
+                          RecordingType.video) {
+                        controller.startVideoRecording(isMainRecording: true);
+                      }
                     },
                   ),
                   Obx(
@@ -121,11 +126,15 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
                       onPressed: () async {
                         if (widget.isPhoto) {
                           //Take a photo
-                          await controller.takePicture();
+                          file = await controller.takePicture();
+                          if (file != null) {
+                            widget.onDone(file!.path);
+                          }
                           Get.back();
                           if (Get.find<MapGetxController>().type.value ==
                               RecordingType.video) {
-                            controller.startVideoRecording();
+                            controller.startVideoRecording(
+                                isMainRecording: true);
                           }
                           return;
                         }
@@ -135,11 +144,18 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
                                 file = await controller.stopVideoRecording(),
                                 if (file != null)
                                   {
-                                    Get.find<AddMediaController>()
-                                        .addVideo(file!)
+                                    if (file != null)
+                                      {widget.onDone(file!.path)}
+                                    // Get.find<AddMediaController>().addNote(
+                                    //     newNote: Note(path: file!.path))
                                   },
                                 Get.back(),
-                                controller.startVideoRecording(),
+                                if (Get.find<MapGetxController>().type.value ==
+                                    RecordingType.video)
+                                  {
+                                    controller.startVideoRecording(
+                                        isMainRecording: true)
+                                  }
                               }
                             : controller
                                 .startVideoRecording()

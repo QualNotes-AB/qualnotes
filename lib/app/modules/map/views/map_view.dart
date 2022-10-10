@@ -7,11 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
+import 'package:qualnote/app/data/models/project_model.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_details_sheet.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_recorder.dart';
 import 'package:qualnote/app/modules/camera/view/camera_window.dart';
-import 'package:qualnote/app/modules/camera/view/video_player.dart';
+import 'package:qualnote/app/modules/camera/view/video_bottom_sheet.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/nav_bar.dart';
 
@@ -23,7 +24,7 @@ class MapView extends GetView<MapGetxController> {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     Get.find<AddMediaController>();
-
+    Get.find<AudioRecordingController>();
     return Scaffold(
       body: Stack(
         children: [
@@ -81,8 +82,10 @@ class MapView extends GetView<MapGetxController> {
 
   List<Marker> get markers {
     List<Marker> markers = [];
+
     //create all photo markers
-    markers.addAll(controller.photoNotes
+    markers.addAll(controller.notes
+        .where((element) => element.type == NoteType.photo.toString())
         .map(
           (element) => Marker(
             point: element.coordinate!,
@@ -106,22 +109,33 @@ class MapView extends GetView<MapGetxController> {
         )
         .toList());
     //create all video markers
-    markers.addAll(controller.videoNotes
+    markers.addAll(controller.notes
+        .where((element) => element.type == NoteType.video.toString())
         .map(
           (element) => Marker(
             point: element.coordinate!,
             builder: (context) {
               return TextButton(
                   onPressed: () {
-                    Get.to(VideoPlayerWidget(path: element.path!));
+                    Get.bottomSheet(
+                      VideoBottomSheet(path: element.path!),
+                      isScrollControlled: true,
+                      barrierColor: Colors.transparent,
+                    );
                   },
-                  child: const Icon(Icons.videocam));
+                  child: Icon(
+                    Icons.videocam,
+                    color: element.hasConsent != true
+                        ? AppColors.red
+                        : AppColors.blue,
+                  ));
             },
           ),
         )
         .toList());
     //create all audio markers
-    markers.addAll(controller.audioNotes
+    markers.addAll(controller.notes
+        .where((element) => element.type == NoteType.audio.toString())
         .map(
           (element) => Marker(
             height: 55,
@@ -169,6 +183,7 @@ class MapView extends GetView<MapGetxController> {
           ),
         )
         .toList());
+
     return markers;
   }
 }

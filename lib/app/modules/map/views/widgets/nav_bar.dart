@@ -46,14 +46,26 @@ class NavBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    const NavButton(
-                      onPressed: pausedDialog,
-                      title: 'Pause',
-                      icon: Icon(
-                        Icons.pause,
-                        size: 34,
-                        color: AppColors.white,
-                      ),
+                    Obx(
+                      () => mapGetxController.isMapping.value
+                          ? const NavButton(
+                              onPressed: pausedDialog,
+                              title: 'Pause',
+                              icon: Icon(
+                                Icons.pause,
+                                size: 34,
+                                color: AppColors.white,
+                              ),
+                            )
+                          : NavButton(
+                              onPressed: () => Get.back(),
+                              title: 'Back',
+                              icon: const Icon(
+                                Icons.keyboard_arrow_left_rounded,
+                                size: 34,
+                                color: AppColors.white,
+                              ),
+                            ),
                     ),
                     const NavButton(
                       onPressed: finishedDialog,

@@ -8,9 +8,11 @@ import 'package:qualnote/app/modules/home/views/project_overview_view.dart';
 
 class ProjectListTile extends StatelessWidget {
   final String title;
+  final String id;
   const ProjectListTile({
     Key? key,
     required this.title,
+    required this.id,
   }) : super(key: key);
 
   @override
@@ -22,7 +24,7 @@ class ProjectListTile extends StatelessWidget {
         Expanded(
           child: TextButton(
             onPressed: () async {
-              Project? project = await Get.find<HiveDb>().getProject(title);
+              Project? project = await Get.find<HiveDb>().getProject(id);
               if (project != null) {
                 Get.to(() => ProjectOverviewView(project));
               }

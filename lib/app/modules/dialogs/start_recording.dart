@@ -7,6 +7,8 @@ import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 
 startRecordingDialog() {
   var mapGetxController = Get.find<MapGetxController>();
+  Get.find<CameraGetxController>();
+  //Get.find<AudioRecordingController>().openTheRecorder();
   mapGetxController.isMapping.value
       ? Get.snackbar(
           'Already recording', 'Recording method has already been selected')
@@ -38,11 +40,13 @@ startRecordingDialog() {
                   ),
                   Expanded(
                     child: TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Get.back();
                         mapGetxController
                             .selectRecordingType(RecordingType.audio);
                         mapGetxController.startMapping();
+                        await Get.find<AudioRecordingController>()
+                            .openTheRecorder();
                         Get.find<AudioRecordingController>()
                             .startRecorder(isMainRecording: true);
                       },
@@ -64,7 +68,7 @@ startRecordingDialog() {
                             .selectRecordingType(RecordingType.video);
                         mapGetxController.startMapping();
                         await Get.find<CameraGetxController>()
-                            .startVideoRecording();
+                            .startVideoRecording(isMainRecording: true);
                       },
                       child: const Center(
                         child: Text(

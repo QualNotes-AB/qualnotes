@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,7 @@ import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/utils/distance_helper.dart';
+import 'package:qualnote/app/utils/id_generator.dart';
 
 class MapGetxController extends GetxController {
   MapController mapController = MapController();
@@ -26,9 +28,7 @@ class MapGetxController extends GetxController {
   RxBool rebuild = false.obs;
   Rx<RecordingType> type = RecordingType.justMapping.obs;
   RxList<LatLng> routePoints = <LatLng>[].obs;
-  RxList<CameraMedia> photoNotes = <CameraMedia>[].obs;
-  RxList<CameraMedia> videoNotes = <CameraMedia>[].obs;
-  RxList<AudioMedia> audioNotes = <AudioMedia>[].obs;
+  RxList<Note> notes = <Note>[].obs;
 
   Future<LatLng> getCurrentLocation() async {
     Location _location = Location();
@@ -68,33 +68,32 @@ class MapGetxController extends GetxController {
     isPreview.value = false;
   }
 
-  void saveRouteLocaly(String title) async {
+  Future<Project> saveRouteLocaly(String title) async {
     final cameraGetx = Get.find<CameraGetxController>();
     final audioGetx = Get.find<AudioRecordingController>();
-    final recordingType = type.value == RecordingType.audio
-        ? 'Audio recording'
-        : type.value == RecordingType.video
-            ? 'Video recording'
-            : 'Map only';
-    Project route = Project(
+
+    Project newProject = Project(
+      id: getRandomString(20),
       title: title,
       description: '',
       totalTime: duration,
-      type: recordingType,
+      type: type.value.toString(),
       author: FirebaseAuth.instance.currentUser!.displayName ?? 'No username',
       date: DateTime.now(),
       distance: calculateRouteDistance(routePoints.value),
-      photos: photoNotes.value,
-      videos: videoNotes.value,
-      audios: audioNotes.value,
+      notes: notes.value,
       routePoints: routePoints.value,
       routeVideos: cameraGetx.videoPaths,
       routeAudios: audioGetx.audioPaths,
     );
-    await Get.find<HiveDb>().saveProject(route);
+
+    await Get.find<HiveDb>().saveProject(newProject);
+
     cameraGetx.videoPaths.clear();
     audioGetx.audioPaths.clear();
+    notes.clear();
     resetFields();
+    return newProject;
   }
 
   void selectProject(Project project) {
@@ -103,12 +102,8 @@ class MapGetxController extends GetxController {
     isMapping.value = false;
     routePoints.clear();
     routePoints.addAll(project.routePoints!);
-    photoNotes.clear();
-    photoNotes.addAll(project.photos!);
-    videoNotes.clear();
-    videoNotes.addAll(project.videos!);
-    audioNotes.clear();
-    audioNotes.addAll(project.audios!);
+    notes.clear();
+    notes.value.addAll(project.notes!);
   }
 
   void triggerRebuild() => rebuild.value = !rebuild.value;
@@ -117,9 +112,7 @@ class MapGetxController extends GetxController {
     duration = 0;
     isMapping.value = false;
     routePoints.clear();
-    photoNotes.clear();
-    videoNotes.clear();
-    audioNotes.clear();
+    notes.clear();
   }
 
   Future<void> init() async {

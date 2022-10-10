@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
+import 'package:qualnote/app/data/models/project_model.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
+import 'package:qualnote/app/modules/audio_recording/views/audio_recording_view.dart';
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/camera/view/camera_record_page.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
-import 'package:qualnote/app/routes/app_pages.dart';
 
 addMediaDialog() {
   var addController = Get.find<AddMediaController>();
@@ -43,9 +44,19 @@ addMediaDialog() {
                   Expanded(
                     child: TextButton(
                       onPressed: () {
-                        cameraGetxController.stopVideoRecording();
+                        if (mapController.type.value == RecordingType.video) {
+                          cameraGetxController.stopVideoRecording();
+                        }
                         Get.back();
-                        Get.to(() => const CameraRecordPage(isPhoto: true));
+                        Get.to(() => CameraRecordPage(
+                              isPhoto: true,
+                              onDone: (path) => addController.addNote(
+                                newNote: Note(
+                                  path: path,
+                                  type: NoteType.photo.toString(),
+                                ),
+                              ),
+                            ));
                       },
                       child: const Center(
                         child: Text(
@@ -60,9 +71,19 @@ addMediaDialog() {
                   Expanded(
                     child: TextButton(
                       onPressed: () async {
-                        cameraGetxController.stopVideoRecording();
+                        if (mapController.type.value == RecordingType.video) {
+                          cameraGetxController.stopVideoRecording();
+                        }
                         Get.back();
-                        Get.to(() => const CameraRecordPage());
+                        Get.to(() => CameraRecordPage(
+                              onDone: (path) => addController.addNote(
+                                newNote: Note(
+                                  path: path,
+                                  type: NoteType.video.toString(),
+                                  hasConsent: false,
+                                ),
+                              ),
+                            ));
                       },
                       child: const Center(
                         child: Text(
@@ -76,9 +97,12 @@ addMediaDialog() {
                       height: 1, thickness: 1, color: AppColors.lightGrey),
                   Expanded(
                     child: TextButton(
-                      onPressed: () {
-                        audioGetxController.stopRecorder(isFinish: true);
-                        Get.offAndToNamed(Routes.AUDIO_RECORDING);
+                      onPressed: () async {
+                        if (mapController.type.value == RecordingType.audio) {
+                          await audioGetxController.stopRecorder(
+                              isFinish: true);
+                        }
+                        Get.off(() => const AudioRecordingView());
                       },
                       child: const Center(
                         child: Text(

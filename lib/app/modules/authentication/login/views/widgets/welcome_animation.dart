@@ -37,8 +37,9 @@ class _WelcomeAnimationState extends State<WelcomeAnimation>
           await Future.delayed(const Duration(seconds: 2));
           _animationController.reverse();
           await Future.delayed(const Duration(seconds: 1));
+
           Get.offAndToNamed(Routes.LOGIN);
-          // Get.offAndToNamed(Routes.HOME);
+          //Get.offAndToNamed(Routes.HOME);
         }
       },
     );

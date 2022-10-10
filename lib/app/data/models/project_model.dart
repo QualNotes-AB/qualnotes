@@ -1,6 +1,7 @@
 import 'package:latlong2/latlong.dart';
 
 class Project {
+  String? id;
   String? title;
   String? description;
   int? totalTime;
@@ -8,14 +9,13 @@ class Project {
   String? author;
   DateTime? date;
   double? distance;
-  List<CameraMedia>? photos;
-  List<CameraMedia>? videos;
-  List<AudioMedia>? audios;
+  List<Note>? notes;
   List<LatLng>? routePoints;
   List<String>? routeVideos;
   List<String>? routeAudios;
 
   Project({
+    required this.id,
     this.title,
     this.description,
     this.totalTime,
@@ -23,15 +23,14 @@ class Project {
     this.author,
     this.date,
     this.distance,
-    this.photos,
-    this.videos,
-    this.audios,
+    this.notes,
     this.routePoints,
     this.routeVideos,
     this.routeAudios,
   });
 
   Project.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     title = json['title'];
     description = json['description'];
     totalTime = json['totalTime'];
@@ -39,22 +38,11 @@ class Project {
     author = json['author'];
     date = json['date'];
     distance = json['distance'];
-    if (json['photos'] != null) {
-      photos = <CameraMedia>[];
-      json['photos'].forEach((v) {
-        photos?.add(CameraMedia.fromJson(v));
-      });
-    }
-    if (json['videos'] != null) {
-      videos = <CameraMedia>[];
-      json['videos'].forEach((v) {
-        videos?.add(CameraMedia.fromJson(v));
-      });
-    }
-    if (json['audios'] != null) {
-      audios = <AudioMedia>[];
-      json['audios'].forEach((v) {
-        audios?.add(AudioMedia.fromJson(v));
+
+    if (json['notes'] != null) {
+      notes = <Note>[];
+      json['notes'].forEach((v) {
+        notes?.add(Note.fromJson(v));
       });
     }
     if (json['routePoints'] != null) {
@@ -86,14 +74,9 @@ class Project {
     data['author'] = author;
     data['date'] = date;
     data['distance'] = distance;
-    if (photos != null) {
-      data['photos'] = photos?.map((v) => v.toJson()).toList();
-    }
-    if (videos != null) {
-      data['videos'] = videos?.map((v) => v.toJson()).toList();
-    }
-    if (audios != null) {
-      data['audios'] = audios?.map((v) => v.toJson()).toList();
+
+    if (notes != null) {
+      data['notes'] = notes?.map((v) => v.toJson()).toList();
     }
     if (routePoints != null) {
       data['routePoints'] = routePoints?.map((v) => v.toJson()).toList();
@@ -108,32 +91,7 @@ class Project {
   }
 }
 
-class CameraMedia {
-  String? title;
-  String? description;
-  LatLng? coordinate;
-  String? path;
-
-  CameraMedia({this.title, this.description, this.coordinate, this.path});
-
-  CameraMedia.fromJson(Map<String, dynamic> json) {
-    title = json['title'];
-    description = json['description'];
-    coordinate = LatLng.fromJson(json['coordinate']);
-    path = json['path'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final data = <String, dynamic>{};
-    data['title'] = title;
-    data['description'] = description;
-    data['coordinate'] = coordinate!.toJson();
-    data['path'] = path;
-    return data;
-  }
-}
-
-class AudioMedia {
+class Note {
   String? title;
   String? description;
   LatLng? coordinate;
@@ -141,17 +99,20 @@ class AudioMedia {
   String? author;
   int? duration;
   bool? hasConsent;
+  String? type;
 
-  AudioMedia(
-      {this.title,
-      this.description,
-      this.coordinate,
-      this.path,
-      this.author,
-      this.duration,
-      this.hasConsent});
+  Note({
+    this.title,
+    this.description,
+    this.coordinate,
+    this.path,
+    this.author,
+    this.duration,
+    this.hasConsent,
+    this.type,
+  });
 
-  AudioMedia.fromJson(Map<String, dynamic> json) {
+  Note.fromJson(Map<String, dynamic> json) {
     title = json['title'];
     description = json['description'];
     coordinate = LatLng.fromJson(json['coordinate']);
@@ -159,6 +120,7 @@ class AudioMedia {
     author = json['author'];
     duration = json['duration'];
     hasConsent = json['hasConsent'];
+    type = json['type'];
   }
 
   Map<String, dynamic> toJson() {
@@ -170,25 +132,9 @@ class AudioMedia {
     data['author'] = author;
     data['duration'] = duration;
     data['hasConsent'] = hasConsent;
+    data['type'] = type;
     return data;
   }
 }
 
-// class RoutePoint {
-//   double? latitude;
-//   double? longitute;
-
-//   RoutePoint({this.latitude, this.longitute});
-
-//   RoutePoint.fromJson(Map<String, dynamic> json) {
-//     latitude = json['latitude'];
-//     longitute = json['longitute'];
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     final data = <String, dynamic>{};
-//     data['latitude'] = latitude;
-//     data['longitute'] = longitute;
-//     return data;
-//   }
-// }
+enum NoteType { video, audio, photo, other }

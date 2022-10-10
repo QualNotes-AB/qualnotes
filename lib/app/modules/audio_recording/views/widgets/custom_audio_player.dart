@@ -5,7 +5,9 @@ import '../../../../config/colors.dart';
 
 class CustomAudioPlayer extends StatefulWidget {
   final String path;
-  const CustomAudioPlayer({super.key, required this.path});
+  final int duration;
+  const CustomAudioPlayer(
+      {super.key, required this.path, required this.duration});
 
   @override
   State<CustomAudioPlayer> createState() => _CustomAudioPlayerState();
@@ -86,6 +88,13 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     }
   }
 
+  void playerForward(double value) async {
+    if (_mPlayerIsInited && _mPlayer != null) {
+      _mPlayer!.updateProgress(duration: widget.duration, position: 4);
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -116,9 +125,14 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                   size: 60,
                 ),
               ),
-              const Icon(
-                Icons.forward_30_rounded,
-                size: 35,
+              TextButton(
+                onPressed: () {
+                  playerForward(21.2);
+                },
+                child: const Icon(
+                  Icons.forward_30_rounded,
+                  size: 35,
+                ),
               ),
             ],
           ),

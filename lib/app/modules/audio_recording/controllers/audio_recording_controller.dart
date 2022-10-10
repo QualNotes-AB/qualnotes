@@ -29,11 +29,12 @@ class AudioRecordingController extends GetxController {
   RxInt mainDuration = 0.obs;
   Timer _timer = Timer(const Duration(days: 1), () {});
   Codec _codec = Codec.aacMP4;
-  String _mainPath = 'tau_file.mp4';
+  String _mainPath = '';
   FlutterSoundRecorder? mRecorder = FlutterSoundRecorder();
   bool mRecorderIsInited = false;
   RxBool isRecording = false.obs;
   bool isConsent = false;
+  bool isRetake = false;
   List<String> audioPaths = [];
   List<String> consentPaths = [];
   late Directory appDocDir;
@@ -46,13 +47,16 @@ class AudioRecordingController extends GetxController {
 
   Future<void> saveAudioPath(File file, int duration) async {
     if (file.path != audioPath.value) {
-      await mediaController.addAudio(
-        audio: AudioMedia(path: file.path, duration: duration),
+      await mediaController.addNote(
+        newNote: Note(
+          path: file.path,
+          duration: duration,
+          type: NoteType.audio.toString(),
+        ),
       );
       return;
     }
-    mediaController.updateAudioDetails(
-        title.value, description.value, duration);
+    mediaController.updateNote(title.value, description.value, duration);
   }
 
   void saveAudioDetails() {
@@ -64,13 +68,12 @@ class AudioRecordingController extends GetxController {
       Get.back();
       return;
     }
-    mediaController.updateAudioDetails(
-        title.value, description.value, duration.value);
+    mediaController.updateNote(title.value, description.value, duration.value);
     resetFields();
     Get.back();
   }
 
-  void selectAudioNote(AudioMedia audioNote) {
+  void selectAudioNote(Note audioNote) {
     audioPath.value = audioNote.path!;
     title.value = audioNote.title!;
     description.value = audioNote.description ?? '';
@@ -121,14 +124,17 @@ class AudioRecordingController extends GetxController {
       });
       isRecording.value = true;
     }
-    _mainPath =
-        '${appDocDir.path}/audio${dateFormat.format(DateTime.now())}.mp4'
-            .removeAllWhitespace;
+    if (!isRetake) {
+      _mainPath =
+          '${appDocDir.path}/audio${dateFormat.format(DateTime.now())}.mp4'
+              .removeAllWhitespace;
+    }
     mRecorder!.startRecorder(
       toFile: _mainPath,
       codec: _codec,
       audioSource: theSource,
     );
+    isRetake = false;
   }
 
   Future<void> stopRecorder({bool isFinish = false}) async {

@@ -4,6 +4,7 @@ import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
+import 'package:qualnote/app/utils/datetime_helper.dart';
 
 class CameraWindow extends StatelessWidget {
   const CameraWindow({
@@ -80,7 +81,7 @@ class CameraWindow extends StatelessWidget {
                             SizedBox(
                               width: 130,
                               height: 200,
-                              child: cameraGetx.cameraController.buildPreview(),
+                              child: cameraGetx.buildCameraWidget(),
                             ),
                           ],
                         ),
@@ -89,12 +90,5 @@ class CameraWindow extends StatelessWidget {
             : const SizedBox();
       }),
     );
-  }
-
-  String formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 }

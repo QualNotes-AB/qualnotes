@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -19,7 +20,8 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
-  <meta name="google-signin-client_id" content="925443941653-ohc9mhf8pf3t7t7vffa5umackkqftqo6.apps.googleusercontent.com" />
+  <meta name="google-signin-client_id"
+    content="925443941653-ohc9mhf8pf3t7t7vffa5umackkqftqo6.apps.googleusercontent.com" />
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -27,7 +29,7 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
 
   <title>qualnote</title>
   <link rel="manifest" href="manifest.json">
@@ -39,6 +41,7 @@
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
+
 <body>
   <script type="module">
     // Import the functions you need from the SDKs you need
@@ -50,31 +53,31 @@
 
     // Your web app's Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyAIoe_GNMbz4QjWRNTOvhNnSCeuwGaN0No",
-  authDomain: "qualnotes-2b65a.firebaseapp.com",
-  projectId: "qualnotes-2b65a",
-  storageBucket: "qualnotes-2b65a.appspot.com",
-  messagingSenderId: "866644776284",
-  appId: "1:866644776284:web:1764f77a1c80ab8257dd99",
-  measurementId: "G-MV63DERLGZ"
+      apiKey: "AIzaSyAp8g5hrKqDQGwLhQCc3M1SWSKeHaYhY6c",
+      authDomain: "qualnotesdev.firebaseapp.com",
+      projectId: "qualnotesdev",
+      storageBucket: "qualnotesdev.appspot.com",
+      messagingSenderId: "925443941653",
+      appId: "1:925443941653:web:02cf360eadf535d093351c"
     };
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
   </script>
   <script>
-    window.addEventListener('load', function(ev) {
+    window.addEventListener('load', function (ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         }
-      }).then(function(engineInitializer) {
+      }).then(function (engineInitializer) {
         return engineInitializer.initializeEngine();
-      }).then(function(appRunner) {
+      }).then(function (appRunner) {
         return appRunner.runApp();
       });
     });
   </script>
 </body>
+
 </html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>925443941653-kpkhi1nma50pf1r5t6ovr5g289mlhltc.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.925443941653-kpkhi1nma50pf1r5t6ovr5g289mlhltc</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>925443941653-fopmn9g3t7tbb97kekt8sqb90q83cv89.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBOLhvA3Jc85ujXtsnADeXe_ogVwD8Q_qg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>925443941653</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.qualnotes.qualnote</string>
+	<key>PROJECT_ID</key>
+	<string>qualnotesdev</string>
+	<key>STORAGE_BUCKET</key>
+	<string>qualnotesdev.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:925443941653:ios:d675d5ac26786d1793351c</string>
+</dict>
+</plist>

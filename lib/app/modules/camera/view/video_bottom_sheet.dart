@@ -4,22 +4,19 @@ import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
-import 'package:qualnote/app/modules/audio_recording/views/widgets/custom_audio_player.dart';
+import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
+import 'package:qualnote/app/modules/camera/view/video_player.dart';
 import 'package:qualnote/app/modules/map/views/widgets/blue_text_button.dart';
 import 'package:qualnote/app/modules/map/views/widgets/custom_checkbox_tile.dart';
 import 'package:qualnote/app/routes/app_pages.dart';
-import 'package:qualnote/app/utils/datetime_helper.dart';
-import 'package:qualnote/app/utils/distance_helper.dart';
 
-class AudioDetailsCard extends StatelessWidget {
+class VideoBottomSheet extends StatelessWidget {
   final String path;
-  AudioDetailsCard({
-    Key? key,
-    required this.path,
-  }) : super(key: key);
+  VideoBottomSheet({super.key, required this.path});
   final AudioRecordingController audioRecordingController =
       Get.find<AudioRecordingController>();
-
+  final CameraGetxController cameraGetxController =
+      Get.find<CameraGetxController>();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -44,40 +41,19 @@ class AudioDetailsCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextField(
-                      minLines: 3,
-                      maxLines: 5,
-                      style: AppTextStyle.regular14Grey,
-                      onChanged: (value) {
-                        audioRecordingController.description.value = value;
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(0),
-                          borderSide: const BorderSide(
-                              color: Color(0xFF9E9E9E), width: 2),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: BlueTextButton(
+                            title: 'PLAY VIDEO',
+                            onPressed: () =>
+                                Get.to(VideoPlayerWidget(path: path)),
+                          ),
                         ),
-                        fillColor: const Color(0xFFF3F3F3),
-                        filled: true,
-                        hintText: 'Add a description to this audio...',
-                      ),
-                    ),
-                    CustomAudioPlayer(
-                      path: path,
-                      duration: audioRecordingController.duration.value,
-                    ),
-                    BlueTextButton(
-                      title: 'RETAKE AUDIO',
-                      onPressed: () {
-                        audioRecordingController.isRetake = true;
-                        Get.toNamed(Routes.AUDIO_RECORDING);
-                      },
-                    ),
-                    Obx(
-                      () => Text(
-                        'DETAILS: ${audioRecordingController.description.value} \nlength: ${convertTime(audioRecordingController.duration.value)}\nGPS ${convertLocation(audioRecordingController.location)}\nby ', //${FirebaseAuth.instance.currentUser!.displayName!}',
-                        style: AppTextStyle.regular14GreyHeight,
-                      ),
+                        BlueTextButton(title: 'RETAKE VIDEO', onPressed: () {}),
+                      ],
                     ),
                     const Text(
                       'Consent:',
@@ -86,22 +62,21 @@ class AudioDetailsCard extends StatelessWidget {
                     Obx(
                       () => CustomCheckboxTile(
                         title: 'I have it already',
-                        onCheckbox: (value) => audioRecordingController
+                        onCheckbox: (value) => cameraGetxController
                             .consentInRecording.value = value!,
                         onPressed: () =>
-                            audioRecordingController.toggleConsentInRecording(),
-                        value:
-                            audioRecordingController.consentInRecording.value,
+                            cameraGetxController.toggleConsentInRecording(),
+                        value: cameraGetxController.consentInRecording.value,
                       ),
                     ),
                     Obx(
                       () => CustomCheckboxTile(
                         title: 'I have it here',
-                        onCheckbox: (value) => audioRecordingController
-                            .consentRecorded.value = value!,
+                        onCheckbox: (value) =>
+                            cameraGetxController.consentRecorded.value = value!,
                         onPressed: () =>
-                            audioRecordingController.toggleConsentRecorded(),
-                        value: audioRecordingController.consentRecorded.value,
+                            cameraGetxController.toggleConsentRecorded(),
+                        value: cameraGetxController.consentRecorded.value,
                       ),
                     ),
                     Padding(
@@ -114,7 +89,9 @@ class AudioDetailsCard extends StatelessWidget {
                             child: BlueTextButton(
                                 title: 'SAVE',
                                 onPressed: () async {
-                                  audioRecordingController.saveAudioDetails();
+                                  // cameraGetxController
+                                  //     .updateVideoRecording(path);
+                                  Get.back();
                                   await SystemChrome.setEnabledSystemUIMode(
                                       SystemUiMode.immersiveSticky);
                                 }),

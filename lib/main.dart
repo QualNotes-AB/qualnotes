@@ -16,11 +16,10 @@ void main() async {
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: "AIzaSyAIoe_GNMbz4QjWRNTOvhNnSCeuwGaN0No",
-        appId: "1:866644776284:web:1764f77a1c80ab8257dd99",
-        messagingSenderId: "866644776284",
-        projectId: "qualnotes-2b65a",
-      ),
+          apiKey: "AIzaSyAp8g5hrKqDQGwLhQCc3M1SWSKeHaYhY6c",
+          projectId: "qualnotesdev",
+          messagingSenderId: "925443941653",
+          appId: "1:925443941653:web:02cf360eadf535d093351c"),
     );
   } else {
     await Firebase.initializeApp();
@@ -33,12 +32,6 @@ void main() async {
   await checkForLocationPermission();
   final mapController = Get.put(MapGetxController());
   await mapController.init();
-
-//  Get.find<CameraGetxController>();
-  // Get.lazyPut<CameraGetxController>(
-  //   () => CameraGetxController(),
-  //   fenix: true,
-  // );
 
   runApp(
     GetMaterialApp(

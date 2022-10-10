@@ -25,11 +25,13 @@ class HomeView extends GetView<HomeController> {
             offset: const Offset(-15, 0),
             child: TextButton(
               onPressed: () {
-                FirebaseAuth.instance.signOut();
+                if (FirebaseAuth.instance.currentUser != null) {
+                  FirebaseAuth.instance.signOut();
+                }
                 Get.toNamed(Routes.LOGIN);
               },
               child: SizedBox(
-                width: 100,
+                width: 110,
                 child: Row(
                   children: const [
                     Icon(
@@ -38,7 +40,7 @@ class HomeView extends GetView<HomeController> {
                       size: 40,
                     ),
                     Text(
-                      'back',
+                      'Sign out',
                       style: AppTextStyle.regular17Blue,
                     )
                   ],
@@ -62,9 +64,14 @@ class HomeView extends GetView<HomeController> {
           ),
           ListView(
             shrinkWrap: true,
-            children: controller.projects
-                .map((project) => ProjectListTile(title: project.title!))
-                .toList(),
+            children: [
+              ...controller.projects
+                  .map((project) =>
+                      ProjectListTile(title: project.title!, id: project.id!))
+                  .toList(),
+              const ProjectListTile(
+                  title: 'demo test', id: 'O5xTGxLP27tMS4dlAkzZ')
+            ],
           )
         ],
       ),
