@@ -8,7 +8,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
-import 'package:qualnote/app/data/models/project_model.dart';
+import 'package:qualnote/app/data/models/coordinate.dart';
+import 'package:qualnote/app/data/models/note.dart';
+import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
@@ -71,7 +73,7 @@ class MapGetxController extends GetxController {
   Future<Project> saveRouteLocaly(String title) async {
     final cameraGetx = Get.find<CameraGetxController>();
     final audioGetx = Get.find<AudioRecordingController>();
-
+    audioGetx.audioPaths.removeAt(0);
     Project newProject = Project(
       id: getRandomString(20),
       title: title,
@@ -82,7 +84,8 @@ class MapGetxController extends GetxController {
       date: DateTime.now(),
       distance: calculateRouteDistance(routePoints.value),
       notes: notes.value,
-      routePoints: routePoints.value,
+      routePoints:
+          routePoints.value.map((e) => Coordinate.fromLatLng(e)).toList(),
       routeVideos: cameraGetx.videoPaths,
       routeAudios: audioGetx.audioPaths,
     );
@@ -101,7 +104,7 @@ class MapGetxController extends GetxController {
     isPreview.value = true;
     isMapping.value = false;
     routePoints.clear();
-    routePoints.addAll(project.routePoints!);
+    routePoints.addAll(project.routePoints!.map((e) => e.toLatLng()).toList());
     notes.clear();
     notes.value.addAll(project.notes!);
   }

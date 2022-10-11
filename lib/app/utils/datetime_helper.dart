@@ -12,3 +12,7 @@ String formatDuration(Duration duration) {
   String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
   return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
 }
+
+String formatTotalTime(int seconds) {
+  return '${(seconds / 60).floor()} min ${(seconds % 60)} sec';
+}

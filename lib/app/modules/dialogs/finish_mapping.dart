@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
-import 'package:qualnote/app/data/models/project_model.dart';
-import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/home/views/project_overview_view.dart';
@@ -78,12 +76,9 @@ finishedDialog() {
                                     var newProject = await mapGetxController
                                         .saveRouteLocaly(title!);
                                     audioGetxController.resetRecorder();
-                                    Project? project = await Get.find<HiveDb>()
-                                        .getProject(newProject.id!);
-                                    if (project != null) {
-                                      Get.to(
-                                          () => ProjectOverviewView(project));
-                                    }
+
+                                    Get.to(
+                                        () => ProjectOverviewView(newProject));
                                   }
                                 },
                                 child: const Center(

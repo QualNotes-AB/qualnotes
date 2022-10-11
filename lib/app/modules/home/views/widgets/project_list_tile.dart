@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
-import 'package:qualnote/app/data/models/project_model.dart';
+import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/home/views/project_overview_view.dart';
 
@@ -26,6 +26,7 @@ class ProjectListTile extends StatelessWidget {
             onPressed: () async {
               Project? project = await Get.find<HiveDb>().getProject(id);
               if (project != null) {
+                print(project.toJson());
                 Get.to(() => ProjectOverviewView(project));
               }
             },

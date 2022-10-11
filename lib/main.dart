@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:location/location.dart';
+import 'package:qualnote/app/data/models/coordinate.dart';
+import 'package:qualnote/app/data/models/note.dart';
+import 'package:qualnote/app/data/models/project.dart';
+import 'package:qualnote/app/data/services/firestore_db.dart';
+import 'package:qualnote/app/data/services/internet_availability.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 
@@ -25,7 +30,11 @@ void main() async {
     await Firebase.initializeApp();
   }
 
+  Get.put(FirebaseDatabase());
   await Hive.initFlutter();
+  Hive.registerAdapter(CoordinateAdapter());
+  Hive.registerAdapter(ProjectAdapter());
+  Hive.registerAdapter(NoteAdapter());
   final db = Get.put(HiveDb());
   await db.init();
 

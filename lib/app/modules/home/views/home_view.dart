@@ -69,8 +69,8 @@ class HomeView extends GetView<HomeController> {
                   .map((project) =>
                       ProjectListTile(title: project.title!, id: project.id!))
                   .toList(),
-              const ProjectListTile(
-                  title: 'demo test', id: 'O5xTGxLP27tMS4dlAkzZ')
+              // const ProjectListTile(
+              //     title: 'demo test', id: 'O5xTGxLP27tMS4dlAkzZ')
             ],
           )
         ],

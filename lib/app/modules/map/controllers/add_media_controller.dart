@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qualnote/app/data/models/project_model.dart';
+import 'package:intl/intl.dart';
+import 'package:qualnote/app/data/models/coordinate.dart';
+import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
+
+final dateFormat = DateFormat('yyMMddhhmmss');
 
 class AddMediaController extends GetxController {
   MapGetxController mapGetxController = Get.find<MapGetxController>();
@@ -12,9 +15,9 @@ class AddMediaController extends GetxController {
   Future<void> addNote({required Note newNote}) async {
     var location = await mapGetxController.getCurrentLocation();
     var note = Note(
-      title: 'Note${TimeOfDay.now()}',
+      title: newNote.title ?? 'Note${dateFormat.format(DateTime.now())}',
       description: newNote.description,
-      coordinate: location,
+      coordinate: Coordinate.fromLatLng(location),
       path: newNote.path!,
       author: FirebaseAuth.instance.currentUser!.displayName!,
       hasConsent: true,

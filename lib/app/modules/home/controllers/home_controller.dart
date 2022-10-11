@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
-import 'package:qualnote/app/data/models/project_model.dart';
+import 'package:qualnote/app/data/models/project.dart';
+import 'package:qualnote/app/data/services/local_db.dart';
 
 class HomeController extends GetxController {
   List<Project> projects = [];
-
   init() async {
-    // projects.addAll(Get.find<HiveDb>().getAllProjects());
+    projects = Get.find<HiveDb>().getAllProjects();
   }
 
   @override

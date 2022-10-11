@@ -1,21 +1,38 @@
-import 'package:latlong2/latlong.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:qualnote/app/data/models/coordinate.dart';
+import 'package:qualnote/app/data/models/note.dart';
 
+part 'project.g.dart';
+
+@HiveType(typeId: 1)
 class Project {
+  @HiveField(0)
   String? id;
+  @HiveField(1)
   String? title;
+  @HiveField(2)
   String? description;
+  @HiveField(3)
   int? totalTime;
+  @HiveField(4)
   String? type;
+  @HiveField(5)
   String? author;
+  @HiveField(6)
   DateTime? date;
+  @HiveField(7)
   double? distance;
+  @HiveField(8)
   List<Note>? notes;
-  List<LatLng>? routePoints;
+  @HiveField(9)
+  List<Coordinate>? routePoints;
+  @HiveField(10)
   List<String>? routeVideos;
+  @HiveField(11)
   List<String>? routeAudios;
 
   Project({
-    required this.id,
+    this.id,
     this.title,
     this.description,
     this.totalTime,
@@ -46,9 +63,9 @@ class Project {
       });
     }
     if (json['routePoints'] != null) {
-      routePoints = <LatLng>[];
+      routePoints = <Coordinate>[];
       json['routePoints'].forEach((v) {
-        routePoints?.add(LatLng.fromJson(v));
+        routePoints?.add(Coordinate.fromJson(v));
       });
     }
     if (json['routeVideos'] != null) {
@@ -90,51 +107,3 @@ class Project {
     return data;
   }
 }
-
-class Note {
-  String? title;
-  String? description;
-  LatLng? coordinate;
-  String? path;
-  String? author;
-  int? duration;
-  bool? hasConsent;
-  String? type;
-
-  Note({
-    this.title,
-    this.description,
-    this.coordinate,
-    this.path,
-    this.author,
-    this.duration,
-    this.hasConsent,
-    this.type,
-  });
-
-  Note.fromJson(Map<String, dynamic> json) {
-    title = json['title'];
-    description = json['description'];
-    coordinate = LatLng.fromJson(json['coordinate']);
-    path = json['path'];
-    author = json['author'];
-    duration = json['duration'];
-    hasConsent = json['hasConsent'];
-    type = json['type'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final data = <String, dynamic>{};
-    data['title'] = title;
-    data['description'] = description;
-    data['coordinate'] = coordinate!.toJson();
-    data['path'] = path;
-    data['author'] = author;
-    data['duration'] = duration;
-    data['hasConsent'] = hasConsent;
-    data['type'] = type;
-    return data;
-  }
-}
-
-enum NoteType { video, audio, photo, other }

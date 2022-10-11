@@ -6,15 +6,13 @@ import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:qualnote/app/data/models/project_model.dart';
+import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_recorder.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
-
-final dateFormat = DateFormat('yyMMddhhmmss');
+import 'package:qualnote/app/utils/note_type.dart';
 
 class AudioRecordingController extends GetxController {
   final AddMediaController mediaController = Get.find<AddMediaController>();
@@ -49,6 +47,7 @@ class AudioRecordingController extends GetxController {
     if (file.path != audioPath.value) {
       await mediaController.addNote(
         newNote: Note(
+          title: title.value,
           path: file.path,
           duration: duration,
           type: NoteType.audio.toString(),
@@ -77,7 +76,7 @@ class AudioRecordingController extends GetxController {
     audioPath.value = audioNote.path!;
     title.value = audioNote.title!;
     description.value = audioNote.description ?? '';
-    location = audioNote.coordinate!;
+    location = location;
     duration.value = audioNote.duration!;
     hasConsent.value = audioNote.hasConsent!;
   }
@@ -125,9 +124,8 @@ class AudioRecordingController extends GetxController {
       isRecording.value = true;
     }
     if (!isRetake) {
-      _mainPath =
-          '${appDocDir.path}/audio${dateFormat.format(DateTime.now())}.mp4'
-              .removeAllWhitespace;
+      title.value = 'audio${dateFormat.format(DateTime.now())}';
+      _mainPath = '${appDocDir.path}/${title.value}.mp4'.removeAllWhitespace;
     }
     mRecorder!.startRecorder(
       toFile: _mainPath,
@@ -171,9 +169,9 @@ class AudioRecordingController extends GetxController {
 
   Future<void> openTheRecorder() async {
     appDocDir = await getApplicationDocumentsDirectory();
+    title.value = 'audio${dateFormat.format(DateTime.now())}';
     _mainPath = audioPath.isEmpty
-        ? '${appDocDir.path}/audio${dateFormat.format(DateTime.now())}.mp4'
-            .removeAllWhitespace
+        ? '${appDocDir.path}/${title.value}.mp4'.removeAllWhitespace
         : audioPath.value;
     mRecorder = FlutterSoundRecorder();
     await mRecorder!.openRecorder();

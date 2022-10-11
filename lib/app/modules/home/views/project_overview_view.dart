@@ -1,12 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:qualnote/app/config/text_styles.dart';
-import 'package:qualnote/app/data/models/project_model.dart';
+import 'package:qualnote/app/data/models/project.dart';
+import 'package:qualnote/app/data/services/firestore_db.dart';
+import 'package:qualnote/app/data/services/internet_availability.dart';
 import 'package:qualnote/app/modules/authentication/login/views/widgets/page_holder.dart';
+import 'package:qualnote/app/modules/dialogs/delete.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/routes/app_pages.dart';
+import 'package:qualnote/app/utils/datetime_helper.dart';
 import 'package:qualnote/app/utils/distance_helper.dart';
+import 'package:qualnote/app/utils/note_type.dart';
 
 final overviewDate = DateFormat('MMMM dd');
 final standardDate = DateFormat('yyyy M d');
@@ -55,19 +62,12 @@ class ProjectOverviewView extends GetView {
                     )),
               ),
             ),
+            getFirstPhoto(),
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // children: [project.notes!.firstWhere((element) =>
-                  //               element.type == NoteType.photo.toString()).path ;
-                  //   project.notes!.isNotEmpty
-                  //       ? Image.file(
-                  //           File(),
-                  //           width: 150,
-                  //         )
-                  //       : const SizedBox(),
                   Padding(
                     padding: const EdgeInsets.only(left: 10, top: 20),
                     child: Text(
@@ -106,18 +106,46 @@ class ProjectOverviewView extends GetView {
                   ),
                 ),
                 const SizedBox(width: 10),
+                Obx(
+                  () => ElevatedButton(
+                    style: ButtonStyle(
+                        shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)))),
+                    onPressed:
+                        Get.find<InternetAvailability>().isConnected.value
+                            ? () {
+                                var file = project.notes!.first;
+                                print(file.toJson());
+                                Get.find<FirebaseDatabase>()
+                                    .saveProjectToCloud(project);
+                              }
+                            : null,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Text('Upload'),
+                          Icon(Icons.upload),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
                 ElevatedButton(
                   style: ButtonStyle(
-                      shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)))),
-                  onPressed: () {},
+                    shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20))),
+                  ),
+                  onPressed: () async => await deleteDialog(project),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: const [
-                        Text('Upload'),
-                        Icon(Icons.upload),
+                        Text('Delete'),
+                        Icon(Icons.delete_outline),
                       ],
                     ),
                   ),
@@ -145,7 +173,15 @@ class ProjectOverviewView extends GetView {
     );
   }
 
-  String formatTotalTime(int seconds) {
-    return '${(seconds / 60).floor()} min ${(seconds % 60)} sec';
+  Widget getFirstPhoto() {
+    project.notes!.map((element) {
+      if (element.type == NoteType.photo.toString()) {
+        return Image.file(
+          File(element.path!),
+          width: 150,
+        );
+      }
+    });
+    return const SizedBox();
   }
 }
