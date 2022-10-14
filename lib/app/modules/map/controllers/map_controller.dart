@@ -14,6 +14,7 @@ import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
+import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/utils/distance_helper.dart';
 import 'package:qualnote/app/utils/id_generator.dart';
 
@@ -25,6 +26,7 @@ class MapGetxController extends GetxController {
   late Timer timer;
   int duration = 0;
   Rx<LatLng> currentLocation = LatLng(0, 0).obs;
+  Rx<LatLng> center = LatLng(0, 0).obs;
   RxBool isMapping = false.obs;
   RxBool isPreview = false.obs;
   RxBool rebuild = false.obs;
@@ -70,10 +72,17 @@ class MapGetxController extends GetxController {
     isPreview.value = false;
   }
 
+  void recenter() async {
+    mapController.move(currentLocation.value, 17)
+        ? log('recenter success')
+        : log('recenter failed');
+  }
+
   Future<Project> saveRouteLocaly(String title) async {
     final cameraGetx = Get.find<CameraGetxController>();
     final audioGetx = Get.find<AudioRecordingController>();
-    audioGetx.audioPaths.removeAt(0);
+    final addMediaController = Get.find<AddMediaController>();
+    // audioGetx.audioPaths.removeAt(0);
     Project newProject = Project(
       id: getRandomString(20),
       title: title,
@@ -83,15 +92,19 @@ class MapGetxController extends GetxController {
       author: FirebaseAuth.instance.currentUser!.displayName ?? 'No username',
       date: DateTime.now(),
       distance: calculateRouteDistance(routePoints.value),
-      notes: notes.value,
+      notes: notes.value.toList(),
       routePoints:
           routePoints.value.map((e) => Coordinate.fromLatLng(e)).toList(),
-      routeVideos: cameraGetx.videoPaths,
-      routeAudios: audioGetx.audioPaths,
+      routeVideos: cameraGetx.videoPaths.toList(),
+      routeAudios: audioGetx.audioPaths.toList(),
+      consents: addMediaController.consentsPaths.toList(),
+      routeAudiosLength: audioGetx.audioPaths.length.toInt(),
+      routeVideosLength: cameraGetx.videoPaths.length.toInt(),
+      consentsLength: addMediaController.consentsPaths.length.toInt(),
     );
 
     await Get.find<HiveDb>().saveProject(newProject);
-
+    addMediaController.consentsPaths.clear();
     cameraGetx.videoPaths.clear();
     audioGetx.audioPaths.clear();
     notes.clear();
@@ -100,6 +113,7 @@ class MapGetxController extends GetxController {
   }
 
   void selectProject(Project project) {
+    center.value = project.routePoints!.first.toLatLng();
     type.value = RecordingType.justMapping;
     isPreview.value = true;
     isMapping.value = false;
@@ -122,6 +136,7 @@ class MapGetxController extends GetxController {
     log('Map init');
     duration = 0;
     currentLocation.value = await getCurrentLocation();
+    center.value = currentLocation.value;
     locationStream = location.onLocationChanged.asBroadcastStream().listen(
       (LocationData data) {
         var location = LatLng(data.latitude ?? 0, data.longitude ?? 0);
@@ -133,6 +148,7 @@ class MapGetxController extends GetxController {
         }
       },
     );
+    //Get.put(CameraGetxController());
   }
 
   @override

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/public/flutter_sound_player.dart';
 
@@ -18,13 +21,23 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   bool _isPlaying = false;
   bool _mPlayerIsInited = false;
   double volume = 0.5;
+  StreamSubscription? _mPlayerSubscription;
+  int _mSubscriptionDuration = 0;
+  int pos = 0;
   @override
   void initState() {
     _mPlayer!.openPlayer().then((value) {
       setState(() {
         _mPlayerIsInited = true;
       });
+      _mPlayerSubscription = _mPlayer!.onProgress!.listen((e) {
+        setState(() {
+          _mSubscriptionDuration = e.duration.inMilliseconds;
+          pos = e.position.inMilliseconds;
+        });
+      });
     });
+
     super.initState();
   }
 
@@ -32,7 +45,10 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   void dispose() {
     _mPlayer!.closePlayer();
     _mPlayer = null;
-
+    if (_mPlayerSubscription != null) {
+      _mPlayerSubscription!.cancel();
+      _mPlayerSubscription = null;
+    }
     super.dispose();
   }
 
@@ -40,6 +56,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     // assert(_mPlayerIsInited);
     setState(() {
       _isPlaying = true;
+      pos = 0;
     });
 
     if (!_mPlayer!.isPaused) {
@@ -68,6 +85,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     _isPlaying = false;
     _mPlayer!.stopPlayer().then((value) {
       setState(() {
+        pos = 0;
         _isPlaying = false;
       });
     });
@@ -88,11 +106,35 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     }
   }
 
-  void playerForward(double value) async {
-    if (_mPlayerIsInited && _mPlayer != null) {
-      _mPlayer!.updateProgress(duration: widget.duration, position: 4);
-      setState(() {});
+  void forward10Seconds() {
+    if (_mPlayer == null) {
+      return;
     }
+    if (!_isPlaying) {
+      return;
+    }
+    if (pos + 10000 > _mSubscriptionDuration) {
+      stopPlayer();
+      return;
+    }
+    _mPlayer!.seekToPlayer(Duration(milliseconds: (pos + 10000)));
+    log(pos.toString());
+  }
+
+  void back10Seconds() {
+    if (_mPlayer == null) {
+      return;
+    }
+    if (!_isPlaying) {
+      return;
+    }
+    if (pos - 10000 < 0) {
+      _mPlayer!.seekToPlayer(const Duration(milliseconds: 0));
+      pos = 0;
+      return;
+    }
+    _mPlayer!.seekToPlayer(Duration(milliseconds: (pos - 10000)));
+    log(pos.toString());
   }
 
   @override
@@ -105,14 +147,15 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              GestureDetector(
-                onTap: () {},
+              TextButton(
+                onPressed: back10Seconds,
                 child: Transform(
                   alignment: Alignment.center,
                   transform: Matrix4.rotationY(3.142),
                   child: const Icon(
                     Icons.forward_10_rounded,
                     size: 35,
+                    color: Colors.black,
                   ),
                 ),
               ),
@@ -126,12 +169,11 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                 ),
               ),
               TextButton(
-                onPressed: () {
-                  playerForward(21.2);
-                },
+                onPressed: forward10Seconds,
                 child: const Icon(
-                  Icons.forward_30_rounded,
+                  Icons.forward_10_rounded,
                   size: 35,
+                  color: Colors.black,
                 ),
               ),
             ],

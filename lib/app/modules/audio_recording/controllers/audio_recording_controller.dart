@@ -19,9 +19,6 @@ class AudioRecordingController extends GetxController {
   RxString audioPath = ''.obs;
   RxString title = ''.obs;
   RxString description = ''.obs;
-  RxBool hasConsent = false.obs;
-  RxBool consentInRecording = false.obs;
-  RxBool consentRecorded = false.obs;
   LatLng location = LatLng(0, 0);
   RxInt duration = 0.obs;
   RxInt mainDuration = 0.obs;
@@ -34,14 +31,7 @@ class AudioRecordingController extends GetxController {
   bool isConsent = false;
   bool isRetake = false;
   List<String> audioPaths = [];
-  List<String> consentPaths = [];
   late Directory appDocDir;
-
-  void toggleConsentInRecording() =>
-      consentInRecording.value = !consentInRecording.value;
-
-  void toggleConsentRecorded() =>
-      consentRecorded.value = !consentRecorded.value;
 
   Future<void> saveAudioPath(File file, int duration) async {
     if (file.path != audioPath.value) {
@@ -59,10 +49,6 @@ class AudioRecordingController extends GetxController {
   }
 
   void saveAudioDetails() {
-    if (!consentInRecording.value || !consentRecorded.value) {
-      hasConsent.value = false;
-      return;
-    }
     if (description.isEmpty) {
       Get.back();
       return;
@@ -76,18 +62,15 @@ class AudioRecordingController extends GetxController {
     audioPath.value = audioNote.path!;
     title.value = audioNote.title!;
     description.value = audioNote.description ?? '';
-    location = location;
+    location = audioNote.coordinate!.toLatLng();
     duration.value = audioNote.duration!;
-    hasConsent.value = audioNote.hasConsent!;
+    // hasConsent.value = audioNote.hasConsent!;
   }
 
   void resetFields() {
     audioPath.value = '';
     title.value = '';
     description.value = '';
-    hasConsent.value = false;
-    consentInRecording.value = false;
-    consentRecorded.value = false;
     location = LatLng(0, 0);
     duration.value = 0;
   }
@@ -136,28 +119,31 @@ class AudioRecordingController extends GetxController {
   }
 
   Future<void> stopRecorder({bool isFinish = false}) async {
+    if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
+      return;
+    }
     if (mRecorder != null) {
       _timer.cancel();
       isRecording.value = false;
       await mRecorder!.stopRecorder().then((value) async {
         log(_mainPath);
-
-        if (!isFinish) {
-          await saveAudioPath(File(_mainPath), duration.value);
-          Get.back();
-          if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
-            startRecorder(isMainRecording: true);
-          }
-          return;
-        }
         if (isConsent) {
-          consentPaths.add(_mainPath);
+          mediaController.saveAudioConsent(_mainPath);
           _timer.cancel();
           isConsent = false;
+          Get.back();
           return;
         }
-        _timer.cancel();
-        audioPaths.add(_mainPath);
+        if (isFinish) {
+          _timer.cancel();
+          audioPaths.add(_mainPath);
+          return;
+        }
+        await saveAudioPath(File(_mainPath), duration.value);
+        Get.back();
+        if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
+          startRecorder(isMainRecording: true);
+        }
       });
     }
   }
@@ -171,7 +157,7 @@ class AudioRecordingController extends GetxController {
     appDocDir = await getApplicationDocumentsDirectory();
     title.value = 'audio${dateFormat.format(DateTime.now())}';
     _mainPath = audioPath.isEmpty
-        ? '${appDocDir.path}/${title.value}.mp4'.removeAllWhitespace
+        ? '${appDocDir.path}/audio/${title.value}.mp4'.removeAllWhitespace
         : audioPath.value;
     mRecorder = FlutterSoundRecorder();
     await mRecorder!.openRecorder();

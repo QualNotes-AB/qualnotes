@@ -4,12 +4,14 @@ import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_list_tile.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_recorder.dart';
+import 'package:qualnote/app/modules/home/controllers/home_controller.dart';
 import 'package:qualnote/app/modules/home/views/widgets/home_search.dart';
 
 import '../controllers/audio_recording_controller.dart';
 
 class AudioRecordingView extends GetView<AudioRecordingController> {
-  const AudioRecordingView({Key? key}) : super(key: key);
+  AudioRecordingView({Key? key}) : super(key: key);
+  final homeController = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,10 +62,13 @@ class AudioRecordingView extends GetView<AudioRecordingController> {
                     padding: EdgeInsets.only(top: 10, left: 10, right: 10),
                     child: HomeSearch(),
                   ),
-                  ListView(
+                  ListView.builder(
                     shrinkWrap: true,
-                    children: const [AudioListTile()],
-                  )
+                    itemCount: homeController.getAllAudioRecordings().length,
+                    itemBuilder: (context, index) {
+                      return const AudioListTile();
+                    },
+                  ),
                 ],
               ),
             ),

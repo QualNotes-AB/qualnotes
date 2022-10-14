@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -50,7 +51,7 @@ class ProjectOverviewView extends GetView {
               child: SizedBox(
                 width: 100,
                 child: TextButton(
-                    onPressed: () => Get.back(),
+                    onPressed: () {}, //=> Get.back(),
                     child: Row(
                       children: const [
                         Icon(
@@ -111,15 +112,17 @@ class ProjectOverviewView extends GetView {
                     style: ButtonStyle(
                         shape: MaterialStatePropertyAll(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20)))),
-                    onPressed:
-                        Get.find<InternetAvailability>().isConnected.value
-                            ? () {
-                                var file = project.notes!.first;
-                                print(file.toJson());
-                                Get.find<FirebaseDatabase>()
-                                    .saveProjectToCloud(project);
-                              }
-                            : null,
+                    onPressed: Get.find<InternetAvailability>()
+                            .isConnected
+                            .value
+                        ? () {
+                            var file = project.notes!.first;
+                            if (kDebugMode) {
+                              print(file.toJson());
+                            }
+                            Get.find<FirebaseDatabase>().uploadProject(project);
+                          }
+                        : null,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
@@ -162,8 +165,8 @@ class ProjectOverviewView extends GetView {
             Text('Distance: ${getDistanceAsString(project.distance!)}'),
             Text('Total time: ${formatTotalTime(project.totalTime!)}'),
             Text('Notes: ${project.notes!.length}'),
-            Text('Notes: ${project.routeAudios!.length}'),
-            Text('Notes: ${project.routeVideos!.length}'),
+            // Text('Audio: ${project.routeAudiosLength}'),
+            // Text('Video: ${project.routeVideosLength}'),
             Text('Type: ${project.type}'),
             Text('Author: ${project.author}'),
             Text('Date: ${standardDate.format(project.date!)}'),

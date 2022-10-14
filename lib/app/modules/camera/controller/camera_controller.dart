@@ -78,11 +78,11 @@ class CameraGetxController extends GetxController {
     }
     if (isMainRecording) {
       await changeCameraQuality(ResolutionPreset.high);
+      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        durationInSeconds.value++;
+      });
     }
 
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      durationInSeconds.value++;
-    });
     try {
       await cameraController.startVideoRecording();
     } on Exception catch (e) {
@@ -90,7 +90,8 @@ class CameraGetxController extends GetxController {
     }
   }
 
-  Future<XFile?> stopVideoRecording({bool isFinish = false}) async {
+  Future<XFile?> stopVideoRecording(
+      {bool isFinish = false, bool isMainRecording = false}) async {
     if (!isInitialized.value) {
       return null;
     }
@@ -105,7 +106,9 @@ class CameraGetxController extends GetxController {
     }
     try {
       XFile? video = await cameraController.stopVideoRecording();
-      videoPaths.add(video.path);
+      if (isMainRecording) {
+        videoPaths.add(video.path);
+      }
       return video;
     } on Exception catch (e) {
       log(e.toString());

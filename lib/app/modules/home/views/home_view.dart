@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -59,20 +61,44 @@ class HomeView extends GetView<HomeController> {
             title: 'Upload docx pdf to My Files',
           ),
           AddButton(
-            onPressed: () {},
-            title: 'Open from My Files (below)',
+            onPressed: () {
+              Get.toNamed(Routes.AUDIO_RECORDING);
+            },
+            title: 'Open audio recordings',
           ),
-          ListView(
-            shrinkWrap: true,
-            children: [
-              ...controller.projects
-                  .map((project) =>
-                      ProjectListTile(title: project.title!, id: project.id!))
-                  .toList(),
-              // const ProjectListTile(
-              //     title: 'demo test', id: 'O5xTGxLP27tMS4dlAkzZ')
-            ],
-          )
+          Obx(
+            () => ListView(
+              shrinkWrap: true,
+              children: [
+                ...controller.localProjects.value
+                    .map((project) => Visibility(
+                          visible:
+                              !controller.cloudProjects.value.contains(project),
+                          child: ProjectListTile(
+                            title: project.title!,
+                            id: project.id!,
+                            isLocal: true,
+                          ),
+                        ))
+                    .toList(),
+              ],
+            ),
+          ),
+          Obx(
+            () => ListView(
+              shrinkWrap: true,
+              children: [
+                ...controller.cloudProjects.value
+                    .map((project) => ProjectListTile(
+                          title: project.title!,
+                          id: project.id!,
+                          isLocal:
+                              controller.localProjects.value.contains(project),
+                        ))
+                    .toList(),
+              ],
+            ),
+          ),
         ],
       ),
     );

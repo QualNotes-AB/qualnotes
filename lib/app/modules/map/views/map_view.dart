@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -11,9 +12,10 @@ import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_details_sheet.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_recorder.dart';
 import 'package:qualnote/app/modules/camera/view/camera_window.dart';
-import 'package:qualnote/app/modules/camera/view/video_bottom_sheet.dart';
+import 'package:qualnote/app/modules/camera/view/video_player.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/nav_bar.dart';
+import 'package:qualnote/app/utils/distance_helper.dart';
 import 'package:qualnote/app/utils/note_type.dart';
 
 import '../controllers/map_controller.dart';
@@ -24,7 +26,7 @@ class MapView extends GetView<MapGetxController> {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     Get.find<AddMediaController>();
-    Get.find<AudioRecordingController>();
+    // Get.find<AudioRecordingController>();
     return Scaffold(
       body: Stack(
         children: [
@@ -32,9 +34,9 @@ class MapView extends GetView<MapGetxController> {
             controller.rebuild.value;
 
             return FlutterMap(
-              mapController: MapController(),
+              mapController: controller.mapController,
               options: MapOptions(
-                center: controller.currentLocation.value,
+                center: controller.center.value,
                 zoom: 16.0,
                 maxZoom: 19.0,
               ),
@@ -74,6 +76,15 @@ class MapView extends GetView<MapGetxController> {
               : controller.type.value == RecordingType.audio
                   ? const AudioMapping()
                   : const SizedBox()),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+                onPressed: () => controller.recenter(),
+                child: const Icon(
+                  Icons.my_location_rounded,
+                  color: Colors.black,
+                )),
+          ),
           NavBar(),
         ],
       ),
@@ -83,6 +94,60 @@ class MapView extends GetView<MapGetxController> {
   List<Marker> get markers {
     List<Marker> markers = [];
 
+    //create all text markers
+    markers.addAll(controller.notes
+        .where((element) => element.type == NoteType.text.toString())
+        .map(
+          (element) => Marker(
+            point: element.coordinate!.toLatLng(),
+            width: 30,
+            height: 50,
+            builder: (context) {
+              return TextButton(
+                onPressed: () {
+                  Get.bottomSheet(
+                    SafeArea(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 30, horizontal: 30),
+                        color: Colors.white,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(element.description!),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                      'Author: ${FirebaseAuth.instance.currentUser!.displayName}'),
+                                  Text(
+                                      'GPS: ${convertLocation(element.coordinate!.toLatLng())}')
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: Column(
+                  children: const [
+                    Icon(
+                      Icons.notes_outlined,
+                      color: Colors.black,
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
+        )
+        .toList());
     //create all photo markers
     markers.addAll(controller.notes
         .where((element) => element.type == NoteType.photo.toString())
@@ -117,11 +182,7 @@ class MapView extends GetView<MapGetxController> {
             builder: (context) {
               return TextButton(
                   onPressed: () {
-                    Get.bottomSheet(
-                      VideoBottomSheet(path: element.path!),
-                      isScrollControlled: true,
-                      barrierColor: Colors.transparent,
-                    );
+                    Get.to(VideoPlayerWidget(path: element.path!));
                   },
                   child: Icon(
                     Icons.videocam,

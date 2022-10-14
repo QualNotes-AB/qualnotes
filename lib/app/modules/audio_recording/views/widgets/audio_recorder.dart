@@ -25,12 +25,12 @@ class _SimpleRecorderState extends State<SimpleRecorder> {
     super.initState();
   }
 
-  // @override
-  // void dispose() {
-  //   audioGetxController.mRecorder!.closeRecorder();
-  //   audioGetxController.mRecorder = null;
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    // audioGetxController.mRecorder!.closeRecorder();
+    // audioGetxController.mRecorder = null;
+    super.dispose();
+  }
 
   final audioGetxController = Get.find<AudioRecordingController>();
 

@@ -29,6 +29,7 @@ finishedDialog() {
                       Expanded(
                         child: TextField(
                           onChanged: (value) => title = value,
+                          autocorrect: false,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.only(left: 20),
@@ -73,12 +74,10 @@ finishedDialog() {
                                         .stopVideoRecording(isFinish: true);
                                     await audioGetxController.stopRecorder(
                                         isFinish: true);
-                                    var newProject = await mapGetxController
+                                    final newRoute = await mapGetxController
                                         .saveRouteLocaly(title!);
                                     audioGetxController.resetRecorder();
-
-                                    Get.to(
-                                        () => ProjectOverviewView(newProject));
+                                    Get.to(() => ProjectOverviewView(newRoute));
                                   }
                                 },
                                 child: const Center(

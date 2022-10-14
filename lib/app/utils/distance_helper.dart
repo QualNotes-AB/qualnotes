@@ -22,7 +22,7 @@ String getDistanceAsString(double distance) {
   if (distance < 1) {
     return '${(distance * 1000).floor()} meters';
   }
-  return '${distance.floor()} km ${(distance * 1000).floor()} meters';
+  return '${distance.floor()} km ${((distance - distance.floor()) * 1000).floor()} meters';
 }
 
 String convertLocation(LatLng location) {

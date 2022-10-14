@@ -126,37 +126,11 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
                       onPressed: () async {
                         if (widget.isPhoto) {
                           //Take a photo
-                          file = await controller.takePicture();
-                          if (file != null) {
-                            widget.onDone(file!.path);
-                          }
-                          Get.back();
-                          if (Get.find<MapGetxController>().type.value ==
-                              RecordingType.video) {
-                            controller.startVideoRecording(
-                                isMainRecording: true);
-                          }
-                          return;
+                          await takePhoto();
                         }
                         //Record a video
                         secondPress
-                            ? {
-                                file = await controller.stopVideoRecording(),
-                                if (file != null)
-                                  {
-                                    if (file != null)
-                                      {widget.onDone(file!.path)}
-                                    // Get.find<AddMediaController>().addNote(
-                                    //     newNote: Note(path: file!.path))
-                                  },
-                                Get.back(),
-                                if (Get.find<MapGetxController>().type.value ==
-                                    RecordingType.video)
-                                  {
-                                    controller.startVideoRecording(
-                                        isMainRecording: true)
-                                  }
-                              }
+                            ? await stopRecordingAndSave()
                             : controller
                                 .startVideoRecording()
                                 .then((value) => setState(() {
@@ -272,5 +246,30 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
         ],
       ),
     );
+  }
+
+  Future<void> stopRecordingAndSave() async {
+    file = await controller.stopVideoRecording();
+    if (file != null) {
+      if (file != null) {
+        widget.onDone(file!.path);
+      }
+    }
+    Get.back();
+    if (Get.find<MapGetxController>().type.value == RecordingType.video) {
+      controller.startVideoRecording(isMainRecording: true);
+    }
+  }
+
+  Future<void> takePhoto() async {
+    file = await controller.takePicture();
+    if (file != null) {
+      widget.onDone(file!.path);
+    }
+    Get.back();
+    if (Get.find<MapGetxController>().type.value == RecordingType.video) {
+      controller.startVideoRecording(isMainRecording: true);
+    }
+    return;
   }
 }

@@ -30,6 +30,14 @@ class Project {
   List<String>? routeVideos;
   @HiveField(11)
   List<String>? routeAudios;
+  @HiveField(12)
+  List<String>? consents;
+  @HiveField(13)
+  int? routeVideosLength;
+  @HiveField(14)
+  int? routeAudiosLength;
+  @HiveField(15)
+  int? consentsLength;
 
   Project({
     this.id,
@@ -44,18 +52,25 @@ class Project {
     this.routePoints,
     this.routeVideos,
     this.routeAudios,
+    this.consents,
+    this.routeVideosLength,
+    this.routeAudiosLength,
+    this.consentsLength,
   });
 
-  Project.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+  Project.fromJson(Map<String, dynamic> json, String docId) {
+    id = docId;
     title = json['title'];
     description = json['description'];
     totalTime = json['totalTime'];
     type = json['type'];
     author = json['author'];
-    date = json['date'];
+    date = DateTime.fromMillisecondsSinceEpoch(
+        json['date'].millisecondsSinceEpoch);
     distance = json['distance'];
-
+    routeVideosLength = json['routeVideosLength'];
+    routeAudiosLength = json['routeAudiosLength'];
+    consentsLength = json['consentsLength'];
     if (json['notes'] != null) {
       notes = <Note>[];
       json['notes'].forEach((v) {
@@ -68,18 +83,24 @@ class Project {
         routePoints?.add(Coordinate.fromJson(v));
       });
     }
-    if (json['routeVideos'] != null) {
-      routeVideos = <String>[];
-      json['routeVideos'].forEach((v) {
-        routeVideos?.add(v.toString());
-      });
-    }
-    if (json['routeAudios'] != null) {
-      routeAudios = <String>[];
-      json['routeAudios'].forEach((v) {
-        routeAudios?.add(v.toString());
-      });
-    }
+    // if (json['routeVideos'] != null) {
+    //   routeVideos = <String>[];
+    //   json['routeVideos'].forEach((v) {
+    //     routeVideos?.add(v.toString());
+    //   });
+    // }
+    // if (json['routeAudios'] != null) {
+    //   routeAudios = <String>[];
+    //   json['routeAudios'].forEach((v) {
+    //     routeAudios?.add(v.toString());
+    //   });
+    // }
+    // if (json['consents'] != null) {
+    //   consents = <String>[];
+    //   json['consents'].forEach((v) {
+    //     consents?.add(v.toString());
+    //   });
+    // }
   }
 
   Map<String, dynamic> toJson() {
@@ -91,6 +112,9 @@ class Project {
     data['author'] = author;
     data['date'] = date;
     data['distance'] = distance;
+    data['routeVideosLength'] = routeVideosLength;
+    data['routeAudiosLength'] = routeAudiosLength;
+    data['consentsLength'] = consentsLength;
 
     if (notes != null) {
       data['notes'] = notes?.map((v) => v.toJson()).toList();
@@ -98,12 +122,18 @@ class Project {
     if (routePoints != null) {
       data['routePoints'] = routePoints?.map((v) => v.toJson()).toList();
     }
-    if (routeVideos != null) {
-      data['routeVideos'] = routeVideos?.map((v) => v).toList();
-    }
-    if (routeAudios != null) {
-      data['routeAudios'] = routeAudios?.map((v) => v).toList();
-    }
+    // if (routeVideos != null) {
+    //   data['routeVideos'] = routeVideos?.map((v) => v).toList();
+    // }
+    // if (routeAudios != null) {
+    //   data['routeAudios'] = routeAudios?.map((v) => v).toList();
+    // }
     return data;
   }
+
+  @override
+  operator ==(other) => other is Project && other.id == id;
+
+  @override
+  int get hashCode => Object.hash(Project, id);
 }

@@ -11,6 +11,7 @@ import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/firestore_db.dart';
 import 'package:qualnote/app/data/services/internet_availability.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
+import 'package:qualnote/app/modules/home/controllers/progress_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 
 import 'app/routes/app_pages.dart';
@@ -30,15 +31,19 @@ void main() async {
     await Firebase.initializeApp();
   }
 
-  Get.put(FirebaseDatabase());
+  ///location initialisation
+  await checkForLocationPermission();
+
+  ///Database and controllers initialisation
   await Hive.initFlutter();
   Hive.registerAdapter(CoordinateAdapter());
   Hive.registerAdapter(ProjectAdapter());
   Hive.registerAdapter(NoteAdapter());
+  Get.put(ProgressController());
+  Get.put(InternetAvailability());
+  Get.put(FirebaseDatabase());
   final db = Get.put(HiveDb());
   await db.init();
-
-  await checkForLocationPermission();
   final mapController = Get.put(MapGetxController());
   await mapController.init();
 
@@ -58,10 +63,8 @@ void main() async {
 Future<void> checkForLocationPermission() async {
   //checks and asks for loaction premmission
   Location location = Location();
-
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
-
   _serviceEnabled = await location.serviceEnabled();
   if (!_serviceEnabled) {
     _serviceEnabled = await location.requestService();
@@ -69,7 +72,6 @@ Future<void> checkForLocationPermission() async {
       return;
     }
   }
-
   _permissionGranted = await location.hasPermission();
   if (_permissionGranted == PermissionStatus.denied) {
     _permissionGranted = await location.requestPermission();

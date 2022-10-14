@@ -10,6 +10,7 @@ import '../modules/authentication/register/views/register_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/map/bindings/map_binding.dart';
+import '../modules/map/views/consent_view.dart';
 import '../modules/map/views/map_view.dart';
 
 // ignore_for_file: constant_identifier_names
@@ -48,7 +49,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.AUDIO_RECORDING,
-      page: () => const AudioRecordingView(),
+      page: () => AudioRecordingView(),
       binding: AudioRecordingBinding(),
     ),
   ];
