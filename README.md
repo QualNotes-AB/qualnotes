@@ -25,7 +25,9 @@ After that make sure that "General" tab us selected and scroll down until you se
 
 At the bottom you will click on a button that says "Add fingerprint" and paste your SHA1 and SHY256 keys.
 
-Hit save for each one and you're all done.
+Hit save for each one.
+
+Once this is done, download the google-services.json file and copy it to `android/app` directory.
 
 Once this is done, go to your project and clean it:
 ```
