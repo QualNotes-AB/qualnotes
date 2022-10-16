@@ -8,9 +8,7 @@ class InternetAvailability extends GetxController {
   RxBool isConnected = false.obs;
 
   checkInternet(ConnectivityResult? result) async {
-    if (result != null) {
-      result = await Connectivity().checkConnectivity();
-    }
+    result ??= await Connectivity().checkConnectivity();
     if (result == ConnectivityResult.mobile ||
         result == ConnectivityResult.wifi) {
       isConnected.value = true;

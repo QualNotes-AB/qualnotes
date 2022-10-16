@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
-import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
-import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/dialogs/add_text_note.dart';
 import 'package:qualnote/app/modules/dialogs/camera_alert.dart';
-import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/utils/note_type.dart';
 
 addMediaDialog() {
-  var addController = Get.find<AddMediaController>();
   var mapController = Get.find<MapGetxController>();
-  var cameraGetxController = Get.find<CameraGetxController>();
-  var audioGetxController = Get.find<AudioRecordingController>();
   mapController.isMapping.value
       ? Get.dialog(
           Dialog(

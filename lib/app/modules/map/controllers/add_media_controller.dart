@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -32,7 +33,6 @@ class AddMediaController extends GetxController {
       coordinate: Coordinate.fromLatLng(location),
       path: newNote.path!,
       author: FirebaseAuth.instance.currentUser!.displayName!,
-      hasConsent: true,
       duration: newNote.duration,
       type: newNote.type!,
     );
@@ -110,4 +110,44 @@ class AddMediaController extends GetxController {
   }
 
   void saveAudioConsent(String path) => consentsPaths.add(path);
+
+  void addFileNote() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'mp4', 'jpeg', 'jpg', 'png', 'docx']);
+    if (result == null) return;
+
+    File file = await saveFileToAppStorage(result.files.first);
+    FilePicker.platform.clearTemporaryFiles();
+    var location = await mapGetxController.getCurrentLocation();
+    var note = Note(
+      title: '${result.files.first.name}-${dateFormat.format(DateTime.now())}',
+      description: '',
+      coordinate: Coordinate.fromLatLng(location),
+      author: FirebaseAuth.instance.currentUser!.displayName!,
+      type: await checkNoteType(result.files.first.extension!),
+      path: file.path,
+    );
+    mapGetxController.notes.add(note);
+    mapGetxController.triggerRebuild();
+  }
+
+  Future<File> saveFileToAppStorage(PlatformFile file) async {
+    final appStorage = await getApplicationDocumentsDirectory();
+    final newFile = File('${appStorage.path}/${file.name}');
+    return await File(file.path!).copy(newFile.path);
+  }
+
+  Future<String> checkNoteType(String fileExtension) async {
+    log(fileExtension);
+    if (fileExtension == 'jpeg' ||
+        fileExtension == 'jpg' ||
+        fileExtension == 'png') {
+      return NoteType.photo.toString();
+    }
+    if (fileExtension == 'MP4' || fileExtension == 'mp4') {
+      return NoteType.video.toString();
+    }
+    return NoteType.document.toString();
+  }
 }

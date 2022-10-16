@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/data/models/project.dart';
@@ -25,17 +26,23 @@ class HomeController extends GetxController {
 
   init() async {
     //initial data fetch
-    localProjects.value = Get.find<HiveDb>().getAllProjects();
+    if (!kIsWeb) {
+      localProjects.value = Get.find<HiveDb>().getAllProjects();
+    }
     cloudProjects.value = await Get.find<FirebaseDatabase>().getProjects();
 
     //on any changes update home controller lists
-    streamSubscription = Get.find<HiveDb>().projectsBox.watch().listen((event) {
-      if (event.deleted) {
-        localProjects.removeWhere((element) => event.value.id! == element.id!);
-      } else {
-        localProjects.add(event.value);
-      }
-    });
+    if (!kIsWeb) {
+      streamSubscription =
+          Get.find<HiveDb>().projectsBox.watch().listen((event) {
+        if (event.deleted) {
+          localProjects
+              .removeWhere((element) => event.value.id! == element.id!);
+        } else {
+          localProjects.add(event.value);
+        }
+      });
+    }
 
     cloudStreamSubscription = Get.find<FirebaseDatabase>()
         .projectsStream

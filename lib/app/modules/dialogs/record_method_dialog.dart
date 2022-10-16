@@ -5,6 +5,9 @@ import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/routes/app_pages.dart';
 
 recordMethodDialog() {
+  // if (kIsWeb) {
+  //   return;
+  // }
   var controller = Get.find<MapGetxController>();
   Get.dialog(
     Dialog(

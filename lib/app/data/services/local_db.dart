@@ -23,12 +23,12 @@ class HiveDb extends GetxController {
     }
 
     if (project.type! == 'RecordingType.video') {
-      for (var path in project.routeVideos!) {
+      for (var path in project.routeVideos ?? []) {
         await File(path).delete();
       }
     }
     if (project.type! == 'RecordingType.audio') {
-      for (var path in project.routeVideos!) {
+      for (var path in project.routeAudios ?? []) {
         await File(path).delete();
       }
     }

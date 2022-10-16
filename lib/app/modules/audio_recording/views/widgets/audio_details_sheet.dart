@@ -12,7 +12,7 @@ import 'package:qualnote/app/utils/datetime_helper.dart';
 import 'package:qualnote/app/utils/distance_helper.dart';
 
 class AudioDetailsCard extends StatelessWidget {
-  final String path;
+  final String? path;
   AudioDetailsCard({
     Key? key,
     required this.path,
@@ -63,10 +63,12 @@ class AudioDetailsCard extends StatelessWidget {
                         hintText: 'Add a description to this audio...',
                       ),
                     ),
-                    CustomAudioPlayer(
-                      path: path,
-                      duration: audioRecordingController.duration.value,
-                    ),
+                    path == null
+                        ? const Text('Audio not found')
+                        : CustomAudioPlayer(
+                            path: path!,
+                            duration: audioRecordingController.duration.value,
+                          ),
                     BlueTextButton(
                       title: 'RETAKE AUDIO',
                       onPressed: () {

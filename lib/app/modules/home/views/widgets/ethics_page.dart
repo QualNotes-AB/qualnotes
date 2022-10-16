@@ -18,7 +18,7 @@ class EthicsPage extends StatelessWidget {
             ),
           ),
           Center(
-            child: Image.asset('assets/ethics.png'),
+            child: Image.asset('assets/images/ethics.png'),
           ),
         ],
       ),

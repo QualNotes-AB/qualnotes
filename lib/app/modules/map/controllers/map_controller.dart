@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
@@ -15,12 +16,14 @@ import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
+import 'package:qualnote/app/modules/map/views/widgets/note_bottom_sheet.dart';
 import 'package:qualnote/app/utils/distance_helper.dart';
 import 'package:qualnote/app/utils/id_generator.dart';
 
 class MapGetxController extends GetxController {
   MapController mapController = MapController();
-
+  Project selectedProject = Project();
+  RxInt selectedNoteIndex = (-1).obs;
   Location location = Location();
   late StreamSubscription locationStream;
   late Timer timer;
@@ -113,6 +116,7 @@ class MapGetxController extends GetxController {
   }
 
   void selectProject(Project project) {
+    selectedProject = project;
     center.value = project.routePoints!.first.toLatLng();
     type.value = RecordingType.justMapping;
     isPreview.value = true;
@@ -132,6 +136,25 @@ class MapGetxController extends GetxController {
     notes.clear();
   }
 
+  void nextNote(int index) =>
+      index != notes.length ? _openNote(index + 1) : null;
+
+  void previousNote(int index) => index != 0 ? _openNote(index - 1) : null;
+
+  void _openNote(int index) {
+    Get.back();
+    Note note = notes[index];
+    Get.bottomSheet(
+      NoteBottomSheet(note: note, index: index),
+      barrierColor: Colors.transparent,
+    );
+    selectedNoteIndex.value = index;
+    mapController.move(
+        LatLng(
+            note.coordinate!.latitude! - 0.0015, note.coordinate!.longitude!),
+        17);
+  }
+
   Future<void> init() async {
     log('Map init');
     duration = 0;
@@ -148,7 +171,6 @@ class MapGetxController extends GetxController {
         }
       },
     );
-    //Get.put(CameraGetxController());
   }
 
   @override

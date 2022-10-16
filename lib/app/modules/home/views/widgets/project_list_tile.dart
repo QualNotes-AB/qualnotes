@@ -9,13 +9,11 @@ import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/home/views/project_overview_view.dart';
 
 class ProjectListTile extends StatelessWidget {
-  final String title;
-  final String id;
+  final Project project;
   final bool isLocal;
   const ProjectListTile({
     Key? key,
-    required this.title,
-    required this.id,
+    required this.project,
     this.isLocal = true,
   }) : super(key: key);
 
@@ -28,13 +26,16 @@ class ProjectListTile extends StatelessWidget {
         Expanded(
           child: TextButton(
             onPressed: () async {
-              Project? project = await Get.find<HiveDb>().getProject(id);
-              if (project != null) {
-                if (kDebugMode) {
-                  print(project.toJson());
-                }
-                Get.to(() => ProjectOverviewView(project));
+              Project? completeProject;
+              if (!kIsWeb) {
+                completeProject =
+                    await Get.find<HiveDb>().getProject(project.id!);
               }
+              if (kDebugMode) {
+                print(project.toJson());
+              }
+              Get.to(() =>
+                  ProjectOverviewView(completeProject ?? project, isLocal));
             },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -47,7 +48,7 @@ class ProjectListTile extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
-                    title,
+                    project.title!,
                     style: isLocal
                         ? AppTextStyle.regular17Black
                         : AppTextStyle.regular17Blue,
@@ -67,7 +68,7 @@ class ProjectListTile extends StatelessWidget {
               )
             : TextButton(
                 onPressed: () {
-                  Get.find<FirebaseDatabase>().getProject(id);
+                  Get.find<FirebaseDatabase>().getProject(project.id!);
                 },
                 child: const Icon(
                   Icons.download,

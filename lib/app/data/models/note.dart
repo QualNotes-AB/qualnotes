@@ -18,9 +18,9 @@ class Note {
   @HiveField(5)
   int? duration;
   @HiveField(6)
-  bool? hasConsent;
-  @HiveField(7)
   String? type;
+  @HiveField(7)
+  String? fileExtension;
 
   Note({
     this.title,
@@ -29,8 +29,8 @@ class Note {
     this.path,
     this.author,
     this.duration,
-    this.hasConsent,
     this.type,
+    this.fileExtension,
   });
 
   Note.fromJson(Map<String, dynamic> json) {
@@ -40,8 +40,8 @@ class Note {
     path = json['path'];
     author = json['author'];
     duration = json['duration'];
-    hasConsent = json['hasConsent'];
     type = json['type'];
+    fileExtension = json['fileExtension'];
   }
 
   Map<String, dynamic> toJson() {
@@ -52,8 +52,8 @@ class Note {
     //data['path'] = path;
     data['author'] = author;
     data['duration'] = duration;
-    data['hasConsent'] = hasConsent;
     data['type'] = type;
+    data['fileExtension'] = fileExtension;
     return data;
   }
 }

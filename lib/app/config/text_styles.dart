@@ -123,4 +123,17 @@ class AppTextStyle {
     fontWeight: FontWeight.w400,
     color: AppColors.blueText,
   );
+
+  static const medium22Black = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w400,
+    color: AppColors.black,
+  );
+
+  static const regular13BlackHeight = TextStyle(
+    fontSize: 13,
+    height: 1.5,
+    fontWeight: FontWeight.w400,
+    color: AppColors.black,
+  );
 }

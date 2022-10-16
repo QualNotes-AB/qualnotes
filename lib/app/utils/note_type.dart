@@ -1,1 +1,1 @@
-enum NoteType { video, audio, photo, text, file }
+enum NoteType { video, audio, photo, text, document }

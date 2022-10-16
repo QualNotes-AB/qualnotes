@@ -22,10 +22,12 @@ void main() async {
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-          apiKey: "AIzaSyAp8g5hrKqDQGwLhQCc3M1SWSKeHaYhY6c",
-          projectId: "qualnotesdev",
-          messagingSenderId: "925443941653",
-          appId: "1:925443941653:web:02cf360eadf535d093351c"),
+        apiKey: "AIzaSyAp8g5hrKqDQGwLhQCc3M1SWSKeHaYhY6c",
+        projectId: "qualnotesdev",
+        messagingSenderId: "925443941653",
+        appId: "1:925443941653:web:02cf360eadf535d093351c",
+        storageBucket: "qualnotesdev.appspot.com",
+      ),
     );
   } else {
     await Firebase.initializeApp();
@@ -37,13 +39,14 @@ void main() async {
   ///Database and controllers initialisation
   await Hive.initFlutter();
   Hive.registerAdapter(CoordinateAdapter());
-  Hive.registerAdapter(ProjectAdapter());
   Hive.registerAdapter(NoteAdapter());
+  Hive.registerAdapter(ProjectAdapter());
+
+  final db = Get.put(HiveDb());
+  await db.init();
   Get.put(ProgressController());
   Get.put(InternetAvailability());
   Get.put(FirebaseDatabase());
-  final db = Get.put(HiveDb());
-  await db.init();
   final mapController = Get.put(MapGetxController());
   await mapController.init();
 

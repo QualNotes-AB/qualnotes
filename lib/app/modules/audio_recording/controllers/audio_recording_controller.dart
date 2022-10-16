@@ -59,7 +59,7 @@ class AudioRecordingController extends GetxController {
   }
 
   void selectAudioNote(Note audioNote) {
-    audioPath.value = audioNote.path!;
+    audioPath.value = audioNote.path ?? '';
     title.value = audioNote.title!;
     description.value = audioNote.description ?? '';
     location = audioNote.coordinate!.toLatLng();

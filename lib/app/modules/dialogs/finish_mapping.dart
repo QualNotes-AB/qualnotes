@@ -77,7 +77,8 @@ finishedDialog() {
                                     final newRoute = await mapGetxController
                                         .saveRouteLocaly(title!);
                                     audioGetxController.resetRecorder();
-                                    Get.to(() => ProjectOverviewView(newRoute));
+                                    Get.to(() =>
+                                        ProjectOverviewView(newRoute, true));
                                   }
                                 },
                                 child: const Center(

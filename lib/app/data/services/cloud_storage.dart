@@ -29,6 +29,7 @@ class CloudStorage {
     } else {
       filePath = "${appDocDir.path}/$fileName.mp4";
     }
+
     log(filePath);
     final file = File(filePath);
     try {

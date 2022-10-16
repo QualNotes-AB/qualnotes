@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:qualnote/app/config/text_styles.dart';
+import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/firestore_db.dart';
 import 'package:qualnote/app/data/services/internet_availability.dart';
@@ -21,7 +22,9 @@ final standardDate = DateFormat('yyyy M d');
 
 class ProjectOverviewView extends GetView {
   final Project project;
-  const ProjectOverviewView(this.project, {Key? key}) : super(key: key);
+  final bool isLocal;
+  const ProjectOverviewView(this.project, this.isLocal, {Key? key})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return PageHolder(
@@ -63,17 +66,22 @@ class ProjectOverviewView extends GetView {
                     )),
               ),
             ),
-            getFirstPhoto(),
+
             Padding(
-              padding: const EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.only(top: 20, bottom: 10),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10, top: 20),
-                    child: Text(
-                      project.title ?? 'No title',
-                      style: AppTextStyle.bold32Black,
+                  getFirstPhoto(),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10, top: 20),
+                      child: Text(
+                        project.title ?? 'No title',
+                        style: AppTextStyle.bold32Black,
+                        softWrap: true,
+                        maxLines: 3,
+                      ),
                     ),
                   ),
                 ],
@@ -86,23 +94,26 @@ class ProjectOverviewView extends GetView {
             Text(project.description ?? 'No description'),
             Row(
               children: [
-                ElevatedButton(
-                  style: ButtonStyle(
-                      shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)))),
-                  onPressed: () {
-                    //open map
-                    Get.find<MapGetxController>().selectProject(project);
-                    Get.toNamed(Routes.MAP);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Text('Play'),
-                        Icon(Icons.play_arrow_rounded),
-                      ],
+                Visibility(
+                  visible: isLocal,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                        shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)))),
+                    onPressed: () {
+                      //open map
+                      Get.find<MapGetxController>().selectProject(project);
+                      Get.toNamed(Routes.MAP);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Text('Play'),
+                          Icon(Icons.play_arrow_rounded),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -177,14 +188,18 @@ class ProjectOverviewView extends GetView {
   }
 
   Widget getFirstPhoto() {
-    project.notes!.map((element) {
-      if (element.type == NoteType.photo.toString()) {
-        return Image.file(
-          File(element.path!),
-          width: 150,
-        );
-      }
-    });
-    return const SizedBox();
+    if (project.notes == null) return const SizedBox();
+    Note? note = project.notes!.firstWhereOrNull(
+        (element) => element.type == NoteType.photo.toString());
+    if (note == null || note.path == null) {
+      return const SizedBox();
+    }
+
+    return Image.file(
+      File(note.path!),
+      fit: BoxFit.cover,
+      height: 170,
+      width: 150,
+    );
   }
 }
