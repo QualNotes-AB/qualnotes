@@ -13,6 +13,7 @@ import 'package:qualnote/app/data/services/firestore_db.dart';
 import 'package:qualnote/app/data/services/internet_availability.dart';
 import 'package:qualnote/app/modules/authentication/login/views/widgets/page_holder.dart';
 import 'package:qualnote/app/modules/dialogs/delete.dart';
+import 'package:qualnote/app/modules/home/controllers/progress_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/modules/map/views/map_view.dart';
 import 'package:qualnote/app/modules/overview/views/widgets/blue_overview_button.dart';
@@ -149,13 +150,19 @@ class OverviewView extends GetView<OverviewController> {
                               onPressed: Get.find<InternetAvailability>()
                                       .isConnected
                                       .value
-                                  ? () {
+                                  ? () async {
                                       var file = project.notes!.first;
                                       if (kDebugMode) {
                                         print(file.toJson());
                                       }
-                                      Get.find<FirebaseDatabase>()
+                                      Get.find<ProgressController>()
+                                          .showProgress(
+                                              'Uploading project...', 0);
+                                      await Get.find<FirebaseDatabase>()
                                           .uploadProject(project);
+                                      Get.find<ProgressController>()
+                                          .showProgress(
+                                              'Uploading project...', 1);
                                     }
                                   : null,
                             ),

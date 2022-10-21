@@ -53,25 +53,25 @@ class RecordingNavBar extends StatelessWidget {
             color: AppColors.white,
           ),
         ),
-        NavButton(
-          onPressed: () {}, //startRecordingDialog,
-          title: 'REC',
-          icon: Stack(
-            alignment: Alignment.center,
-            children: const [
-              Icon(
-                Icons.fiber_manual_record_outlined,
-                color: AppColors.white,
-                size: 40,
-              ),
-              Icon(
-                Icons.fiber_manual_record,
-                color: AppColors.white,
-                size: 22,
-              ),
-            ],
-          ),
-        ),
+        // NavButton(
+        //   onPressed: () {}, //startRecordingDialog,
+        //   title: 'REC',
+        //   icon: Stack(
+        //     alignment: Alignment.center,
+        //     children: const [
+        //       Icon(
+        //         Icons.fiber_manual_record_outlined,
+        //         color: AppColors.white,
+        //         size: 40,
+        //       ),
+        //       Icon(
+        //         Icons.fiber_manual_record,
+        //         color: AppColors.white,
+        //         size: 22,
+        //       ),
+        //     ],
+        //   ),
+        // ),
         const NavButton(
           onPressed: addMediaDialog,
           title: 'Add',

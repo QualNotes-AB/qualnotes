@@ -56,12 +56,12 @@ class MainRecordingBottomSheet extends StatelessWidget {
                         children: [
                           Visibility(
                             visible: index != 0,
-                            child: BlueTextButton(
+                            child: const BlueTextButton(
                               title: 'Prev',
-                              onPressed: () => mapGetxController.openRecording(
-                                  index: index,
-                                  isMainRecording: false,
-                                  forward: false),
+                              // onPressed: () => mapGetxController.openRecording(
+                              //     index: index,
+                              //     isMainRecording: false,
+                              //     forward: false),
                             ),
                           ),
                           Row(
@@ -70,13 +70,13 @@ class MainRecordingBottomSheet extends StatelessWidget {
                               Visibility(
                                 visible:
                                     index != mapGetxController.notes.length,
-                                child: BlueTextButton(
+                                child: const BlueTextButton(
                                   title: 'Next',
-                                  onPressed: () =>
-                                      mapGetxController.openRecording(
-                                          index: index,
-                                          isMainRecording: false,
-                                          forward: true),
+                                  // onPressed: () =>
+                                  //     mapGetxController.openRecording(
+                                  //         index: index,
+                                  //         isMainRecording: false,
+                                  //         forward: true),
                                 ),
                               ),
                             ],

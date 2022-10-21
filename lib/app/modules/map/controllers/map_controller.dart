@@ -19,15 +19,14 @@ import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/dialogs/enter_note_number.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
-import 'package:qualnote/app/modules/map/views/widgets/main_recording_bottom_sheet.dart';
 import 'package:qualnote/app/modules/map/views/widgets/note_bottom_sheet.dart';
 import 'package:qualnote/app/utils/distance_helper.dart';
 import 'package:qualnote/app/utils/id_generator.dart';
-import 'package:qualnote/app/utils/note_type.dart';
 
 class MapGetxController extends GetxController {
   HiveDb dbController = Get.find<HiveDb>();
   MapController mapController = MapController();
+  TickerProvider? vsync;
   double maxZoom = 19;
   double zoom = 16;
   double minZoom = 5;
@@ -73,11 +72,7 @@ class MapGetxController extends GetxController {
     isPreview.value = false;
   }
 
-  void recenter() async {
-    mapController.move(currentLocation.value, 17)
-        ? log('recenter success')
-        : log('recenter failed');
-  }
+  void recenter() async => mapController.move(currentLocation.value, 17);
 
   void zoomIn() {
     final bounds = mapController.bounds!;
@@ -201,89 +196,161 @@ class MapGetxController extends GetxController {
   }
 
   ///used in navigation bar and main recording and note bottom sheet cards for navigating to next or previous recording
-  void openRecording({
-    required int index,
-    required bool isMainRecording,
-    required bool forward,
-  }) {
-    //No main recordings
-    try {
-      if (selectedProject.type == RecordingType.justMapping.toString()) {
-        if (!forward && index == 1) Get.back();
-        index != notes.length
-            ? _openNote(forward ? index + 1 : index - 1)
-            : null;
-        return;
-      }
-      //Main recordings
-      if (selectedProject.type != RecordingType.justMapping.toString()) {
-        if (isMainRecording) {
-          final mainList =
-              selectedProject.type == RecordingType.video.toString()
-                  ? selectedProject.routeVideos
-                  : selectedProject.routeAudios;
-          if (index == 0 && !forward) Get.back();
-          index != mainList!.length
-              ? _openMainRecording(
-                  (forward ? index + 1 : index),
-                  selectedProject.type == RecordingType.video.toString()
-                      ? false
-                      : true,
-                  mainList[(forward ? index + 1 : index)],
-                )
-              : null;
-          return;
-        }
-        if (index == 0 || index == notes.length) Get.back();
-        index != (forward ? notes.length : notes.length + 1)
-            ? _openNote((forward ? index : index - 1))
-            : null;
+  // void openRecording({
+  //   required int index,
+  //   required bool isMainRecording,
+  //   required bool forward,
+  // }) {
+  //   //No main recordings
+  //   try {
+  //     if (selectedProject.type == RecordingType.justMapping.toString()) {
+  //       if (!forward && index == 1) Get.back();
+  //       index != notes.length
+  //           ? _openNote(forward ? index + 1 : index - 1)
+  //           : null;
+  //       return;
+  //     }
+  //     //Main recordings
+  //     if (selectedProject.type != RecordingType.justMapping.toString()) {
+  //       if (isMainRecording) {
+  //         final mainList =
+  //             selectedProject.type == RecordingType.video.toString()
+  //                 ? selectedProject.routeVideos
+  //                 : selectedProject.routeAudios;
+  //         if (index == 0 && !forward) Get.back();
+  //         index != mainList!.length
+  //             ? _openMainRecording(
+  //                 (forward ? index + 1 : index),
+  //                 selectedProject.type == RecordingType.video.toString()
+  //                     ? false
+  //                     : true,
+  //                 mainList[(forward ? index + 1 : index)],
+  //               )
+  //             : null;
+  //         return;
+  //       }
+  //       if (index == 0 || index == notes.length) Get.back();
+  //       index != (forward ? notes.length : notes.length + 1)
+  //           ? _openNote((forward ? index : index - 1))
+  //           : null;
 
-        return;
-      }
-    } on Exception catch (e) {
-      log(e.toString());
-    }
+  //       return;
+  //     }
+  //   } on Exception catch (e) {
+  //     log(e.toString());
+  //   }
+  // }
+
+  // void _openMainRecording(int index, bool isAudio, String path) {
+  //   log(index.toString());
+  //   if (index != 0) Get.back();
+  //   Get.bottomSheet(
+  //     MainRecordingBottomSheet(
+  //       isAudio: isAudio,
+  //       index: index,
+  //       path: path,
+  //     ),
+  //     // isScrollControlled: !kIsWeb && !isAudio,
+  //     barrierColor: Colors.transparent,
+  //   );
+  // }
+
+  // void _openNote(int index) {
+  //   log(index.toString());
+  //   if (index != 0) Get.back();
+  //   Note note = notes[index];
+  //   if (note.type == NoteType.video.toString() ||
+  //       note.type == NoteType.photo.toString()) {
+  //     Get.bottomSheet(
+  //       NoteBottomSheet(note: note, index: index),
+  //       barrierColor: Colors.transparent,
+  //       // isScrollControlled: !kIsWeb,
+  //       // ignoreSafeArea: false,
+  //       // isDismissible: true,
+  //     );
+  //   } else {
+  //     Get.bottomSheet(
+  //       NoteBottomSheet(note: note, index: index),
+  //       barrierColor: Colors.transparent,
+  //     );
+  //   }
+  //   selectedNoteIndex.value = index;
+  //   mapController.move(
+  //       LatLng(
+  //           note.coordinate!.latitude! - 0.0015, note.coordinate!.longitude!),
+  //       17);
+  // }
+
+  void nextNote() {
+    if (selectedNoteIndex.value == notes.length - 1) return;
+    final index = ++selectedNoteIndex.value;
+    openNote(index);
   }
 
-  void _openMainRecording(int index, bool isAudio, String path) {
-    log(index.toString());
-    if (index != 0) Get.back();
+  void previousNote() {
+    if (selectedNoteIndex.value == 0) return;
+    final index = --selectedNoteIndex.value;
+    openNote(index);
+  }
+
+  void openNote(int index) {
+    Note note = notes[index];
     Get.bottomSheet(
-      MainRecordingBottomSheet(
-        isAudio: isAudio,
-        index: index,
-        path: path,
-      ),
-      isScrollControlled: !kIsWeb && !isAudio,
+      NoteBottomSheet(note: note, index: index),
       barrierColor: Colors.transparent,
     );
+    // final rotationDeg = mapController.rotation.abs();
+    // log(mapController.rotation.toString());
+    // double latitude = 0.0015;
+    // double longitude = 0.0015;
+    // if (rotationDeg >= 0 && rotationDeg <= 90) {
+    //   longitude *= rotationDeg / 90;
+    //   latitude *= ((90 - rotationDeg) / 90);
+    // }
+    animatedMapMove(
+        LatLng(note.coordinate!.latitude! - 0.0015,
+            note.coordinate!.longitude! + 0.0015),
+        17,
+        vsync!);
+    // mapController.move(
+    //     LatLng(
+    //         note.coordinate!.latitude! - 0.0015, note.coordinate!.longitude!),
+    //     17);
   }
 
-  void _openNote(int index) {
-    log(index.toString());
-    if (index != 0) Get.back();
-    Note note = notes[index];
-    if (note.type == NoteType.video.toString() ||
-        note.type == NoteType.photo.toString()) {
-      Get.bottomSheet(
-        NoteBottomSheet(note: note, index: index),
-        barrierColor: Colors.transparent,
-        isScrollControlled: !kIsWeb,
-        ignoreSafeArea: false,
-        isDismissible: true,
-      );
-    } else {
-      Get.bottomSheet(
-        NoteBottomSheet(note: note, index: index),
-        barrierColor: Colors.transparent,
-      );
-    }
-    selectedNoteIndex.value = index;
-    mapController.move(
-        LatLng(
-            note.coordinate!.latitude! - 0.0015, note.coordinate!.longitude!),
-        17);
+  void animatedMapMove(
+      LatLng destLocation, double destZoom, TickerProvider vsync) {
+    // Create some tweens. These serve to split up the transition from one location to another.
+    // In our case, we want to split the transition be<tween> our current map center and the destination.
+    final latTween = Tween<double>(
+        begin: mapController.center.latitude, end: destLocation.latitude);
+    final lngTween = Tween<double>(
+        begin: mapController.center.longitude, end: destLocation.longitude);
+    final zoomTween = Tween<double>(begin: mapController.zoom, end: destZoom);
+
+    // Create a animation controller that has a duration and a TickerProvider.
+    final controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: vsync);
+    // The animation determines what path the animation will take. You can try different Curves values, although I found
+    // fastOutSlowIn to be my favorite.
+    final Animation<double> animation =
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+
+    controller.addListener(() {
+      mapController.move(
+          LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+          zoomTween.evaluate(animation));
+    });
+
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        controller.dispose();
+      } else if (status == AnimationStatus.dismissed) {
+        controller.dispose();
+      }
+    });
+
+    controller.forward();
   }
 
   void updateNoteTitle(String value, int index) =>

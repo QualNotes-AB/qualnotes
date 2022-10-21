@@ -7,9 +7,7 @@ import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
-import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_details_sheet.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
-import 'package:qualnote/app/modules/map/views/widgets/note_bottom_sheet.dart';
 
 Marker audioMarker(
     {required Note note, required bool isPreview, required int index}) {
@@ -33,17 +31,20 @@ Marker audioMarker(
               onPressed: () {
                 controller.selectedNoteIndex.value = index;
                 Get.find<AudioRecordingController>().selectAudioNote(note);
-                isPreview
-                    ? Get.bottomSheet(
-                        NoteBottomSheet(note: note, index: index),
-                        elevation: 0,
-                        barrierColor: Colors.transparent,
-                      )
-                    : Get.bottomSheet(
-                        AudioDetailsCard(path: note.path),
-                        isScrollControlled: true,
-                        barrierColor: Colors.transparent,
-                      );
+                controller.openNote(index);
+                // isPreview
+                //     ? Get.bottomSheet(
+                //         NoteBottomSheet(note: note, index: index),
+                //         elevation: 0,
+                //         ignoreSafeArea: true,
+                //         barrierColor: Colors.transparent,
+                //       )
+                //     : Get.bottomSheet(
+                //         AudioDetailsCard(path: note.path),
+                //         // isScrollControlled: true,
+                //         ignoreSafeArea: true,
+                //         barrierColor: Colors.transparent,
+                //       );
               },
               style: const ButtonStyle(
                 padding: MaterialStatePropertyAll(
@@ -97,14 +98,13 @@ Marker videoMarker(
           child: TextButton(
               onPressed: () {
                 controller.selectedNoteIndex.value = index;
-                Get.bottomSheet(
-                  NoteBottomSheet(note: note, index: index),
-                  elevation: 0,
-                  barrierColor: Colors.transparent,
-                  isScrollControlled: !kIsWeb,
-                  ignoreSafeArea: false,
-                  isDismissible: true,
-                );
+                controller.openNote(index);
+                // Get.bottomSheet(
+                //   NoteBottomSheet(note: note, index: index),
+                //   elevation: 0,
+                //   ignoreSafeArea: true,
+                //   barrierColor: Colors.transparent,
+                // );
               },
               style: const ButtonStyle(
                   padding: MaterialStatePropertyAll(EdgeInsets.zero)),
@@ -158,14 +158,13 @@ Marker photoMarker(
                   child: TextButton(
                     onPressed: () {
                       controller.selectedNoteIndex.value = index;
-                      Get.bottomSheet(
-                        NoteBottomSheet(note: note, index: index),
-                        elevation: 0,
-                        barrierColor: Colors.transparent,
-                        isScrollControlled: false,
-                        ignoreSafeArea: false,
-                        isDismissible: true,
-                      );
+                      controller.openNote(index);
+                      // Get.bottomSheet(
+                      //   NoteBottomSheet(note: note, index: index),
+                      //   elevation: 0,
+                      //   ignoreSafeArea: true,
+                      //   barrierColor: Colors.transparent,
+                      // );
                     },
                     style: const ButtonStyle(
                         padding: MaterialStatePropertyAll(EdgeInsets.zero)),
@@ -203,11 +202,13 @@ Marker textNoteMarker(
           child: TextButton(
             onPressed: () {
               controller.selectedNoteIndex.value = index;
-              Get.bottomSheet(
-                NoteBottomSheet(note: note, index: index),
-                elevation: 0,
-                barrierColor: Colors.transparent,
-              );
+              controller.openNote(index);
+              // Get.bottomSheet(
+              //   NoteBottomSheet(note: note, index: index),
+              //   elevation: 0,
+              //   ignoreSafeArea: true,
+              //   barrierColor: Colors.transparent,
+              // );
             },
             style: const ButtonStyle(
                 padding: MaterialStatePropertyAll(EdgeInsets.zero)),
@@ -255,12 +256,13 @@ Marker fileMarker(
           child: TextButton(
               onPressed: () {
                 controller.selectedNoteIndex.value = index;
-                Get.bottomSheet(
-                  NoteBottomSheet(note: note, index: index),
-                  elevation: 0,
-                  barrierColor: Colors.transparent,
-                  isDismissible: true,
-                );
+                controller.openNote(index);
+                // Get.bottomSheet(
+                //   NoteBottomSheet(note: note, index: index),
+                //   elevation: 0,
+                //   ignoreSafeArea: true,
+                //   barrierColor: Colors.transparent,
+                // );
               },
               style: const ButtonStyle(
                   padding: MaterialStatePropertyAll(EdgeInsets.zero)),

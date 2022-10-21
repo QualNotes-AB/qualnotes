@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qualnote/app/modules/home/controllers/progress_controller.dart';
@@ -30,14 +29,13 @@ class CloudStorage {
     log(filePath);
     final file = File(filePath);
     try {
-      final downloadTask = storageRef.writeToFile(file);
+      await storageRef.writeToFile(file);
 
-      downloadTask.snapshotEvents.listen((event) {
-        log(event.state.toString());
-
-        Get.find<ProgressController>().showProgress(
-            'Downloading files', event.bytesTransferred / event.totalBytes);
-      });
+      // downloadTask.snapshotEvents.listen((event) {
+      //   log(event.state.toString());
+      // Get.find<ProgressController>().showProgress(
+      //     'Downloading files', event.bytesTransferred / event.totalBytes);
+      // });
     } catch (e) {
       log(e.toString());
     }
@@ -80,26 +78,27 @@ class CloudStorage {
         fileType: fileType, projectId: projectId, fileName: fileName);
 
     try {
-      var uploadTask = _storage.ref(storagePath).putFile(file);
+      // var uploadTask =
+      await _storage.ref(storagePath).putFile(file);
       //  _storage.ref(storagePath).putData(file.readAsBytesSync());
 
-      uploadTask.snapshotEvents.listen(
-        (event) {
-          log(event.state.toString());
-          Get.find<ProgressController>().showProgress(
-              'Uploading file $filePosition/$numberOfFiles',
-              event.bytesTransferred / event.totalBytes);
-          if (numberOfFiles == filePosition &&
-              event.state == TaskState.success) {
-            Get.snackbar(
-              'Hooray!',
-              'File uploaded',
-              backgroundColor: Colors.green,
-              colorText: Colors.white,
-            );
-          }
-        },
-      );
+      // uploadTask.snapshotEvents.listen(
+      //   (event) {
+      //     log(event.state.toString());
+      // Get.find<ProgressController>().showProgress(
+      //     'Uploading file $filePosition/$numberOfFiles',
+      //     event.bytesTransferred / event.totalBytes);
+      // if (numberOfFiles == filePosition &&
+      //     event.state == TaskState.success) {
+      //   Get.snackbar(
+      //     'Hooray!',
+      //     'File uploaded',
+      //     backgroundColor: Colors.green,
+      //     colorText: Colors.white,
+      //   );
+      // }
+      // },
+      // );
       return storagePath;
     } on FirebaseException catch (e) {
       log(e.toString());
@@ -123,16 +122,16 @@ class CloudStorage {
         .asStream()
         .listen((event) {
       log(event.state.toString());
-      Get.find<ProgressController>().showProgress(
-          'Uploading file ', event.bytesTransferred / event.totalBytes);
-      if (event.state == TaskState.success) {
-        Get.snackbar(
-          'Hooray!',
-          'File uploaded',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
-      }
+      // Get.find<ProgressController>().showProgress(
+      //     'Uploading file ', event.bytesTransferred / event.totalBytes);
+      // if (event.state == TaskState.success) {
+      //   Get.snackbar(
+      //     'Hooray!',
+      //     'File uploaded',
+      //     backgroundColor: Colors.green,
+      //     colorText: Colors.white,
+      //   );
+      // }
     });
 
     return await _storage.ref(path).getDownloadURL();

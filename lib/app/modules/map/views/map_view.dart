@@ -1,6 +1,5 @@
 // ignore_for_file: invalid_use_of_protected_member
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -11,6 +10,7 @@ import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_recorder.dart';
 import 'package:qualnote/app/modules/authentication/login/views/widgets/storage_progress_indicator.dart';
 import 'package:qualnote/app/modules/camera/view/camera_window.dart';
+import 'package:qualnote/app/modules/map/views/widgets/map_controls.dart';
 import 'package:qualnote/app/modules/map/views/widgets/nav_bar.dart';
 import 'package:qualnote/app/modules/map/views/widgets/note_markers.dart';
 import 'package:qualnote/app/utils/note_type.dart';
@@ -48,7 +48,7 @@ class MapView extends GetView<MapGetxController> {
                       onTap: (tapPosition, point) =>
                           controller.addFileOnPoint(point),
                     ),
-                    children: [
+                    nonRotatedChildren: [
                       TileLayer(
                         urlTemplate:
                             'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -65,7 +65,7 @@ class MapView extends GetView<MapGetxController> {
                         ],
                       ),
                       MarkerLayer(
-                        rotate: true,
+                        //rotate: true,
                         markers: [
                           Marker(
                             point: controller.currentLocation.value,
@@ -88,7 +88,7 @@ class MapView extends GetView<MapGetxController> {
                       : const SizedBox()
               : const SizedBox()),
           MapControls(controller: controller),
-          NavBar(),
+          const NavBar(),
           StorageProgressIndicator(),
         ],
       ),
@@ -134,59 +134,5 @@ class MapView extends GetView<MapGetxController> {
       markers.add(marker);
     }
     return markers;
-  }
-}
-
-class MapControls extends StatelessWidget {
-  const MapControls({
-    Key? key,
-    required this.controller,
-  }) : super(key: key);
-
-  final MapGetxController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Visibility(
-            visible: !controller.isPreview.value,
-            child: TextButton(
-              onPressed: () => controller.recenter(),
-              child: const Icon(
-                Icons.my_location_rounded,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          kIsWeb
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextButton(
-                      onPressed: () => controller.zoomIn(),
-                      child: const Icon(
-                        Icons.zoom_in_outlined,
-                        size: 30,
-                        color: Colors.black,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () => controller.zoomOut(),
-                      child: const Icon(
-                        Icons.zoom_out_outlined,
-                        size: 30,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                )
-              : const SizedBox()
-        ],
-      ),
-    );
   }
 }

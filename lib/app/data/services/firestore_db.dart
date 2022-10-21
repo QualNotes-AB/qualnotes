@@ -10,7 +10,6 @@ import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/cloud_storage.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/home/controllers/progress_controller.dart';
-import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/utils/note_type.dart';
 
 class FirebaseDatabase extends GetxController {
@@ -32,6 +31,7 @@ class FirebaseDatabase extends GetxController {
       .snapshots();
 
   Future<Project?> getProjectForWeb(String projectId) async {
+    Get.find<ProgressController>().showProgress('Downloading project...', 0);
     Project project = Project();
     await _db.collection('projects').doc(projectId).get().then(
         (snapshot) => project = Project.fromJson(snapshot.data()!, projectId));
@@ -60,29 +60,29 @@ class FirebaseDatabase extends GetxController {
       project.consents!.add(filePath);
     }
 
-    if (project.type == RecordingType.video.toString()) {
-      for (int i = 1; i <= project.routeVideosLength!; i++) {
-        var filePath = await _storage.getStoragePath(
-          projectId: projectId,
-          fileName: 'VideoRecording$i',
-          fileType: project.type!,
-          downloadUrl: true,
-        );
-        project.routeVideos!.add(filePath);
-      }
-    }
+    // if (project.type == RecordingType.video.toString()) {
+    //   for (int i = 1; i <= project.routeVideosLength!; i++) {
+    //     var filePath = await _storage.getStoragePath(
+    //       projectId: projectId,
+    //       fileName: 'VideoRecording$i',
+    //       fileType: project.type!,
+    //       downloadUrl: true,
+    //     );
+    //     project.routeVideos!.add(filePath);
+    //   }
+    // }
 
-    if (project.type == RecordingType.audio.toString()) {
-      for (int i = 1; i <= project.routeAudiosLength!; i++) {
-        var filePath = await _storage.getStoragePath(
-          projectId: projectId,
-          fileName: 'AudioRecording$i',
-          fileType: project.type!,
-          downloadUrl: true,
-        );
-        project.routeAudios!.add(filePath);
-      }
-    }
+    // if (project.type == RecordingType.audio.toString()) {
+    //   for (int i = 1; i <= project.routeAudiosLength!; i++) {
+    //     var filePath = await _storage.getStoragePath(
+    //       projectId: projectId,
+    //       fileName: 'AudioRecording$i',
+    //       fileType: project.type!,
+    //       downloadUrl: true,
+    //     );
+    //     project.routeAudios!.add(filePath);
+    //   }
+    // }
     Get.find<ProgressController>().showProgress('Downloading project...', 1);
     return project;
   }
@@ -117,29 +117,29 @@ class FirebaseDatabase extends GetxController {
         project.consents!.add(filePath);
       }
 
-      if (project.type == RecordingType.video.toString()) {
-        for (int i = 1; i <= project.routeVideosLength!; i++) {
-          var filePath = await _storage.downloadFile(
-            projectId: projectId,
-            fileName: 'VideoRecording$i',
-            fileType: project.type!,
-          );
-          project.routeVideos ??= [];
-          project.routeVideos!.add(filePath);
-        }
-      }
+      // if (project.type == RecordingType.video.toString()) {
+      //   for (int i = 1; i <= project.routeVideosLength!; i++) {
+      //     var filePath = await _storage.downloadFile(
+      //       projectId: projectId,
+      //       fileName: 'VideoRecording$i',
+      //       fileType: project.type!,
+      //     );
+      //     project.routeVideos ??= [];
+      //     project.routeVideos!.add(filePath);
+      //   }
+      // }
 
-      if (project.type == RecordingType.audio.toString()) {
-        for (int i = 1; i <= project.routeAudiosLength!; i++) {
-          var filePath = await _storage.downloadFile(
-            projectId: projectId,
-            fileName: 'AudioRecording$i',
-            fileType: project.type!,
-          );
-          project.routeAudios ??= [];
-          project.routeAudios!.add(filePath);
-        }
-      }
+      // if (project.type == RecordingType.audio.toString()) {
+      //   for (int i = 1; i <= project.routeAudiosLength!; i++) {
+      //     var filePath = await _storage.downloadFile(
+      //       projectId: projectId,
+      //       fileName: 'AudioRecording$i',
+      //       fileType: project.type!,
+      //     );
+      //     project.routeAudios ??= [];
+      //     project.routeAudios!.add(filePath);
+      //   }
+      // }
       await Get.find<HiveDb>().saveProject(project);
     } on Exception catch (e) {
       log(e.toString());
@@ -170,35 +170,35 @@ class FirebaseDatabase extends GetxController {
     }
 
     //delete main route recordings
-    if (project.type! == RecordingType.video.toString()) {
-      for (var i = 1; i <= project.routeVideos!.length; i++) {
-        await _storage.deleteFile(
-          projectId: project.id!,
-          fileName: 'VideoRecording$i',
-          fileType: project.type!,
-        );
-      }
-    }
-    if (project.type! == RecordingType.audio.toString()) {
-      for (var i = 1; i <= project.routeAudios!.length; i++) {
-        await _storage.deleteFile(
-          projectId: project.id!,
-          fileName: 'AudioRecording$i',
-          fileType: project.type!,
-        );
-      }
-    }
+    // if (project.type! == RecordingType.video.toString()) {
+    //   for (var i = 1; i <= project.routeVideos!.length; i++) {
+    //     await _storage.deleteFile(
+    //       projectId: project.id!,
+    //       fileName: 'VideoRecording$i',
+    //       fileType: project.type!,
+    //     );
+    //   }
+    // }
+    // if (project.type! == RecordingType.audio.toString()) {
+    //   for (var i = 1; i <= project.routeAudios!.length; i++) {
+    //     await _storage.deleteFile(
+    //       projectId: project.id!,
+    //       fileName: 'AudioRecording$i',
+    //       fileType: project.type!,
+    //     );
+    //   }
+    // }
 
     log('Project deleted from cloud!');
   }
 
   Future<void> uploadProject(Project project) async {
-    Get.snackbar(
-      'Preparing upload',
-      'Try to maintain good connection.',
-      backgroundColor: Colors.blue,
-      colorText: Colors.white,
-    );
+    // Get.snackbar(
+    //   'Preparing upload',
+    //   'Try to maintain good connection.',
+    //   backgroundColor: Colors.blue,
+    //   colorText: Colors.white,
+    // );
     //uploads all notes to cloud storage
 
     for (int i = 0; i < project.notes!.length; i++) {
@@ -230,36 +230,43 @@ class FirebaseDatabase extends GetxController {
     }
 
     //upload main route recordings
-    if (project.type! == RecordingType.video.toString()) {
-      int i = 0;
-      for (var path in project.routeVideos!) {
-        i++;
-        await _storage.uploadFile(
-          path: path,
-          projectId: project.id!,
-          fileName: 'VideoRecording$i',
-          fileType: project.type!,
-          numberOfFiles: project.routeVideosLength!,
-          filePosition: i,
-        );
-      }
-    }
-    if (project.type! == RecordingType.audio.toString()) {
-      int i = 0;
-      for (var path in project.routeAudios!) {
-        i++;
-        await _storage.uploadFile(
-          path: path,
-          projectId: project.id!,
-          fileName: 'AudioRecording$i',
-          fileType: project.type!,
-          numberOfFiles: project.routeAudiosLength!,
-          filePosition: i,
-        );
-      }
-    }
+    // if (project.type! == RecordingType.video.toString()) {
+    //   int i = 0;
+    //   for (var path in project.routeVideos!) {
+    //     i++;
+    //     await _storage.uploadFile(
+    //       path: path,
+    //       projectId: project.id!,
+    //       fileName: 'VideoRecording$i',
+    //       fileType: project.type!,
+    //       numberOfFiles: project.routeVideosLength!,
+    //       filePosition: i,
+    //     );
+    //   }
+    // }
+    // if (project.type! == RecordingType.audio.toString()) {
+    //   int i = 0;
+    //   for (var path in project.routeAudios!) {
+    //     i++;
+    //     await _storage.uploadFile(
+    //       path: path,
+    //       projectId: project.id!,
+    //       fileName: 'AudioRecording$i',
+    //       fileType: project.type!,
+    //       numberOfFiles: project.routeAudiosLength!,
+    //       filePosition: i,
+    //     );
+    //   }
+    // }
     await _db.collection('projects').doc(project.id!).set(project.toJson());
-
+    // `Get.find<ProgressController>().showProgress('Uploading project...', 1);`
+    Get.snackbar(
+      'Hooray!',
+      'Project uploaded',
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 2),
+    );
     log('Project uploaded! Hooray!');
   }
 
@@ -270,6 +277,7 @@ class FirebaseDatabase extends GetxController {
       'Project updated',
       backgroundColor: Colors.green,
       colorText: Colors.white,
+      duration: const Duration(seconds: 2),
     );
   }
 

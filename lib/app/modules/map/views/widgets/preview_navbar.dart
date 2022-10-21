@@ -21,6 +21,7 @@ class PreviewNavbar extends StatelessWidget {
       children: [
         NavButton(
           onPressed: () {
+            mapGetxController.previousNote();
             // mapGetxController.openRecording(
             //     index: mapGetxController.selectedNoteIndex.value,
             //     isMainRecording: false,
@@ -35,6 +36,7 @@ class PreviewNavbar extends StatelessWidget {
         ),
         NavButton(
           onPressed: () {
+            mapGetxController.nextNote();
             // mapGetxController.openRecording(
             //     index: mapGetxController.selectedNoteIndex.value,
             //     isMainRecording: false,
@@ -49,14 +51,19 @@ class PreviewNavbar extends StatelessWidget {
         ),
         NavButton(
           onPressed: () {
+            mapGetxController.openNote(
+              mapGetxController.selectedNoteIndex.value < 0
+                  ? 0
+                  : mapGetxController.selectedNoteIndex.value,
+            );
             // if (mapGetxController.selectedNoteIndex.value != 0) return;
-            if (mapGetxController.type.value == RecordingType.justMapping) {
-              mapGetxController.openRecording(
-                  index: -1, isMainRecording: false, forward: true);
-              return;
-            }
-            mapGetxController.openRecording(
-                index: -1, isMainRecording: true, forward: true);
+            // if (mapGetxController.type.value == RecordingType.justMapping) {
+            //   mapGetxController.openRecording(
+            //       index: -1, isMainRecording: false, forward: true);
+            //   return;
+            // }
+            // mapGetxController.openRecording(
+            //     index: -1, isMainRecording: true, forward: true);
           },
           title: 'Play',
           icon: const Icon(
@@ -88,7 +95,7 @@ class PreviewNavbar extends StatelessWidget {
                 message: 'where you want your file to be',
                 snackPosition: SnackPosition.TOP,
                 backgroundColor: Colors.green,
-                duration: Duration(seconds: 5),
+                duration: Duration(seconds: 2),
               ),
             );
           },

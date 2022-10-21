@@ -72,12 +72,12 @@ class CameraGetxController extends GetxController {
       Get.snackbar('Camera', 'Error: select a camera first.');
       return;
     }
-    if (isMainRecording) {
-      await changeCameraQuality(ResolutionPreset.high);
-      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        durationInSeconds.value++;
-      });
-    }
+    // if (isMainRecording) {
+    //   await changeCameraQuality(ResolutionPreset.high);
+    //   timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    //     durationInSeconds.value++;
+    //   });
+    // }
     if (cameraController.value.isRecordingVideo) {
       // A recording is already started, do nothing.
       return;
@@ -107,9 +107,9 @@ class CameraGetxController extends GetxController {
     }
     try {
       XFile? video = await cameraController.stopVideoRecording();
-      if (isMainRecording) {
-        videoPaths.add(video.path);
-      }
+      // if (isMainRecording) {
+      //   videoPaths.add(video.path);
+      // }
       return video;
     } on Exception catch (e) {
       log(e.toString());
