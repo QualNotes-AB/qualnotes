@@ -4,7 +4,6 @@ import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/modules/dialogs/add_media.dart';
 import 'package:qualnote/app/modules/dialogs/finish_mapping.dart';
 import 'package:qualnote/app/modules/dialogs/pause.dart';
-import 'package:qualnote/app/modules/dialogs/start_recording.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/nav_button.dart';
@@ -55,7 +54,7 @@ class RecordingNavBar extends StatelessWidget {
           ),
         ),
         NavButton(
-          onPressed: startRecordingDialog,
+          onPressed: () {}, //startRecordingDialog,
           title: 'REC',
           icon: Stack(
             alignment: Alignment.center,

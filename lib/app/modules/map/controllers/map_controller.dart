@@ -314,11 +314,12 @@ class MapGetxController extends GetxController {
   Future<void> init() async {
     log('Map init');
     duration = 0;
-    if (kIsWeb) {
-      log('web');
-      getProjectFromUrl();
-      return;
-    }
+    // if (kIsWeb) {
+    //   log('web');
+    //   getProjectFromUrl();
+    //   return;
+    // }
+
     if (dbController.lastKnownLocation != LatLng(0, 0)) {
       currentLocation.value = dbController.lastKnownLocation;
     } else {

@@ -10,7 +10,6 @@ import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_details_sheet.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/note_bottom_sheet.dart';
-import 'package:qualnote/app/modules/map/views/widgets/text_note_sheet.dart';
 
 Marker audioMarker(
     {required Note note, required bool isPreview, required int index}) {
@@ -202,19 +201,14 @@ Marker textNoteMarker(
                 : Colors.transparent,
           ),
           child: TextButton(
-            onPressed: () => isPreview
-                ? {
-                    controller.selectedNoteIndex.value = index,
-                    Get.bottomSheet(
-                      NoteBottomSheet(note: note, index: index),
-                      elevation: 0,
-                      barrierColor: Colors.transparent,
-                    ),
-                  }
-                : {
-                    controller.selectedNoteIndex.value = index,
-                    textNoteSheet(note, index)
-                  },
+            onPressed: () {
+              controller.selectedNoteIndex.value = index;
+              Get.bottomSheet(
+                NoteBottomSheet(note: note, index: index),
+                elevation: 0,
+                barrierColor: Colors.transparent,
+              );
+            },
             style: const ButtonStyle(
                 padding: MaterialStatePropertyAll(EdgeInsets.zero)),
             child: Container(

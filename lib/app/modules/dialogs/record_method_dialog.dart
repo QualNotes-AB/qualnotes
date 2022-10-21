@@ -48,6 +48,7 @@ recordMethodDialog() {
                   Get.back();
                   controller.selectRecordingType(RecordingType.justMapping);
                   controller.resetFields();
+                  controller.startMapping();
                   Get.toNamed(Routes.MAP);
                 },
                 child: const Center(

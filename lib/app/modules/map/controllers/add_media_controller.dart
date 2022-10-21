@@ -54,14 +54,14 @@ class AddMediaController extends GetxController {
   }
 
   void addPhotoNote() async {
-    if (mapGetxController.type.value == RecordingType.video) {
-      await Get.find<CameraGetxController>()
-          .stopVideoRecording(isMainRecording: true);
-    }
-    if (mapGetxController.type.value == RecordingType.audio) {
-      await Get.find<AudioRecordingController>()
-          .stopRecorder(isMainRecording: true);
-    }
+    // if (mapGetxController.type.value == RecordingType.video) {
+    //   await Get.find<CameraGetxController>()
+    //       .stopVideoRecording(isMainRecording: true);
+    // }
+    // if (mapGetxController.type.value == RecordingType.audio) {
+    //   await Get.find<AudioRecordingController>()
+    //       .stopRecorder(isMainRecording: true);
+    // }
     Get.to(() => CameraRecordPage(
           isPhoto: true,
           onDone: (path) => addNote(
@@ -75,14 +75,14 @@ class AddMediaController extends GetxController {
   }
 
   void addVideoNote() async {
-    if (mapGetxController.type.value == RecordingType.video) {
-      await Get.find<CameraGetxController>()
-          .stopVideoRecording(isMainRecording: true);
-    }
-    if (mapGetxController.type.value == RecordingType.audio) {
-      await Get.find<AudioRecordingController>()
-          .stopRecorder(isMainRecording: true);
-    }
+    // if (mapGetxController.type.value == RecordingType.video) {
+    //   await Get.find<CameraGetxController>()
+    //       .stopVideoRecording(isMainRecording: true);
+    // }
+    // if (mapGetxController.type.value == RecordingType.audio) {
+    //   await Get.find<AudioRecordingController>()
+    //       .stopRecorder(isMainRecording: true);
+    // }
     Get.to(() => CameraRecordPage(
           onDone: (path) => addNote(
             newNote: Note(
@@ -95,26 +95,26 @@ class AddMediaController extends GetxController {
   }
 
   void addAudioNote() async {
-    if (mapGetxController.type.value == RecordingType.video) {
-      await Get.find<CameraGetxController>()
-          .stopVideoRecording(isMainRecording: true);
-    }
-    if (mapGetxController.type.value == RecordingType.audio) {
-      await Get.find<AudioRecordingController>()
-          .stopRecorder(isMainRecording: true);
-    }
+    // if (mapGetxController.type.value == RecordingType.video) {
+    //   await Get.find<CameraGetxController>()
+    //       .stopVideoRecording(isMainRecording: true);
+    // }
+    // if (mapGetxController.type.value == RecordingType.audio) {
+    //   await Get.find<AudioRecordingController>()
+    //       .stopRecorder(isMainRecording: true);
+    // }
     Get.to(() => AudioRecordingView());
   }
 
   Future<void> addTextNote(String text) async {
-    if (mapGetxController.type.value == RecordingType.video) {
-      await Get.find<CameraGetxController>()
-          .stopVideoRecording(isMainRecording: true);
-    }
-    if (mapGetxController.type.value == RecordingType.audio) {
-      await Get.find<AudioRecordingController>()
-          .stopRecorder(isMainRecording: true);
-    }
+    // if (mapGetxController.type.value == RecordingType.video) {
+    //   await Get.find<CameraGetxController>()
+    //       .stopVideoRecording(isMainRecording: true);
+    // }
+    // if (mapGetxController.type.value == RecordingType.audio) {
+    //   await Get.find<AudioRecordingController>()
+    //       .stopRecorder(isMainRecording: true);
+    // }
     var location = await mapGetxController.getCurrentLocation();
     var note = Note(
       title: 'TextNote${dateFormat.format(DateTime.now())}',
@@ -154,10 +154,10 @@ class AddMediaController extends GetxController {
   void saveAudioConsent(String path) => consentsPaths.add(path);
 
   void addFileNote({LatLng? tapCoordinate, int? index}) async {
-    if (mapGetxController.type.value == RecordingType.video) {
-      await Get.find<CameraGetxController>()
-          .stopVideoRecording(isMainRecording: true);
-    }
+    // if (mapGetxController.type.value == RecordingType.video) {
+    //   await Get.find<CameraGetxController>()
+    //       .stopVideoRecording(isMainRecording: true);
+    // }
     // if (mapGetxController.type.value == RecordingType.audio) {
     //   await Get.find<AudioRecordingController>()
     //       .stopRecorder(isMainRecording: true);
@@ -215,22 +215,21 @@ class AddMediaController extends GetxController {
         numberOfFiles: 1,
         filePosition: 1,
       );
-      if (Get.find<MapGetxController>().type.value == RecordingType.video) {
-        await Get.find<CameraGetxController>()
-            .startVideoRecording(isMainRecording: true);
-      }
-      if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
-        Get.find<AudioRecordingController>()
-            .startRecorder(isMainRecording: true);
-      }
+      // if (Get.find<MapGetxController>().type.value == RecordingType.video) {
+      //   await Get.find<CameraGetxController>()
+      //       .startVideoRecording(isMainRecording: true);
+      // }
+      // if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
+      //   Get.find<AudioRecordingController>()
+      //       .startRecorder(isMainRecording: true);
+      // }
     }
 
     ///used when adding files on a specific point on route
     if (index != null) {
       mapGetxController.notes.insert(index, note);
       mapGetxController.triggerRebuild();
-      // Get.find<FirebaseDatabase>()
-      //     .addNote(mapGetxController.selectedProject.id!, note);
+
       return;
     }
 

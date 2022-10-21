@@ -91,6 +91,15 @@ class NoteBottomSheet extends StatelessWidget {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: BlueTextButton(
+                                  title: 'Delete',
+                                  onPressed: () async {
+                                    //TODO Delete
+                                  },
+                                ),
+                              ),
                               note.type != NoteType.text.toString()
                                   ? Padding(
                                       padding: const EdgeInsets.only(right: 10),
