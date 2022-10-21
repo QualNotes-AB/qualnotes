@@ -10,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_recorder.dart';
+import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/utils/note_type.dart';
@@ -145,8 +146,14 @@ class AudioRecordingController extends GetxController {
         }
         if (!isMainRecording) {
           await saveAudioPath(File(_mainPath), duration.value);
+
+          if (Get.find<MapGetxController>().type.value == RecordingType.video) {
+            await Get.find<CameraGetxController>()
+                .startVideoRecording(isMainRecording: true);
+          }
           if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
-            startRecorder(isMainRecording: true);
+            Get.find<AudioRecordingController>()
+                .startRecorder(isMainRecording: true);
           }
           Get.back();
         }

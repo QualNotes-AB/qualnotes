@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
+import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 
@@ -85,7 +86,13 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
 
                       if (Get.find<MapGetxController>().type.value ==
                           RecordingType.video) {
-                        controller.startVideoRecording(isMainRecording: true);
+                        Get.find<CameraGetxController>()
+                            .startVideoRecording(isMainRecording: true);
+                      }
+                      if (Get.find<MapGetxController>().type.value ==
+                          RecordingType.audio) {
+                        Get.find<AudioRecordingController>()
+                            .startRecorder(isMainRecording: true);
                       }
                     },
                   ),
@@ -258,7 +265,11 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
     }
     Get.back();
     if (Get.find<MapGetxController>().type.value == RecordingType.video) {
-      controller.startVideoRecording(isMainRecording: true);
+      Get.find<CameraGetxController>()
+          .startVideoRecording(isMainRecording: true);
+    }
+    if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
+      Get.find<AudioRecordingController>().startRecorder(isMainRecording: true);
     }
   }
 
@@ -269,7 +280,11 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
     }
     Get.back();
     if (Get.find<MapGetxController>().type.value == RecordingType.video) {
-      controller.startVideoRecording(isMainRecording: true);
+      Get.find<CameraGetxController>()
+          .startVideoRecording(isMainRecording: true);
+    }
+    if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
+      Get.find<AudioRecordingController>().startRecorder(isMainRecording: true);
     }
     return;
   }

@@ -113,6 +113,7 @@ class FirebaseDatabase extends GetxController {
           fileName: 'Consent$i',
           fileType: 'consent',
         );
+        project.consents ??= [];
         project.consents!.add(filePath);
       }
 
@@ -123,6 +124,7 @@ class FirebaseDatabase extends GetxController {
             fileName: 'VideoRecording$i',
             fileType: project.type!,
           );
+          project.routeVideos ??= [];
           project.routeVideos!.add(filePath);
         }
       }
@@ -134,6 +136,7 @@ class FirebaseDatabase extends GetxController {
             fileName: 'AudioRecording$i',
             fileType: project.type!,
           );
+          project.routeAudios ??= [];
           project.routeAudios!.add(filePath);
         }
       }
@@ -269,6 +272,16 @@ class FirebaseDatabase extends GetxController {
       colorText: Colors.white,
     );
   }
+
+  // Future<void> addNote(String id, Note note) async {
+  //   try {
+  //     await _db.collection('projects').doc(id).update({
+  //       "notes": FieldValue.arrayUnion([note])
+  //     });
+  //   } on Exception catch (e) {
+  //     log(e.toString());
+  //   }
+  // }
 
   Future<void> addCollaborator(String id, List<String> emails) async {
     await _db.collection('projects').doc(id).update({"collaborators": emails});

@@ -21,10 +21,10 @@ class PreviewNavbar extends StatelessWidget {
       children: [
         NavButton(
           onPressed: () {
-            mapGetxController.openRecording(
-                index: mapGetxController.selectedNoteIndex.value,
-                isMainRecording: false,
-                forward: false);
+            // mapGetxController.openRecording(
+            //     index: mapGetxController.selectedNoteIndex.value,
+            //     isMainRecording: false,
+            //     forward: false);
           },
           title: 'Back',
           icon: const Icon(
@@ -35,10 +35,10 @@ class PreviewNavbar extends StatelessWidget {
         ),
         NavButton(
           onPressed: () {
-            mapGetxController.openRecording(
-                index: mapGetxController.selectedNoteIndex.value,
-                isMainRecording: false,
-                forward: true);
+            // mapGetxController.openRecording(
+            //     index: mapGetxController.selectedNoteIndex.value,
+            //     isMainRecording: false,
+            //     forward: true);
           },
           title: 'Next',
           icon: const Icon(

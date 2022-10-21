@@ -112,6 +112,7 @@ class MapGetxController extends GetxController {
   ///used when updating the project in overview//specificly in preview navbar finish button
   Project getUpdatedProject() {
     selectedProject.notes!.clear();
+
     selectedProject.notes!.addAll(notes.value);
     return selectedProject;
   }

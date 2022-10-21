@@ -66,18 +66,18 @@ class HomeView extends GetView<HomeController> {
             onPressed: recordMethodDialog,
             title: 'New Qual Notes Project',
           ),
-          AddButton(
-            onPressed: () {},
-            title: 'Upload docx pdf to My Files',
-          ),
-          AddButton(
-            onPressed: () {
-              if (!kIsWeb) {
-                Get.toNamed(Routes.AUDIO_RECORDING);
-              }
-            },
-            title: 'Open audio recordings',
-          ),
+          // AddButton(
+          //   onPressed: () {},
+          //   title: 'Upload docx pdf to My Files',
+          // ),
+          // AddButton(
+          //   onPressed: () {
+          //     if (!kIsWeb) {
+          //       Get.toNamed(Routes.AUDIO_RECORDING);
+          //     }
+          //   },
+          //   title: 'Open audio recordings',
+          // ),
           Obx(
             () => controller.isPublicCatalogue.value || kIsWeb
                 ? const SizedBox()

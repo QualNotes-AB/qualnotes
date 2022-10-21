@@ -30,6 +30,14 @@ class AddMediaController extends GetxController {
   List<String> consentsPaths = [];
 
   Future<void> addNote({required Note newNote}) async {
+    // if (mapGetxController.type.value == RecordingType.video) {
+    //   await Get.find<CameraGetxController>()
+    //       .stopVideoRecording(isMainRecording: true);
+    // }
+    // if (mapGetxController.type.value == RecordingType.audio) {
+    //   await Get.find<AudioRecordingController>()
+    //       .stopRecorder(isMainRecording: true);
+    // }
     var location = await mapGetxController.getCurrentLocation();
     var note = Note(
       title: newNote.title ?? 'Note${dateFormat.format(DateTime.now())}',
@@ -46,9 +54,13 @@ class AddMediaController extends GetxController {
   }
 
   void addPhotoNote() async {
-    log('Continue photo');
     if (mapGetxController.type.value == RecordingType.video) {
-      await Get.find<CameraGetxController>().stopVideoRecording();
+      await Get.find<CameraGetxController>()
+          .stopVideoRecording(isMainRecording: true);
+    }
+    if (mapGetxController.type.value == RecordingType.audio) {
+      await Get.find<AudioRecordingController>()
+          .stopRecorder(isMainRecording: true);
     }
     Get.to(() => CameraRecordPage(
           isPhoto: true,
@@ -63,10 +75,13 @@ class AddMediaController extends GetxController {
   }
 
   void addVideoNote() async {
-    log('Continue video');
     if (mapGetxController.type.value == RecordingType.video) {
       await Get.find<CameraGetxController>()
           .stopVideoRecording(isMainRecording: true);
+    }
+    if (mapGetxController.type.value == RecordingType.audio) {
+      await Get.find<AudioRecordingController>()
+          .stopRecorder(isMainRecording: true);
     }
     Get.to(() => CameraRecordPage(
           onDone: (path) => addNote(
@@ -80,7 +95,10 @@ class AddMediaController extends GetxController {
   }
 
   void addAudioNote() async {
-    log('Continue audio');
+    if (mapGetxController.type.value == RecordingType.video) {
+      await Get.find<CameraGetxController>()
+          .stopVideoRecording(isMainRecording: true);
+    }
     if (mapGetxController.type.value == RecordingType.audio) {
       await Get.find<AudioRecordingController>()
           .stopRecorder(isMainRecording: true);
@@ -89,6 +107,14 @@ class AddMediaController extends GetxController {
   }
 
   Future<void> addTextNote(String text) async {
+    if (mapGetxController.type.value == RecordingType.video) {
+      await Get.find<CameraGetxController>()
+          .stopVideoRecording(isMainRecording: true);
+    }
+    if (mapGetxController.type.value == RecordingType.audio) {
+      await Get.find<AudioRecordingController>()
+          .stopRecorder(isMainRecording: true);
+    }
     var location = await mapGetxController.getCurrentLocation();
     var note = Note(
       title: 'TextNote${dateFormat.format(DateTime.now())}',
@@ -99,6 +125,13 @@ class AddMediaController extends GetxController {
     );
     mapGetxController.notes.add(note);
     mapGetxController.triggerRebuild();
+    if (mapGetxController.type.value == RecordingType.video) {
+      await Get.find<CameraGetxController>()
+          .startVideoRecording(isMainRecording: true);
+    }
+    if (mapGetxController.type.value == RecordingType.audio) {
+      Get.find<AudioRecordingController>().startRecorder(isMainRecording: true);
+    }
   }
 
   void updateNote(String title, String description, int duration) {
@@ -121,6 +154,14 @@ class AddMediaController extends GetxController {
   void saveAudioConsent(String path) => consentsPaths.add(path);
 
   void addFileNote({LatLng? tapCoordinate, int? index}) async {
+    if (mapGetxController.type.value == RecordingType.video) {
+      await Get.find<CameraGetxController>()
+          .stopVideoRecording(isMainRecording: true);
+    }
+    // if (mapGetxController.type.value == RecordingType.audio) {
+    //   await Get.find<AudioRecordingController>()
+    //       .stopRecorder(isMainRecording: true);
+    // }
     FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'mp4', 'mp3', 'jpeg', 'jpg', 'png', 'docx']);
@@ -174,12 +215,22 @@ class AddMediaController extends GetxController {
         numberOfFiles: 1,
         filePosition: 1,
       );
+      if (Get.find<MapGetxController>().type.value == RecordingType.video) {
+        await Get.find<CameraGetxController>()
+            .startVideoRecording(isMainRecording: true);
+      }
+      if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
+        Get.find<AudioRecordingController>()
+            .startRecorder(isMainRecording: true);
+      }
     }
 
     ///used when adding files on a specific point on route
     if (index != null) {
       mapGetxController.notes.insert(index, note);
       mapGetxController.triggerRebuild();
+      // Get.find<FirebaseDatabase>()
+      //     .addNote(mapGetxController.selectedProject.id!, note);
       return;
     }
 

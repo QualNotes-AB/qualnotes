@@ -115,6 +115,7 @@ class OverviewView extends GetView<OverviewController> {
                     ),
                     //Text(project.description ?? 'No description'),
                     Wrap(
+                      runSpacing: 10,
                       children: [
                         Visibility(
                           visible: isLocal || kIsWeb,
