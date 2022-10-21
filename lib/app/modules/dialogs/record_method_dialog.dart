@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
@@ -5,9 +6,15 @@ import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/routes/app_pages.dart';
 
 recordMethodDialog() {
-  // if (kIsWeb) {
-  //   return;
-  // }
+  if (kIsWeb) {
+    Get.snackbar(
+      'Sorry',
+      'Not available for web..',
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+    return;
+  }
   var controller = Get.find<MapGetxController>();
   Get.dialog(
     Dialog(

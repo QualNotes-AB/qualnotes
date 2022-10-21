@@ -24,6 +24,7 @@ class AudioRecordingController extends GetxController {
   RxInt mainDuration = 0.obs;
   Timer _timer = Timer(const Duration(days: 1), () {});
   Codec _codec = Codec.aacMP4;
+  final String codecExtension = 'mp4';
   String _mainPath = '';
   FlutterSoundRecorder? mRecorder = FlutterSoundRecorder();
   bool mRecorderIsInited = false;
@@ -35,11 +36,14 @@ class AudioRecordingController extends GetxController {
 
   Future<void> saveAudioPath(File file, int duration) async {
     if (file.path != audioPath.value) {
+      final recording = await saveFileToAppStorage(file.path);
+      if (recording == null) return;
       await mediaController.addNote(
         newNote: Note(
           title: title.value,
-          path: file.path,
+          path: recording.path,
           duration: duration,
+          fileExtension: codecExtension,
           type: NoteType.audio.toString(),
         ),
       );
@@ -91,10 +95,13 @@ class AudioRecordingController extends GetxController {
     }
   }
 
-  void startRecorder({bool isMainRecording = false}) {
-    if (!mRecorderIsInited) {
+  void startRecorder({bool isMainRecording = false}) async {
+    if (!mRecorderIsInited) return;
+    if (mRecorder == null) {
+      log('Already recording');
       return;
     }
+    _timer.cancel();
     if (isMainRecording) {
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         mainDuration.value++;
@@ -106,23 +113,25 @@ class AudioRecordingController extends GetxController {
       });
       isRecording.value = true;
     }
-    if (!isRetake) {
-      title.value = 'audio${dateFormat.format(DateTime.now())}';
-      _mainPath = '${appDocDir.path}/${title.value}.mp4'.removeAllWhitespace;
-    }
+    // if (!isRetake) {
+    //   title.value = 'audio${dateFormat.format(DateTime.now())}';
+    //   _mainPath = '${appDocDir.path}/${title.value}.mp4'.removeAllWhitespace;
+    // }
+    title.value = 'audio${dateFormat.format(DateTime.now())}';
+    _mainPath =
+        '${appDocDir.path}/${title.value}.$codecExtension'.removeAllWhitespace;
     mRecorder!.startRecorder(
       toFile: _mainPath,
       codec: _codec,
       audioSource: theSource,
     );
-    isRetake = false;
+    // isRetake = false;
   }
 
-  Future<void> stopRecorder({bool isFinish = false}) async {
-    if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
-      return;
-    }
-    if (mRecorder != null) {
+  Future<void> stopRecorder({bool isMainRecording = false}) async {
+    try {
+      if (mRecorder == null) return;
+      if (mRecorder!.isStopped && !mRecorder!.isPaused) return;
       _timer.cancel();
       isRecording.value = false;
       await mRecorder!.stopRecorder().then((value) async {
@@ -134,17 +143,24 @@ class AudioRecordingController extends GetxController {
           Get.back();
           return;
         }
-        if (isFinish) {
-          _timer.cancel();
-          audioPaths.add(_mainPath);
-          return;
+        if (!isMainRecording) {
+          await saveAudioPath(File(_mainPath), duration.value);
+          if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
+            startRecorder(isMainRecording: true);
+          }
+          Get.back();
         }
-        await saveAudioPath(File(_mainPath), duration.value);
-        Get.back();
-        if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
-          startRecorder(isMainRecording: true);
+        if (isMainRecording) {
+          final recording = await saveFileToAppStorage(_mainPath);
+          if (recording == null) return;
+          audioPaths.add(recording.path);
         }
+        title.value = 'audio${dateFormat.format(DateTime.now())}';
+        _mainPath = '${appDocDir.path}/${title.value}.$codecExtension'
+            .removeAllWhitespace;
       });
+    } on Exception catch (e) {
+      log(e.toString());
     }
   }
 
@@ -153,11 +169,25 @@ class AudioRecordingController extends GetxController {
     _timer.cancel();
   }
 
+  Future<File?> saveFileToAppStorage(String path) async {
+    try {
+      final file = File(path);
+      final appStorage = await getApplicationDocumentsDirectory();
+      final newFile = File(
+          '${appStorage.path}/${dateFormat.format(DateTime.now())}.$codecExtension');
+      return await File(file.path).copy(newFile.path);
+    } on Exception catch (e) {
+      log(e.toString());
+    }
+    return null;
+  }
+
   Future<void> openTheRecorder() async {
     appDocDir = await getApplicationDocumentsDirectory();
-    title.value = 'audio${dateFormat.format(DateTime.now())}';
+
     _mainPath = audioPath.isEmpty
-        ? '${appDocDir.path}/audio/${title.value}.mp4'.removeAllWhitespace
+        ? '${appDocDir.path}/audio/${title.value}.$codecExtension'
+            .removeAllWhitespace
         : audioPath.value;
     mRecorder = FlutterSoundRecorder();
     await mRecorder!.openRecorder();

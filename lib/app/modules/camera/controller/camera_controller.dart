@@ -35,7 +35,7 @@ class CameraGetxController extends GetxController {
 
   Widget buildCameraWidget() {
     return isInitialized.value
-        ? cameraController.buildPreview()
+        ? CameraPreview(cameraController)
         : Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -72,15 +72,15 @@ class CameraGetxController extends GetxController {
       Get.snackbar('Camera', 'Error: select a camera first.');
       return;
     }
-    if (cameraController.value.isRecordingVideo) {
-      // A recording is already started, do nothing.
-      return;
-    }
     if (isMainRecording) {
       await changeCameraQuality(ResolutionPreset.high);
       timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         durationInSeconds.value++;
       });
+    }
+    if (cameraController.value.isRecordingVideo) {
+      // A recording is already started, do nothing.
+      return;
     }
 
     try {
@@ -95,7 +95,8 @@ class CameraGetxController extends GetxController {
     if (!isInitialized.value) {
       return null;
     }
-    if (!cameraController.value.isRecordingVideo) {
+    if (!cameraController.value.isRecordingVideo &&
+        !cameraController.value.isRecordingPaused) {
       return null;
     }
     if (timer != null) {

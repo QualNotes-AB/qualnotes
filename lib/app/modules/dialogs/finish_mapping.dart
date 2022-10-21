@@ -3,8 +3,9 @@ import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
-import 'package:qualnote/app/modules/home/views/project_overview_view.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
+import 'package:qualnote/app/modules/overview/controllers/overview_controller.dart';
+import 'package:qualnote/app/modules/overview/views/overview_view.dart';
 
 finishedDialog() {
   var mapGetxController = Get.find<MapGetxController>();
@@ -64,25 +65,39 @@ finishedDialog() {
                               color: AppColors.lightGrey,
                             ),
                             Expanded(
-                              child: TextButton(
-                                onPressed: () async {
-                                  if (title == null || title!.isEmpty) {
-                                    Get.snackbar('Sorry',
-                                        'Please enter the title of the route');
-                                  } else {
-                                    await cameraGetxController
-                                        .stopVideoRecording(isFinish: true);
-                                    await audioGetxController.stopRecorder(
-                                        isFinish: true);
-                                    final newRoute = await mapGetxController
-                                        .saveRouteLocaly(title!);
-                                    audioGetxController.resetRecorder();
-                                    Get.to(() =>
-                                        ProjectOverviewView(newRoute, true));
-                                  }
-                                },
-                                child: const Center(
-                                  child: Text('Save'),
+                              child: Obx(
+                                () => TextButton(
+                                  onPressed: mapGetxController.isFinishing.value
+                                      ? null
+                                      : () async {
+                                          if (title == null || title!.isEmpty) {
+                                            Get.snackbar('Sorry',
+                                                'Please enter the title of the route');
+                                          } else {
+                                            mapGetxController
+                                                .isFinishing.value = true;
+                                            await cameraGetxController
+                                                .stopVideoRecording(
+                                                    isFinish: true,
+                                                    isMainRecording: true);
+                                            await audioGetxController
+                                                .stopRecorder(
+                                                    isMainRecording: true);
+                                            final newProject =
+                                                await mapGetxController
+                                                    .saveRouteLocaly(title!);
+                                            mapGetxController
+                                                .isFinishing.value = false;
+                                            Get.find<OverviewController>()
+                                                .selectProject(
+                                                    newProject: newProject,
+                                                    local: true);
+                                            Get.to(() => const OverviewView());
+                                          }
+                                        },
+                                  child: const Center(
+                                    child: Text('Save'),
+                                  ),
                                 ),
                               ),
                             ),

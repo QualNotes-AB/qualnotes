@@ -10,10 +10,12 @@
             "type": "dart",
             "flutterMode": "debug",
             "args": [
-               "--web-hostname",
-               "localhost",
-               "--web-port",
-               "5000",
+                "--web-hostname",
+                "localhost",
+                "--web-port",
+                "5000",
+                "--web-renderer",
+                "html",
             ]
         },
         {

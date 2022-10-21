@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
@@ -7,7 +8,6 @@ import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_details_sheet.dart';
-import 'package:qualnote/app/modules/camera/view/video_player.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/note_bottom_sheet.dart';
 import 'package:qualnote/app/modules/map/views/widgets/text_note_sheet.dart';
@@ -32,6 +32,7 @@ Marker audioMarker(
             ),
             child: TextButton(
               onPressed: () {
+                controller.selectedNoteIndex.value = index;
                 Get.find<AudioRecordingController>().selectAudioNote(note);
                 isPreview
                     ? Get.bottomSheet(
@@ -61,10 +62,12 @@ Marker audioMarker(
                       Icons.add_circle,
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     Icons.mic,
                     size: 30,
-                    color: AppColors.black,
+                    color: controller.selectedNoteIndex.value == index
+                        ? AppColors.white
+                        : AppColors.black,
                   ),
                 ],
               ),
@@ -84,6 +87,8 @@ Marker videoMarker(
     builder: (context) {
       return Obx(
         () => Container(
+          height: 50,
+          width: 50,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(25),
             color: controller.selectedNoteIndex.value == index
@@ -92,20 +97,23 @@ Marker videoMarker(
           ),
           child: TextButton(
               onPressed: () {
-                isPreview
-                    ? Get.bottomSheet(
-                        NoteBottomSheet(note: note, index: index),
-                        elevation: 0,
-                        barrierColor: Colors.transparent,
-                        isScrollControlled: true,
-                        ignoreSafeArea: false,
-                        isDismissible: true,
-                      )
-                    : Get.to(VideoPlayerPage(path: note.path!));
+                controller.selectedNoteIndex.value = index;
+                Get.bottomSheet(
+                  NoteBottomSheet(note: note, index: index),
+                  elevation: 0,
+                  barrierColor: Colors.transparent,
+                  isScrollControlled: !kIsWeb,
+                  ignoreSafeArea: false,
+                  isDismissible: true,
+                );
               },
-              child: const Icon(
+              style: const ButtonStyle(
+                  padding: MaterialStatePropertyAll(EdgeInsets.zero)),
+              child: Icon(
                 Icons.videocam,
-                color: AppColors.black,
+                color: controller.selectedNoteIndex.value == index
+                    ? AppColors.white
+                    : AppColors.black,
               )),
         ),
       );
@@ -124,38 +132,52 @@ Marker photoMarker(
       return Obx(
         () => Transform.translate(
           offset: const Offset(0, -80),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
-              color: controller.selectedNoteIndex.value == index
-                  ? const Color.fromARGB(129, 36, 145, 235)
-                  : Colors.transparent,
-            ),
-            child: TextButton(
-              onPressed: () {
-                isPreview
-                    ? Get.bottomSheet(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              note.path == null
+                  ? const SizedBox()
+                  : kIsWeb
+                      ? Image.network(
+                          note.path!,
+                          fit: BoxFit.cover,
+                          width: 150,
+                        )
+                      : Image.file(
+                          File(note.path!),
+                          width: 150,
+                        ),
+              Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    color: controller.selectedNoteIndex.value == index
+                        ? const Color.fromARGB(129, 36, 145, 235)
+                        : Colors.transparent,
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      controller.selectedNoteIndex.value = index;
+                      Get.bottomSheet(
                         NoteBottomSheet(note: note, index: index),
                         elevation: 0,
                         barrierColor: Colors.transparent,
-                        isScrollControlled: true,
+                        isScrollControlled: false,
                         ignoreSafeArea: false,
                         isDismissible: true,
-                      )
-                    : {
-                        //TODO Retake photo
-                      };
-              },
-              child: Column(
-                children: [
-                  Image.file(
-                    File(note.path!),
-                    height: 150,
-                  ),
-                  const Icon(Icons.photo_camera_rounded)
-                ],
-              ),
-            ),
+                      );
+                    },
+                    style: const ButtonStyle(
+                        padding: MaterialStatePropertyAll(EdgeInsets.zero)),
+                    child: Icon(
+                      Icons.photo_camera_rounded,
+                      color: controller.selectedNoteIndex.value == index
+                          ? AppColors.white
+                          : AppColors.black,
+                    ),
+                  ))
+            ],
           ),
         ),
       );
@@ -193,10 +215,24 @@ Marker textNoteMarker(
                     controller.selectedNoteIndex.value = index,
                     textNoteSheet(note, index)
                   },
-            child: const Center(
-              child: Icon(
-                Icons.notes_outlined,
-                color: Colors.black,
+            style: const ButtonStyle(
+                padding: MaterialStatePropertyAll(EdgeInsets.zero)),
+            child: Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                color: controller.selectedNoteIndex.value == index
+                    ? const Color.fromARGB(129, 36, 145, 235)
+                    : Colors.transparent,
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.notes_outlined,
+                  color: controller.selectedNoteIndex.value == index
+                      ? AppColors.white
+                      : AppColors.black,
+                ),
               ),
             ),
           ),
@@ -214,6 +250,8 @@ Marker fileMarker(
     builder: (context) {
       return Obx(
         () => Container(
+          height: 50,
+          width: 50,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(25),
             color: controller.selectedNoteIndex.value == index
@@ -222,18 +260,21 @@ Marker fileMarker(
           ),
           child: TextButton(
               onPressed: () {
-                isPreview
-                    ? Get.bottomSheet(
-                        NoteBottomSheet(note: note, index: index),
-                        elevation: 0,
-                        barrierColor: Colors.transparent,
-                        isDismissible: true,
-                      )
-                    : null;
+                controller.selectedNoteIndex.value = index;
+                Get.bottomSheet(
+                  NoteBottomSheet(note: note, index: index),
+                  elevation: 0,
+                  barrierColor: Colors.transparent,
+                  isDismissible: true,
+                );
               },
-              child: const Icon(
+              style: const ButtonStyle(
+                  padding: MaterialStatePropertyAll(EdgeInsets.zero)),
+              child: Icon(
                 Icons.file_present_rounded,
-                color: AppColors.black,
+                color: controller.selectedNoteIndex.value == index
+                    ? AppColors.white
+                    : AppColors.black,
               )),
         ),
       );

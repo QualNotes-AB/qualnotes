@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
+import 'package:qualnote/app/modules/home/controllers/home_controller.dart';
 
 class TabSwitch extends StatelessWidget {
-  const TabSwitch({
+  TabSwitch({
     Key? key,
   }) : super(key: key);
-
+  final homeController = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -16,45 +18,61 @@ class TabSwitch extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: AppColors.blueText, width: 1),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  bottomLeft: Radius.circular(4),
-                ),
-                border: Border.all(color: AppColors.blueText, width: 1),
-                color: AppColors.blueText,
-              ),
-              child: const Center(
-                child: Text(
-                  'Show all My Files',
-                  style: AppTextStyle.regular13White,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(4),
-                  bottomRight: Radius.circular(4),
-                ),
-                border: Border.all(color: AppColors.blueText, width: 1),
-                color: AppColors.white,
-              ),
-              child: const Center(
-                child: Text(
-                  'Show Public Catalogue',
-                  style: AppTextStyle.regular13Blue,
+      child: Obx(
+        () => Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () => homeController.togglePublicCatalogue(false),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(4),
+                      bottomLeft: Radius.circular(4),
+                    ),
+                    border: Border.all(color: AppColors.blueText, width: 1),
+                    color: homeController.isPublicCatalogue.value
+                        ? AppColors.white
+                        : AppColors.blueText,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Show all My Files',
+                      style: !homeController.isPublicCatalogue.value
+                          ? AppTextStyle.regular13White
+                          : AppTextStyle.regular13Blue,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+            Expanded(
+              child: GestureDetector(
+                onTap: () => homeController.togglePublicCatalogue(true),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(4),
+                      bottomRight: Radius.circular(4),
+                    ),
+                    border: Border.all(color: AppColors.blueText, width: 1),
+                    color: !homeController.isPublicCatalogue.value
+                        ? AppColors.white
+                        : AppColors.blueText,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Show Public Catalogue',
+                      style: homeController.isPublicCatalogue.value
+                          ? AppTextStyle.regular13White
+                          : AppTextStyle.regular13Blue,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

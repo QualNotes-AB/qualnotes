@@ -5,8 +5,8 @@ import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
 import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/firestore_db.dart';
-import 'package:qualnote/app/data/services/local_db.dart';
-import 'package:qualnote/app/modules/home/views/project_overview_view.dart';
+import 'package:qualnote/app/modules/overview/controllers/overview_controller.dart';
+import 'package:qualnote/app/routes/app_pages.dart';
 
 class ProjectListTile extends StatelessWidget {
   final Project project;
@@ -25,17 +25,11 @@ class ProjectListTile extends StatelessWidget {
       children: [
         Expanded(
           child: TextButton(
-            onPressed: () async {
-              Project? completeProject;
-              if (!kIsWeb) {
-                completeProject =
-                    await Get.find<HiveDb>().getProject(project.id!);
-              }
-              if (kDebugMode) {
-                print(project.toJson());
-              }
-              Get.to(() =>
-                  ProjectOverviewView(completeProject ?? project, isLocal));
+            onPressed: () {
+              int local = isLocal ? 1 : 0;
+              if (!kIsWeb && !isLocal) return;
+              Get.toNamed("${Routes.OVERVIEW}?id=${project.id}&local=$local");
+              Get.find<OverviewController>().getProjectFromUrl();
             },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -66,13 +60,16 @@ class ProjectListTile extends StatelessWidget {
                   color: AppColors.black,
                 ),
               )
-            : TextButton(
-                onPressed: () {
-                  Get.find<FirebaseDatabase>().getProject(project.id!);
-                },
-                child: const Icon(
-                  Icons.download,
-                  color: AppColors.blue,
+            : Visibility(
+                visible: !kIsWeb,
+                child: TextButton(
+                  onPressed: () {
+                    Get.find<FirebaseDatabase>().getProject(project.id!);
+                  },
+                  child: const Icon(
+                    Icons.download,
+                    color: AppColors.blue,
+                  ),
                 ),
               ),
       ],

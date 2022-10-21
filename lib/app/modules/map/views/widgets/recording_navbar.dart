@@ -8,6 +8,7 @@ import 'package:qualnote/app/modules/dialogs/start_recording.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/nav_button.dart';
+import 'package:qualnote/app/routes/app_pages.dart';
 
 class RecordingNavBar extends StatelessWidget {
   const RecordingNavBar({
@@ -35,7 +36,7 @@ class RecordingNavBar extends StatelessWidget {
                   ),
                 )
               : NavButton(
-                  onPressed: () => Get.back(),
+                  onPressed: () => Get.offAllNamed(Routes.HOME),
                   title: 'Back',
                   icon: const Icon(
                     Icons.keyboard_arrow_left_rounded,

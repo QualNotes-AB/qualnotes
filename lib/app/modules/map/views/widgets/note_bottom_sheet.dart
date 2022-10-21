@@ -1,9 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:open_file/open_file.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
 import 'package:qualnote/app/data/models/note.dart';
@@ -12,6 +13,7 @@ import 'package:qualnote/app/modules/camera/view/video_player.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/blue_text_button.dart';
 import 'package:qualnote/app/utils/note_type.dart';
+import 'package:qualnote/app/utils/open_file/open_file_interface.dart';
 
 class NoteBottomSheet extends StatelessWidget {
   final Note note;
@@ -25,9 +27,14 @@ class NoteBottomSheet extends StatelessWidget {
   final date = DateFormat('dd.MM.yyyy');
   @override
   Widget build(BuildContext context) {
+    log(note.path ?? 'null');
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.only(left: 15, right: 15, bottom: 30),
+        margin: kIsWeb
+            ? EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width / 4)
+            : EdgeInsets.zero,
+        padding: const EdgeInsets.only(left: 15, right: 15, bottom: 10),
         decoration: const BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.only(
@@ -45,12 +52,25 @@ class NoteBottomSheet extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      note.title!,
+                    TextField(
+                      controller: TextEditingController(
+                          text: note.noteTitle ?? 'Note title'),
+                      onChanged: (value) =>
+                          mapGetxController.updateNoteTitle(value, index),
+                      maxLines: 2,
+                      autocorrect: false,
                       style: AppTextStyle.medium22Black,
+                      decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(0)),
+                      scrollPadding: EdgeInsets.zero,
                     ),
+                    // Text(
+                    //   note.title!,
+                    //   style: AppTextStyle.medium22Black,
+                    // ),
                     Text(
-                      'by ${note.author} on ${date.format(mapGetxController.selectedProject.date!)}',
+                      'by ${note.author} on ${date.format(mapGetxController.selectedProject.date ?? DateTime.now())}',
                       style: AppTextStyle.regular12Black,
                     ),
                     Padding(
@@ -59,25 +79,43 @@ class NoteBottomSheet extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Visibility(
-                            visible: index != 0,
+                            visible: true,
                             child: BlueTextButton(
                               title: 'Prev',
-                              onPressed: () =>
-                                  mapGetxController.previousNote(index),
+                              onPressed: () => mapGetxController.openRecording(
+                                  index: index,
+                                  isMainRecording: true,
+                                  forward: false),
                             ),
                           ),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              note.type != NoteType.text.toString()
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: BlueTextButton(
+                                        title: 'Open file',
+                                        onPressed: () async {
+                                          if (note.path != null) {
+                                            OpenFileUtil().openFile(note.path!);
+                                          }
+                                        },
+                                      ),
+                                    )
+                                  : const SizedBox(),
                               Text(
                                   '${index + 1}/${mapGetxController.notes.length}  '),
                               Visibility(
                                 visible:
-                                    index != mapGetxController.notes.length - 1,
+                                    index != mapGetxController.notes.length,
                                 child: BlueTextButton(
                                   title: 'Next',
                                   onPressed: () =>
-                                      mapGetxController.nextNote(index),
+                                      mapGetxController.openRecording(
+                                          index: index,
+                                          isMainRecording: true,
+                                          forward: true),
                                 ),
                               ),
                             ],
@@ -87,40 +125,21 @@ class NoteBottomSheet extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 15),
-                      child: note.type == NoteType.photo.toString()
-                          ? note.path == null
-                              ? const Text('Image not found')
-                              : Image.file(File(note.path!))
-                          : note.type == NoteType.audio.toString()
-                              ? note.path == null
-                                  ? const Text('Audio not found')
-                                  : CustomAudioPlayer(
-                                      path: note.path!, duration: 30)
-                              : note.type == NoteType.video.toString()
-                                  ? VideoPlayerWidget(path: note.path!)
-                                  : note.type == NoteType.document.toString()
-                                      ? BlueTextButton(
-                                          title: 'Open file',
-                                          onPressed: () async {
-                                            //For mobile open file
-                                            var result =
-                                                await OpenFile.open(note.path);
-                                            print(note.path);
-                                            print(result.message);
-                                            //For web download file
-                                          },
-                                        )
-                                      : const SizedBox(),
+                      child: displayMedia(),
                     ),
-                    RichText(
-                        text: TextSpan(children: [
-                      const TextSpan(
-                          text: 'Notes: ', style: AppTextStyle.semiBold13Black),
-                      TextSpan(
-                        text: note.description,
-                        style: AppTextStyle.regular13BlackHeight,
-                      )
-                    ])),
+                    const Text('Notes:', style: AppTextStyle.semiBold13Black),
+                    TextField(
+                      controller: TextEditingController(text: note.description),
+                      minLines: 3,
+                      maxLines: 10,
+                      autocorrect: false,
+                      onChanged: (value) =>
+                          mapGetxController.updateNoteDescription(value, index),
+                      style: AppTextStyle.regular13BlackHeight,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -129,5 +148,30 @@ class NoteBottomSheet extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget displayMedia() {
+    if (note.type == NoteType.text.toString()) {
+      return const SizedBox();
+    }
+    if (note.path == null) {
+      return const Center(
+        child: Text('File unavailable'),
+      );
+    }
+    if (note.type == NoteType.photo.toString()) {
+      return kIsWeb ? Image.network(note.path!) : Image.file(File(note.path!));
+    }
+    if (kIsWeb) {
+      return const SizedBox();
+    }
+    if (note.type == NoteType.document.toString() || kIsWeb) {}
+    if (note.type == NoteType.video.toString()) {
+      return VideoPlayerWidget(path: note.path!);
+    }
+    if (note.type == NoteType.audio.toString()) {
+      return CustomAudioPlayer(path: note.path!, duration: 30);
+    }
+    return const SizedBox();
   }
 }

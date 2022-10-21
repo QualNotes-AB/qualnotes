@@ -12,6 +12,8 @@ abstract class Routes {
   static const MAP = _Paths.MAP;
   static const AUDIO_RECORDING = _Paths.AUDIO_RECORDING;
   static const CONSENT = _Paths.CONSENT;
+  static const OVERVIEW = _Paths.OVERVIEW;
+  static const REFLECTION = _Paths.REFLECTION;
 }
 
 abstract class _Paths {
@@ -23,4 +25,6 @@ abstract class _Paths {
   static const MAP = '/map';
   static const AUDIO_RECORDING = '/audio-recording';
   static const CONSENT = '/consent';
+  static const OVERVIEW = '/overview';
+  static const REFLECTION = '/reflection';
 }

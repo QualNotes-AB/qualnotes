@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
@@ -30,7 +31,7 @@ class NavBar extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: mapGetxController.isPreview.value
+          child: mapGetxController.isPreview.value || kIsWeb
               ? PreviewNavbar(mapGetxController: mapGetxController)
               : RecordingNavBar(mapGetxController: mapGetxController),
         ),

@@ -23,11 +23,12 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
           Obx(() {
             return controller.isInitialized.value
-                ? controller.cameraController.buildPreview()
+                ? Center(child: controller.buildCameraWidget())
                 : Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

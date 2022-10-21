@@ -82,6 +82,18 @@ class AppTextStyle {
     color: AppColors.black,
   );
 
+  static const regular20Black = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w400,
+    color: AppColors.black,
+  );
+  static const regular14BlackHeight = TextStyle(
+    fontSize: 14,
+    height: 1.5,
+    fontWeight: FontWeight.w400,
+    color: AppColors.black,
+  );
+
   static const regular12Green = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w400,

@@ -24,13 +24,16 @@ class NoteAdapter extends TypeAdapter<Note> {
       author: fields[4] as String?,
       duration: fields[5] as int?,
       type: fields[6] as String?,
+      fileExtension: fields[7] as String?,
+      noteTitle: fields[8] as String?,
+      date: fields[9] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Note obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -44,7 +47,13 @@ class NoteAdapter extends TypeAdapter<Note> {
       ..writeByte(5)
       ..write(obj.duration)
       ..writeByte(6)
-      ..write(obj.type);
+      ..write(obj.type)
+      ..writeByte(7)
+      ..write(obj.fileExtension)
+      ..writeByte(8)
+      ..write(obj.noteTitle)
+      ..writeByte(9)
+      ..write(obj.date);
   }
 
   @override

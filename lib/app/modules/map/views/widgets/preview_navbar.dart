@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
+import 'package:qualnote/app/data/services/firestore_db.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/nav_button.dart';
 
@@ -20,8 +21,10 @@ class PreviewNavbar extends StatelessWidget {
       children: [
         NavButton(
           onPressed: () {
-            mapGetxController
-                .previousNote(mapGetxController.selectedNoteIndex.value);
+            mapGetxController.openRecording(
+                index: mapGetxController.selectedNoteIndex.value,
+                isMainRecording: false,
+                forward: false);
           },
           title: 'Back',
           icon: const Icon(
@@ -32,8 +35,10 @@ class PreviewNavbar extends StatelessWidget {
         ),
         NavButton(
           onPressed: () {
-            mapGetxController
-                .nextNote(mapGetxController.selectedNoteIndex.value);
+            mapGetxController.openRecording(
+                index: mapGetxController.selectedNoteIndex.value,
+                isMainRecording: false,
+                forward: true);
           },
           title: 'Next',
           icon: const Icon(
@@ -44,7 +49,14 @@ class PreviewNavbar extends StatelessWidget {
         ),
         NavButton(
           onPressed: () {
-            //TODO play
+            // if (mapGetxController.selectedNoteIndex.value != 0) return;
+            if (mapGetxController.type.value == RecordingType.justMapping) {
+              mapGetxController.openRecording(
+                  index: -1, isMainRecording: false, forward: true);
+              return;
+            }
+            mapGetxController.openRecording(
+                index: -1, isMainRecording: true, forward: true);
           },
           title: 'Play',
           icon: const Icon(
@@ -55,8 +67,10 @@ class PreviewNavbar extends StatelessWidget {
         ),
         NavButton(
           onPressed: () {
+            // mapGetxController.getUpdatedProject();
+            Get.find<FirebaseDatabase>()
+                .updateProject(mapGetxController.getUpdatedProject());
             Get.back();
-            //TODO update db
           },
           title: 'Finish',
           icon: const Icon(
@@ -67,7 +81,16 @@ class PreviewNavbar extends StatelessWidget {
         ),
         NavButton(
           onPressed: () {
-            //TODO Add file notes
+            mapGetxController.isAddFile.value = true;
+            Get.showSnackbar(
+              const GetSnackBar(
+                title: 'Click on the map',
+                message: 'where you want your file to be',
+                snackPosition: SnackPosition.TOP,
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 5),
+              ),
+            );
           },
           title: 'Add',
           icon: const Icon(

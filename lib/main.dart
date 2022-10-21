@@ -12,7 +12,6 @@ import 'package:qualnote/app/data/services/firestore_db.dart';
 import 'package:qualnote/app/data/services/internet_availability.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/home/controllers/progress_controller.dart';
-import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 
 import 'app/routes/app_pages.dart';
 
@@ -33,6 +32,10 @@ void main() async {
     await Firebase.initializeApp();
   }
 
+  //This is used to give some time for the firebase auth to fully initialise for web
+  FirebaseAuth.instance.currentUser;
+  await Future.delayed(const Duration(milliseconds: 500));
+
   ///location initialisation
   await checkForLocationPermission();
 
@@ -41,17 +44,17 @@ void main() async {
   Hive.registerAdapter(CoordinateAdapter());
   Hive.registerAdapter(NoteAdapter());
   Hive.registerAdapter(ProjectAdapter());
-
   final db = Get.put(HiveDb());
   await db.init();
   Get.put(ProgressController());
   Get.put(InternetAvailability());
   Get.put(FirebaseDatabase());
-  final mapController = Get.put(MapGetxController());
-  await mapController.init();
+  // final mapController = Get.put(MapGetxController());
+  // await mapController.init();
 
   runApp(
     GetMaterialApp(
+      textDirection: TextDirection.ltr,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Archivo'),
       title: "Application",
@@ -64,6 +67,7 @@ void main() async {
 }
 
 Future<void> checkForLocationPermission() async {
+  // if (kIsWeb) return;
   //checks and asks for loaction premmission
   Location location = Location();
   bool _serviceEnabled;

@@ -38,6 +38,10 @@ class Project {
   int? routeAudiosLength;
   @HiveField(15)
   int? consentsLength;
+  @HiveField(16)
+  List<String>? collaborators;
+  @HiveField(17)
+  List<Note>? reflectionNotes;
 
   Project({
     this.id,
@@ -56,6 +60,8 @@ class Project {
     this.routeVideosLength,
     this.routeAudiosLength,
     this.consentsLength,
+    this.collaborators,
+    this.reflectionNotes,
   });
 
   Project.fromJson(Map<String, dynamic> json, String docId) {
@@ -83,24 +89,18 @@ class Project {
         routePoints?.add(Coordinate.fromJson(v));
       });
     }
-    // if (json['routeVideos'] != null) {
-    //   routeVideos = <String>[];
-    //   json['routeVideos'].forEach((v) {
-    //     routeVideos?.add(v.toString());
-    //   });
-    // }
-    // if (json['routeAudios'] != null) {
-    //   routeAudios = <String>[];
-    //   json['routeAudios'].forEach((v) {
-    //     routeAudios?.add(v.toString());
-    //   });
-    // }
-    // if (json['consents'] != null) {
-    //   consents = <String>[];
-    //   json['consents'].forEach((v) {
-    //     consents?.add(v.toString());
-    //   });
-    // }
+    if (json['collaborators'] != null) {
+      collaborators = <String>[];
+      json['collaborators'].forEach((v) {
+        collaborators?.add(v.toString());
+      });
+    }
+    if (json['reflectionNotes'] != null) {
+      reflectionNotes = <Note>[];
+      json['reflectionNotes'].forEach((v) {
+        reflectionNotes?.add(Note.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -122,12 +122,13 @@ class Project {
     if (routePoints != null) {
       data['routePoints'] = routePoints?.map((v) => v.toJson()).toList();
     }
-    // if (routeVideos != null) {
-    //   data['routeVideos'] = routeVideos?.map((v) => v).toList();
-    // }
-    // if (routeAudios != null) {
-    //   data['routeAudios'] = routeAudios?.map((v) => v).toList();
-    // }
+    if (collaborators != null) {
+      data['collaborators'] = collaborators?.map((v) => v).toList();
+    }
+    if (reflectionNotes != null) {
+      data['reflectionNotes'] =
+          reflectionNotes?.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 

@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/cloud_storage.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
@@ -23,6 +24,68 @@ class FirebaseDatabase extends GetxController {
       .where('author',
           isEqualTo: FirebaseAuth.instance.currentUser!.displayName!)
       .snapshots();
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> get collabProjects => _db
+      .collection('projects')
+      .where('collaborators',
+          arrayContains: FirebaseAuth.instance.currentUser!.email!)
+      .snapshots();
+
+  Future<Project?> getProjectForWeb(String projectId) async {
+    Project project = Project();
+    await _db.collection('projects').doc(projectId).get().then(
+        (snapshot) => project = Project.fromJson(snapshot.data()!, projectId));
+
+    for (int i = 0; i < project.notes!.length; i++) {
+      var note = project.notes![i];
+      if (note.type == NoteType.text.toString()) {
+        continue;
+      }
+      var filePath = await _storage.getStoragePath(
+        projectId: projectId,
+        fileName: note.title!,
+        fileType: note.type!,
+        downloadUrl: true,
+      );
+      project.notes![i].path = filePath;
+    }
+
+    for (int i = 1; i <= project.consentsLength!; i++) {
+      var filePath = await _storage.getStoragePath(
+        projectId: projectId,
+        fileName: 'Consent$i',
+        fileType: 'consent',
+        downloadUrl: true,
+      );
+      project.consents!.add(filePath);
+    }
+
+    if (project.type == RecordingType.video.toString()) {
+      for (int i = 1; i <= project.routeVideosLength!; i++) {
+        var filePath = await _storage.getStoragePath(
+          projectId: projectId,
+          fileName: 'VideoRecording$i',
+          fileType: project.type!,
+          downloadUrl: true,
+        );
+        project.routeVideos!.add(filePath);
+      }
+    }
+
+    if (project.type == RecordingType.audio.toString()) {
+      for (int i = 1; i <= project.routeAudiosLength!; i++) {
+        var filePath = await _storage.getStoragePath(
+          projectId: projectId,
+          fileName: 'AudioRecording$i',
+          fileType: project.type!,
+          downloadUrl: true,
+        );
+        project.routeAudios!.add(filePath);
+      }
+    }
+    Get.find<ProgressController>().showProgress('Downloading project...', 1);
+    return project;
+  }
 
   Future<void> getProject(String projectId) async {
     Get.find<ProgressController>().showProgress('Downloading project...', 0);
@@ -151,7 +214,7 @@ class FirebaseDatabase extends GetxController {
     }
 
     int i = 0;
-    for (var path in project.consents!) {
+    for (var path in project.consents ?? []) {
       i++;
       await _storage.uploadFile(
         path: path,
@@ -197,8 +260,28 @@ class FirebaseDatabase extends GetxController {
     log('Project uploaded! Hooray!');
   }
 
+  Future<void> updateProject(Project project) async {
+    await _db.collection('projects').doc(project.id!).update(project.toJson());
+    Get.snackbar(
+      'Hooray!',
+      'Project updated',
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
+  }
+
+  Future<void> addCollaborator(String id, List<String> emails) async {
+    await _db.collection('projects').doc(id).update({"collaborators": emails});
+  }
+
+  Future<void> updateReflectionNotes(String id, List<Note> reflections) async {
+    await _db.collection('projects').doc(id).update(
+        {"reflectionNotes": reflections.map((v) => v.toJson()).toList()});
+  }
+
   ///Fetches all projects that the current user has created
   Future<List<Project>> getProjects() async {
+    log(FirebaseAuth.instance.currentUser!.displayName!);
     return await _db
         .collection('projects')
         .where('author',

@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/modules/dialogs/add_text_note.dart';
 import 'package:qualnote/app/modules/dialogs/camera_alert.dart';
+import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/utils/note_type.dart';
 
@@ -35,48 +37,59 @@ addMediaDialog() {
                     thickness: 1,
                     color: AppColors.lightGrey,
                   ),
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {
-                        Get.back();
-                        cameraAlertDialog(noteType: NoteType.photo);
-                      },
-                      child: const Center(
-                        child: Text(
-                          'Photo',
-                          textAlign: TextAlign.center,
+                  Visibility(
+                    visible: !kIsWeb,
+                    child: Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          if (kIsWeb) return;
+                          Get.back();
+                          cameraAlertDialog(noteType: NoteType.photo);
+                        },
+                        child: const Center(
+                          child: Text(
+                            'Photo',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     ),
                   ),
                   const Divider(
                       height: 1, thickness: 1, color: AppColors.lightGrey),
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {
-                        Get.back();
-                        cameraAlertDialog(noteType: NoteType.video);
-                      },
-                      child: const Center(
-                        child: Text(
-                          'Video',
-                          textAlign: TextAlign.center,
+                  Visibility(
+                    visible: !kIsWeb,
+                    child: Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          if (kIsWeb) return;
+                          Get.back();
+                          cameraAlertDialog(noteType: NoteType.video);
+                        },
+                        child: const Center(
+                          child: Text(
+                            'Video',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     ),
                   ),
                   const Divider(
                       height: 1, thickness: 1, color: AppColors.lightGrey),
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {
-                        Get.back();
-                        cameraAlertDialog(noteType: NoteType.audio);
-                      },
-                      child: const Center(
-                        child: Text(
-                          'Audio',
-                          textAlign: TextAlign.center,
+                  Visibility(
+                    visible: !kIsWeb,
+                    child: Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Get.back();
+                          cameraAlertDialog(noteType: NoteType.audio);
+                        },
+                        child: const Center(
+                          child: Text(
+                            'Audio',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     ),
@@ -101,7 +114,10 @@ addMediaDialog() {
                       height: 1, thickness: 1, color: AppColors.lightGrey),
                   Expanded(
                     child: TextButton(
-                      onPressed: () async {},
+                      onPressed: () {
+                        Get.find<AddMediaController>().addFileNote();
+                        Get.back();
+                      },
                       child: const Center(
                         child: Text(
                           'Note (File)',

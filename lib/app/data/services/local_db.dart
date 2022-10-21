@@ -3,13 +3,17 @@ import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/modules/home/controllers/home_controller.dart';
 import 'package:qualnote/app/utils/note_type.dart';
 
 class HiveDb extends GetxController {
+  LatLng lastKnownLocation = LatLng(0, 0);
   late Box<Project> projectsBox;
   RxBool inProgress = false.obs;
+
+  void saveLastKnownLocation(LatLng location) => lastKnownLocation = location;
 
   Future<void> deleteProjectLocaly(String projectId) async {
     var project = await getProject(projectId);
@@ -19,17 +23,30 @@ class HiveDb extends GetxController {
       if (element.type == NoteType.text.toString()) {
         continue;
       }
-      await File(element.path!).delete();
+
+      try {
+        await File(element.path!).delete();
+      } on Exception catch (e) {
+        log(e.toString());
+      }
     }
 
     if (project.type! == 'RecordingType.video') {
       for (var path in project.routeVideos ?? []) {
-        await File(path).delete();
+        try {
+          await File(path!).delete();
+        } on Exception catch (e) {
+          log(e.toString());
+        }
       }
     }
     if (project.type! == 'RecordingType.audio') {
       for (var path in project.routeAudios ?? []) {
-        await File(path).delete();
+        try {
+          await File(path!).delete();
+        } on Exception catch (e) {
+          log(e.toString());
+        }
       }
     }
     projectsBox.delete(projectId);

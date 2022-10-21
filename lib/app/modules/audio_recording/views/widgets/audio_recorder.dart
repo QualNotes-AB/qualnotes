@@ -19,9 +19,11 @@ class SimpleRecorder extends StatefulWidget {
 class _SimpleRecorderState extends State<SimpleRecorder> {
   @override
   void initState() {
-    audioGetxController
-        .openTheRecorder()
-        .then((value) => audioGetxController.mRecorderIsInited = true);
+    if (!audioGetxController.mRecorderIsInited) {
+      audioGetxController
+          .openTheRecorder()
+          .then((value) => audioGetxController.mRecorderIsInited = true);
+    }
     super.initState();
   }
 
@@ -79,9 +81,11 @@ class AudioMapping extends StatefulWidget {
 class _AudioMappingState extends State<AudioMapping> {
   @override
   void initState() {
-    audioGetxController
-        .openTheRecorder()
-        .then((value) => audioGetxController.mRecorderIsInited = true);
+    if (!audioGetxController.mRecorderIsInited) {
+      audioGetxController
+          .openTheRecorder()
+          .then((value) => audioGetxController.mRecorderIsInited = true);
+    }
     super.initState();
   }
 

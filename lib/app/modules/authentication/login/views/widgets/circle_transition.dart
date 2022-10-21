@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
@@ -113,22 +114,32 @@ class _LoginTransitionState extends State<LoginTransition>
       );
     }
     return Scaffold(
-      body: AnimatedBuilder(
-        animation: _transitionController,
-        builder: (context, child) => CustomPaint(
-          painter: TransitionPainter(
-            animation1Progress: animation1.value,
-            animation2Progress: animation2.value,
-            animation3Progress: animation3.value,
-            animation4Progress: animation4.value,
-            backgroundColor: widget.backgroundColor,
-            mainColor: widget.mainColor,
-          ),
-          child: const Center(
-            child: SizedBox.expand(),
-          ),
-        ),
-      ),
+      body: kIsWeb
+          ? Center(
+              child: SizedBox(
+                height: 60,
+                width: 60,
+                child: CircularProgressIndicator(
+                  color: widget.mainColor,
+                ),
+              ),
+            )
+          : AnimatedBuilder(
+              animation: _transitionController,
+              builder: (context, child) => CustomPaint(
+                painter: TransitionPainter(
+                  animation1Progress: animation1.value,
+                  animation2Progress: animation2.value,
+                  animation3Progress: animation3.value,
+                  animation4Progress: animation4.value,
+                  backgroundColor: widget.backgroundColor,
+                  mainColor: widget.mainColor,
+                ),
+                child: const Center(
+                  child: SizedBox.expand(),
+                ),
+              ),
+            ),
     );
   }
 }
@@ -151,51 +162,53 @@ class TransitionPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.fill
-      ..color = mainColor;
-    var maxRadius =
-        size.width > size.height ? size.width + 200 : size.height + 200;
+    if (!kIsWeb) {
+      final paint = Paint()
+        ..style = PaintingStyle.fill
+        ..color = mainColor;
+      var maxRadius =
+          size.width > size.height ? size.width + 200 : size.height + 200;
 
-    canvas.drawCircle(
-      Offset(size.width / 2, (size.height) / 2),
-      maxRadius * animation1Progress,
-      paint,
-    );
+      canvas.drawCircle(
+        Offset(size.width / 2, (size.height) / 2),
+        maxRadius * animation1Progress,
+        paint,
+      );
 
-    paint.style = PaintingStyle.stroke;
-    paint.color = backgroundColor;
-    paint.strokeWidth = 15;
-    paint.strokeCap = StrokeCap.round;
-
-    canvas.drawArc(
-        Rect.fromCenter(
-            center: Offset(size.width / 2, size.height / 2),
-            width: 100,
-            height: 100),
-        0,
-        2 * pi * animation2Progress,
-        false,
-        paint);
-
-    if (animation4Progress > 0.15) {
-      paint.style = PaintingStyle.fill;
+      paint.style = PaintingStyle.stroke;
       paint.color = backgroundColor;
-      canvas.drawCircle(
-        Offset(size.width / 2, (size.height) / 2),
-        maxRadius * animation4Progress,
-        paint,
-      );
-    }
-    paint.style = PaintingStyle.fill;
-    paint.color = mainColor;
+      paint.strokeWidth = 15;
+      paint.strokeCap = StrokeCap.round;
 
-    if (animation3Progress != 1) {
-      canvas.drawCircle(
-        Offset(size.width / 2, (size.height) / 2),
-        140 * animation3Progress,
-        paint,
-      );
+      canvas.drawArc(
+          Rect.fromCenter(
+              center: Offset(size.width / 2, size.height / 2),
+              width: 100,
+              height: 100),
+          0,
+          2 * pi * animation2Progress,
+          false,
+          paint);
+
+      if (animation4Progress > 0.15) {
+        paint.style = PaintingStyle.fill;
+        paint.color = backgroundColor;
+        canvas.drawCircle(
+          Offset(size.width / 2, (size.height) / 2),
+          maxRadius * animation4Progress,
+          paint,
+        );
+      }
+      paint.style = PaintingStyle.fill;
+      paint.color = mainColor;
+
+      if (animation3Progress != 1) {
+        canvas.drawCircle(
+          Offset(size.width / 2, (size.height) / 2),
+          140 * animation3Progress,
+          paint,
+        );
+      }
     }
   }
 

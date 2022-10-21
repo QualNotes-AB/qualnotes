@@ -21,6 +21,10 @@ class Note {
   String? type;
   @HiveField(7)
   String? fileExtension;
+  @HiveField(8)
+  String? noteTitle;
+  @HiveField(9)
+  DateTime? date;
 
   Note({
     this.title,
@@ -31,29 +35,41 @@ class Note {
     this.duration,
     this.type,
     this.fileExtension,
+    this.noteTitle,
+    this.date,
   });
 
   Note.fromJson(Map<String, dynamic> json) {
     title = json['title'];
     description = json['description'];
-    coordinate = Coordinate.fromJson(json['coordinate']);
+    if (json['coordinate'] != null) {
+      coordinate = Coordinate.fromJson(json['coordinate']);
+    }
     path = json['path'];
     author = json['author'];
     duration = json['duration'];
     type = json['type'];
     fileExtension = json['fileExtension'];
+    noteTitle = json['noteTitle'];
+    if (json['date'] != null) {
+      date = DateTime.fromMillisecondsSinceEpoch(
+          json['date'].millisecondsSinceEpoch);
+    }
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['title'] = title;
     data['description'] = description;
-    data['coordinate'] = coordinate!.toJson();
-    //data['path'] = path;
+    if (coordinate != null) {
+      data['coordinate'] = coordinate!.toJson();
+    }
+    data['noteTitle'] = noteTitle;
     data['author'] = author;
     data['duration'] = duration;
     data['type'] = type;
     data['fileExtension'] = fileExtension;
+    data['date'] = date;
     return data;
   }
 }

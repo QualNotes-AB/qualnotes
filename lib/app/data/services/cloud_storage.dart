@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,18 +18,14 @@ class CloudStorage {
     required String fileName,
     required String fileType,
   }) async {
-    String storagePath = getStoragePath(
+    String storagePath = await getStoragePath(
         fileType: fileType, projectId: projectId, fileName: fileName);
 
     log(storagePath);
     final storageRef = _storage.ref(storagePath);
-    final appDocDir = await getApplicationDocumentsDirectory();
-    String filePath;
-    if (fileType == NoteType.photo.toString()) {
-      filePath = "${appDocDir.path}/$fileName.jpg";
-    } else {
-      filePath = "${appDocDir.path}/$fileName.mp4";
-    }
+
+    String filePath = await getAppDirectoryPath(
+        fileType: fileType, projectId: projectId, fileName: fileName);
 
     log(filePath);
     final file = File(filePath);
@@ -52,15 +49,24 @@ class CloudStorage {
     required String fileName,
     required String fileType,
   }) async {
-    String storagePath = getStoragePath(
+    String storagePath = await getStoragePath(
         fileType: fileType, projectId: projectId, fileName: fileName);
 
-    Get.find<ProgressController>().showProgress('Deleting project', 0);
-    await _storage.ref(storagePath).delete();
-    Get.find<ProgressController>().showProgress('Deleting project', 1);
+    Get.find<ProgressController>().showProgress('Deleting file', 0);
+    try {
+      await _storage.ref(storagePath).delete();
+    } on Exception catch (e) {
+      log(storagePath);
+      log(e.toString());
+    }
+    Get.find<ProgressController>().showProgress('Deleting file', 1);
   }
 
-  Future<void> uploadFile({
+  Future<void> downloadFileFromWeb({required String storagePath}) async {
+    await _storage.ref().child(storagePath).getData();
+  }
+
+  Future<String> uploadFile({
     required String path,
     required String projectId,
     required String fileName,
@@ -70,12 +76,12 @@ class CloudStorage {
   }) async {
     File file = File(path);
 
-    String storagePath = getStoragePath(
+    String storagePath = await getStoragePath(
         fileType: fileType, projectId: projectId, fileName: fileName);
 
     try {
-      var uploadTask =
-          _storage.ref(storagePath).putData(file.readAsBytesSync());
+      var uploadTask = _storage.ref(storagePath).putFile(file);
+      //  _storage.ref(storagePath).putData(file.readAsBytesSync());
 
       uploadTask.snapshotEvents.listen(
         (event) {
@@ -94,26 +100,96 @@ class CloudStorage {
           }
         },
       );
+      return storagePath;
     } on FirebaseException catch (e) {
       log(e.toString());
+      return '';
     }
   }
 
-  String getStoragePath(
+  Future<String> uploadFileWeb({
+    required String projectId,
+    required String fileName,
+    required String fileType,
+    required Uint8List data,
+    required String fileExtension,
+  }) async {
+    final path = await getStoragePath(
+        fileType: fileType, projectId: projectId, fileName: fileName);
+
+    _storage
+        .ref(path)
+        .putData(data, SettableMetadata(contentType: fileExtension))
+        .asStream()
+        .listen((event) {
+      log(event.state.toString());
+      Get.find<ProgressController>().showProgress(
+          'Uploading file ', event.bytesTransferred / event.totalBytes);
+      if (event.state == TaskState.success) {
+        Get.snackbar(
+          'Hooray!',
+          'File uploaded',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      }
+    });
+
+    return await _storage.ref(path).getDownloadURL();
+  }
+
+  Future<String> getStoragePath(
       {required String fileType,
       required String projectId,
-      required String fileName}) {
-    if (fileType == RecordingType.audio.toString() ||
-        fileType == RecordingType.video.toString()) {
-      //if it's a recording of the route then save here
-      return 'projects/$projectId/routeRecording/$fileName.mp4';
+      required String fileName,
+      bool downloadUrl = false}) async {
+    late String path;
+    if (fileType == RecordingType.video.toString()) {
+      path = 'projects/$projectId/routeRecording/$fileName.mp4';
+    } else if (fileType == RecordingType.audio.toString()) {
+      path = 'projects/$projectId/routeRecording/$fileName.mp4';
     } else if (fileType == NoteType.audio.toString()) {
-      return 'projects/$projectId/audio/$fileName.mp4';
+      path = 'projects/$projectId/audio/$fileName.mp4';
     } else if (fileType == NoteType.video.toString()) {
-      return 'projects/$projectId/video/$fileName.mp4';
+      path = 'projects/$projectId/video/$fileName.mp4';
     } else if (fileType == NoteType.photo.toString()) {
-      return 'projects/$projectId/photo/$fileName.jpg';
+      path = 'projects/$projectId/photo/$fileName.jpg';
+    } else {
+      path = 'projects/$projectId/$fileType/$fileName.pdf';
     }
-    return 'projects/$projectId/$fileType/$fileName';
+    final ref = _storage.ref();
+    if (downloadUrl) {
+      log(path);
+      try {
+        final url = await ref.child(path).getDownloadURL();
+        log(url);
+        return url;
+      } on Exception catch (e) {
+        log(e.toString());
+      }
+    }
+    return path;
+  }
+
+  Future<String> getAppDirectoryPath(
+      {required String fileType,
+      required String projectId,
+      required String fileName,
+      bool downloadUrl = false}) async {
+    final appDocDir = await getApplicationDocumentsDirectory();
+    late String path;
+    if (fileType == NoteType.photo.toString()) {
+      path = "${appDocDir.path}/$fileName.jpg";
+    } else if (fileType == NoteType.audio.toString() ||
+        fileType == RecordingType.audio.toString()) {
+      path = "${appDocDir.path}/$fileName.mp4";
+    } else if (fileType == NoteType.video.toString() ||
+        fileType == RecordingType.video.toString()) {
+      path = "${appDocDir.path}/$fileName.mp4";
+    } else {
+      path = "${appDocDir.path}/$fileName.pdf";
+    }
+
+    return path;
   }
 }

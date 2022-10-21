@@ -1,14 +1,16 @@
 // ignore_for_file: invalid_use_of_protected_member
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/modules/audio_recording/views/widgets/audio_recorder.dart';
+import 'package:qualnote/app/modules/authentication/login/views/widgets/storage_progress_indicator.dart';
 import 'package:qualnote/app/modules/camera/view/camera_window.dart';
-import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/nav_bar.dart';
 import 'package:qualnote/app/modules/map/views/widgets/note_markers.dart';
 import 'package:qualnote/app/utils/note_type.dart';
@@ -17,69 +19,77 @@ import '../controllers/map_controller.dart';
 
 class MapView extends GetView<MapGetxController> {
   const MapView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    Get.find<AddMediaController>();
+
     return Scaffold(
       body: Stack(
         children: [
           Obx(() {
             controller.rebuild.value;
-
-            return FlutterMap(
-              mapController: controller.mapController,
-              options: MapOptions(
-                center: controller.center.value,
-                zoom: 16.0,
-                maxZoom: 19.0,
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.qualnotes.qualnote',
-                  maxZoom: 19.0,
-                ),
-                PolylineLayer(
-                  polylines: [
-                    Polyline(
-                      points: controller.routePoints.value,
-                      strokeWidth: 8,
-                      color: AppColors.lineBlue,
-                    )
-                  ],
-                ),
-                MarkerLayer(
-                  rotate: true,
-                  markers: [
-                    Marker(
-                      point: controller.currentLocation.value,
-                      builder: (context) => const Icon(
-                        Icons.radio_button_checked,
-                        color: AppColors.blue,
+            return controller.currentLocation.value == LatLng(0, 0)
+                ? const Center(
+                    child: SizedBox(
+                      height: 60,
+                      width: 60,
+                      child: CircularProgressIndicator(
+                        color: AppColors.darkGreen,
                       ),
                     ),
-                    ...markers,
-                  ],
-                ),
-              ],
-            );
+                  )
+                : FlutterMap(
+                    mapController: controller.mapController,
+                    options: MapOptions(
+                      center: controller.center.value,
+                      zoom: controller.zoom,
+                      maxZoom: controller.maxZoom,
+                      onTap: (tapPosition, point) =>
+                          controller.addFileOnPoint(point),
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'com.qualnotes.qualnote',
+                        maxZoom: controller.maxZoom,
+                      ),
+                      PolylineLayer(
+                        polylines: [
+                          Polyline(
+                            points: controller.routePoints.value,
+                            strokeWidth: 8,
+                            color: AppColors.lineBlue,
+                          )
+                        ],
+                      ),
+                      MarkerLayer(
+                        rotate: true,
+                        markers: [
+                          Marker(
+                            point: controller.currentLocation.value,
+                            builder: (context) => const Icon(
+                              Icons.radio_button_checked,
+                              color: AppColors.blue,
+                            ),
+                          ),
+                          ...markers,
+                        ],
+                      ),
+                    ],
+                  );
           }),
-          Obx(() => controller.type.value == RecordingType.video
-              ? CameraWindow(controller: controller)
-              : controller.type.value == RecordingType.audio
-                  ? const AudioMapping()
-                  : const SizedBox()),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-                onPressed: () => controller.recenter(),
-                child: const Icon(
-                  Icons.my_location_rounded,
-                  color: Colors.black,
-                )),
-          ),
+          Obx(() => controller.isMapping.value
+              ? controller.type.value == RecordingType.video
+                  ? CameraWindow(controller: controller)
+                  : controller.type.value == RecordingType.audio
+                      ? const AudioMapping()
+                      : const SizedBox()
+              : const SizedBox()),
+          MapControls(controller: controller),
           NavBar(),
+          StorageProgressIndicator(),
         ],
       ),
     );
@@ -88,6 +98,21 @@ class MapView extends GetView<MapGetxController> {
   List<Marker> get markers {
     List<Marker> markers = [];
     bool isPreview = controller.isPreview.value;
+    if (isPreview) {
+      markers.add(
+        Marker(
+          point: controller.routePoints.first,
+          builder: (context) => Transform.translate(
+            offset: const Offset(0, -10),
+            child: const Icon(
+              Icons.location_on_rounded,
+              color: AppColors.blue,
+              size: 30,
+            ),
+          ),
+        ),
+      );
+    }
     for (int i = 0; i < controller.notes.length; i++) {
       Note note = controller.notes[i];
       late Marker marker;
@@ -108,7 +133,60 @@ class MapView extends GetView<MapGetxController> {
       }
       markers.add(marker);
     }
-
     return markers;
+  }
+}
+
+class MapControls extends StatelessWidget {
+  const MapControls({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  final MapGetxController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Visibility(
+            visible: !controller.isPreview.value,
+            child: TextButton(
+              onPressed: () => controller.recenter(),
+              child: const Icon(
+                Icons.my_location_rounded,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          kIsWeb
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      onPressed: () => controller.zoomIn(),
+                      child: const Icon(
+                        Icons.zoom_in_outlined,
+                        size: 30,
+                        color: Colors.black,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => controller.zoomOut(),
+                      child: const Icon(
+                        Icons.zoom_out_outlined,
+                        size: 30,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                )
+              : const SizedBox()
+        ],
+      ),
+    );
   }
 }
