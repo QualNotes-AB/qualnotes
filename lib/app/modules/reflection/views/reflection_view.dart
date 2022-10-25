@@ -5,7 +5,6 @@ import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/config/text_styles.dart';
 import 'package:qualnote/app/modules/authentication/login/views/widgets/page_holder.dart';
 import 'package:qualnote/app/modules/reflection/views/widgets/reflection_tile.dart';
-import 'package:qualnote/app/routes/app_pages.dart';
 
 import '../controllers/reflection_controller.dart';
 
@@ -26,14 +25,14 @@ class ReflectionView extends GetView<ReflectionController> {
               child: SizedBox(
                 width: 200,
                 child: TextButton(
-                  onPressed: () => Get.offAllNamed(Routes.HOME),
+                  onPressed: () => Get.back(),
                   child: Row(
                     children: const [
                       Icon(
                         Icons.keyboard_arrow_left_outlined,
                         size: 30,
                       ),
-                      Text('Back to Main Menu'),
+                      Text('Back'),
                     ],
                   ),
                 ),
@@ -80,6 +79,7 @@ class ReflectionView extends GetView<ReflectionController> {
                   autocorrect: false,
                   style: AppTextStyle.regular16DarkGrey,
                   decoration: const InputDecoration(
+                      hintText: 'Enter reflection note',
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.all(0)),
                   scrollPadding: EdgeInsets.zero,

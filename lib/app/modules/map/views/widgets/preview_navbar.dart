@@ -51,11 +51,11 @@ class PreviewNavbar extends StatelessWidget {
         ),
         NavButton(
           onPressed: () {
-            mapGetxController.openNote(
-              mapGetxController.selectedNoteIndex.value < 0
-                  ? 0
-                  : mapGetxController.selectedNoteIndex.value,
-            );
+            mapGetxController.selectedNoteIndex.value < 0
+                ? mapGetxController.selectedNoteIndex.value = 0
+                : null;
+            mapGetxController
+                .openNote(mapGetxController.selectedNoteIndex.value);
             // if (mapGetxController.selectedNoteIndex.value != 0) return;
             // if (mapGetxController.type.value == RecordingType.justMapping) {
             //   mapGetxController.openRecording(
@@ -77,7 +77,9 @@ class PreviewNavbar extends StatelessWidget {
             // mapGetxController.getUpdatedProject();
             Get.find<FirebaseDatabase>()
                 .updateProject(mapGetxController.getUpdatedProject());
+
             Get.back();
+            mapGetxController.selectedNoteIndex.value = -1;
           },
           title: 'Finish',
           icon: const Icon(

@@ -23,7 +23,9 @@ class PageHolder extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: SingleChildScrollView(child: child),
                 ),
-                InternetStatusIndicator(),
+                Align(
+                    alignment: Alignment.topRight,
+                    child: InternetStatusIndicator()),
                 StorageProgressIndicator(),
               ],
             ),

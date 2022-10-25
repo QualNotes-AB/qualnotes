@@ -16,7 +16,7 @@ class InternetStatusIndicator extends StatelessWidget {
         visible: !connectivity.isConnected.value,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.red[700],
+            color: Colors.orange[700],
             borderRadius: BorderRadius.circular(3),
           ),
           padding: const EdgeInsets.all(3),
@@ -29,7 +29,7 @@ class InternetStatusIndicator extends StatelessWidget {
                 color: Colors.white,
               ),
               Text(
-                ' No internet ',
+                ' Offline mode ',
                 style: TextStyle(color: Colors.white),
               )
             ],

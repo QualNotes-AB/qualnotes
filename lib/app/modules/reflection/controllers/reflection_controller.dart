@@ -1,11 +1,11 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/data/services/firestore_db.dart';
-import 'package:qualnote/app/data/services/internet_availability.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/overview/controllers/overview_controller.dart';
 
@@ -27,6 +27,20 @@ class ReflectionController extends GetxController {
             : FirebaseAuth.instance.currentUser!.displayName ?? 'Anonymous'));
     textEditingController.text = '';
     text = '';
+    try {
+      Get.find<FirebaseDatabase>().updateReflectionNotes(
+        overviewController.project.value.id!,
+        reflectionNotes,
+      );
+    } on Exception catch (e) {
+      log(e.toString());
+    }
+    try {
+      Get.find<HiveDb>().saveOrUpdateProject(
+          overviewController.project.value..reflectionNotes = reflectionNotes);
+    } on Exception catch (e) {
+      log(e.toString());
+    }
   }
 
   @override
@@ -50,16 +64,6 @@ class ReflectionController extends GetxController {
         overviewController.project.value.reflectionNotes!.length ==
             reflectionNotes.length) {
       return;
-    }
-    if (Get.find<InternetAvailability>().isConnected.value &&
-        !overviewController.isLocal) {
-      Get.find<FirebaseDatabase>().updateReflectionNotes(
-        overviewController.project.value.id!,
-        reflectionNotes,
-      );
-    } else {
-      Get.find<HiveDb>().saveProject(
-          overviewController.project.value..reflectionNotes = reflectionNotes);
     }
 
     super.onClose();

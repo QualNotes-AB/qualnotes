@@ -11,9 +11,10 @@ class OverviewController extends GetxController {
   RxBool loaded = false.obs;
   late TextEditingController textEditingController;
   RxString link = ''.obs;
+
   createShareLink() {
     String domain = 'https://qualnotesdev.web.app/#';
-    link.value = '$domain/map?id=${project.value.id!}';
+    link.value = '$domain/overview?id=${project.value.id!}&local=0';
   }
 
   getProjectFromUrl() async {
@@ -37,6 +38,7 @@ class OverviewController extends GetxController {
       loaded.value = false;
     } else {
       project.value = result;
+
       loaded.value = true;
       textEditingController = TextEditingController(
           text: project.value.description ?? 'Project description');
@@ -52,8 +54,8 @@ class OverviewController extends GetxController {
   }
 
   @override
-  void onInit() {
-    getProjectFromUrl();
+  void onInit() async {
+    await getProjectFromUrl();
 
     super.onInit();
   }

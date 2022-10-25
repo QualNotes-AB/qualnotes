@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -41,40 +42,66 @@ class OverviewView extends GetView<OverviewController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Transform.translate(
-                      offset: const Offset(-20, 0),
-                      child: SizedBox(
-                        width: 160,
-                        child: TextButton(
-                            onPressed: () => Get.offNamed(Routes.HOME),
-                            child: Row(
-                              children: const [
-                                Icon(
-                                  Icons.keyboard_arrow_left_outlined,
-                                  size: 30,
-                                ),
-                                Text('To Main Menu'),
-                              ],
-                            )),
+                    Visibility(
+                      visible: FirebaseAuth.instance.currentUser == null,
+                      child: Transform.translate(
+                        offset: const Offset(-20, 0),
+                        child: SizedBox(
+                          width: 160,
+                          child: TextButton(
+                              onPressed: () => Get.offNamed(Routes.LOGIN),
+                              child: Row(
+                                children: const [
+                                  Icon(
+                                    Icons.keyboard_arrow_left_outlined,
+                                    size: 30,
+                                  ),
+                                  Text('Login'),
+                                ],
+                              )),
+                        ),
                       ),
                     ),
-                    Transform.translate(
-                      offset: const Offset(-20, 0),
-                      child: SizedBox(
-                        width: 100,
-                        child: TextButton(
-                            onPressed: () {
-                              Get.back();
-                            }, //=>
-                            child: Row(
-                              children: const [
-                                Icon(
-                                  Icons.keyboard_arrow_left_outlined,
-                                  size: 30,
-                                ),
-                                Text('Back'),
-                              ],
-                            )),
+                    Visibility(
+                      visible: FirebaseAuth.instance.currentUser != null,
+                      child: Transform.translate(
+                        offset: const Offset(-20, 0),
+                        child: SizedBox(
+                          width: 160,
+                          child: TextButton(
+                              onPressed: () => Get.offNamed(Routes.HOME),
+                              child: Row(
+                                children: const [
+                                  Icon(
+                                    Icons.keyboard_arrow_left_outlined,
+                                    size: 30,
+                                  ),
+                                  Text('To Main Menu'),
+                                ],
+                              )),
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: FirebaseAuth.instance.currentUser != null,
+                      child: Transform.translate(
+                        offset: const Offset(-20, 0),
+                        child: SizedBox(
+                          width: 100,
+                          child: TextButton(
+                              onPressed: () {
+                                Get.back();
+                              }, //=>
+                              child: Row(
+                                children: const [
+                                  Icon(
+                                    Icons.keyboard_arrow_left_outlined,
+                                    size: 30,
+                                  ),
+                                  Text('Back'),
+                                ],
+                              )),
+                        ),
                       ),
                     ),
                     Padding(
@@ -110,6 +137,7 @@ class OverviewView extends GetView<OverviewController> {
                       autocorrect: false,
                       style: AppTextStyle.regular14BlackHeight,
                       decoration: const InputDecoration(
+                          hintText: 'Enter project description',
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.all(0)),
                       scrollPadding: EdgeInsets.zero,
@@ -120,25 +148,28 @@ class OverviewView extends GetView<OverviewController> {
                       children: [
                         Visibility(
                           visible: isLocal || kIsWeb,
-                          child: BlueOverviewButton(
-                            title: 'Play',
-                            icon: Icons.play_arrow_rounded,
-                            onPressed: () {
-                              //open map
-
-                              isLocal
-                                  ? {
-                                      Get.find<MapGetxController>()
-                                          .selectProject(project),
-                                      Get.to(() => const MapView()),
-                                    }
-                                  : {
-                                      Get.toNamed(
-                                          "${Routes.MAP}?id=${project.id}"),
-                                      Get.find<MapGetxController>()
-                                          .getProjectFromUrl()
-                                    };
-                            },
+                          child: Obx(
+                            () => BlueOverviewButton(
+                              title: 'Play',
+                              icon: Icons.play_arrow_rounded,
+                              onPressed:
+                                  //open map
+                                  Get.find<ProgressController>()
+                                          .inProgress
+                                          .value
+                                      ? null
+                                      : isLocal
+                                          ? () {
+                                              Get.find<MapGetxController>()
+                                                  .selectProject(project);
+                                              Get.to(() => const MapView());
+                                            }
+                                          : () {
+                                              Get.toNamed(Routes.MAP);
+                                              Get.find<MapGetxController>()
+                                                  .selectProject(project);
+                                            },
+                            ),
                           ),
                         ),
                         Visibility(
@@ -148,8 +179,11 @@ class OverviewView extends GetView<OverviewController> {
                               title: 'Upload',
                               icon: Icons.upload,
                               onPressed: Get.find<InternetAvailability>()
-                                      .isConnected
-                                      .value
+                                          .isConnected
+                                          .value &&
+                                      !Get.find<ProgressController>()
+                                          .inProgress
+                                          .value
                                   ? () async {
                                       var file = project.notes!.first;
                                       if (kDebugMode) {
@@ -171,7 +205,10 @@ class OverviewView extends GetView<OverviewController> {
                         BlueOverviewButton(
                           title: 'Delete',
                           icon: Icons.delete_outline,
-                          onPressed: () async => await deleteDialog(project),
+                          onPressed:
+                              Get.find<ProgressController>().inProgress.value
+                                  ? null
+                                  : () async => await deleteDialog(project),
                         ),
                         BlueOverviewButton(
                           title: 'Share',
@@ -181,7 +218,7 @@ class OverviewView extends GetView<OverviewController> {
                                   ? () {
                                       Get.bottomSheet(
                                         ShareBottomSheet(project: project),
-                                        elevation: 3,
+                                        elevation: 0,
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(30)),
@@ -214,10 +251,10 @@ class OverviewView extends GetView<OverviewController> {
                               text:
                                   'Total time: ${formatTotalTime(project.totalTime!)}\n'),
                           TextSpan(text: 'Notes: ${project.notes!.length}\n'),
-                          TextSpan(
-                              text: 'Audio: ${project.routeAudiosLength}\n'),
-                          TextSpan(
-                              text: 'Video: ${project.routeVideosLength}\n'),
+                          // TextSpan(
+                          //     text: 'Audio: ${project.routeAudiosLength}\n'),
+                          // TextSpan(
+                          //     text: 'Video: ${project.routeVideosLength}\n'),
                           TextSpan(
                               text: 'Type: ${formatType(project.type!)}\n'),
                           TextSpan(text: 'Author: ${project.author}\n'),
@@ -260,6 +297,8 @@ class OverviewView extends GetView<OverviewController> {
         width: 150,
       );
     }
+    log(note.path!);
+    log('local photos');
     return Image.file(
       File(note.path!),
       fit: BoxFit.cover,

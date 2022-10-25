@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/modules/home/controllers/home_controller.dart';
+import 'package:qualnote/app/modules/home/controllers/progress_controller.dart';
 import 'package:qualnote/app/utils/note_type.dart';
 
 class HiveDb extends GetxController {
@@ -31,32 +32,32 @@ class HiveDb extends GetxController {
       }
     }
 
-    if (project.type! == 'RecordingType.video') {
-      for (var path in project.routeVideos ?? []) {
-        try {
-          await File(path!).delete();
-        } on Exception catch (e) {
-          log(e.toString());
-        }
-      }
-    }
-    if (project.type! == 'RecordingType.audio') {
-      for (var path in project.routeAudios ?? []) {
-        try {
-          await File(path!).delete();
-        } on Exception catch (e) {
-          log(e.toString());
-        }
-      }
-    }
-    projectsBox.delete(projectId);
+    // if (project.type! == 'RecordingType.video') {
+    //   for (var path in project.routeVideos ?? []) {
+    //     try {
+    //       await File(path!).delete();
+    //     } on Exception catch (e) {
+    //       log(e.toString());
+    //     }
+    //   }
+    // }
+    // if (project.type! == 'RecordingType.audio') {
+    //   for (var path in project.routeAudios ?? []) {
+    //     try {
+    //       await File(path!).delete();
+    //     } on Exception catch (e) {
+    //       log(e.toString());
+    //     }
+    //   }
+    // }
+    await projectsBox.delete(projectId);
     log('Project deleted from local storage');
   }
 
-  Future<void> saveProject(Project project) async {
+  Future<void> saveOrUpdateProject(Project project) async {
     inProgress.value = true;
     await projectsBox.put(project.id!, project);
-
+    Get.find<ProgressController>().showProgress('Downloading project...', 1);
     log('Route Saved');
   }
 

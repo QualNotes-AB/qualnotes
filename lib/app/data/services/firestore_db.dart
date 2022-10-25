@@ -31,7 +31,7 @@ class FirebaseDatabase extends GetxController {
       .snapshots();
 
   Future<Project?> getProjectForWeb(String projectId) async {
-    Get.find<ProgressController>().showProgress('Downloading project...', 0);
+    // Get.find<ProgressController>().showProgress('Downloading project...', 0);
     Project project = Project();
     await _db.collection('projects').doc(projectId).get().then(
         (snapshot) => project = Project.fromJson(snapshot.data()!, projectId));
@@ -83,7 +83,7 @@ class FirebaseDatabase extends GetxController {
     //     project.routeAudios!.add(filePath);
     //   }
     // }
-    Get.find<ProgressController>().showProgress('Downloading project...', 1);
+    // Get.find<ProgressController>().showProgress('Downloading project...', 1);
     return project;
   }
 
@@ -140,14 +140,14 @@ class FirebaseDatabase extends GetxController {
       //     project.routeAudios!.add(filePath);
       //   }
       // }
-      await Get.find<HiveDb>().saveProject(project);
+      await Get.find<HiveDb>().saveOrUpdateProject(project);
     } on Exception catch (e) {
       log(e.toString());
     }
-    Get.find<ProgressController>().showProgress('Downloading project...', 1);
   }
 
   Future<void> deleteProject(Project project) async {
+    Get.find<ProgressController>().showProgress('Deleting project', 0);
     await _db.collection('projects').doc(project.id).delete();
     //delete all notes to cloud storage
     for (var element in project.notes!) {
@@ -188,7 +188,7 @@ class FirebaseDatabase extends GetxController {
     //     );
     //   }
     // }
-
+    Get.find<ProgressController>().showProgress('Deleting project', 1);
     log('Project deleted from cloud!');
   }
 
@@ -265,31 +265,30 @@ class FirebaseDatabase extends GetxController {
       'Project uploaded',
       backgroundColor: Colors.green,
       colorText: Colors.white,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1),
     );
     log('Project uploaded! Hooray!');
   }
 
   Future<void> updateProject(Project project) async {
     await _db.collection('projects').doc(project.id!).update(project.toJson());
-    Get.snackbar(
-      'Hooray!',
-      'Project updated',
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 2),
-    );
+    Get.snackbar('Hooray!', 'Project updated',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        snackPosition: SnackPosition.BOTTOM);
   }
 
-  // Future<void> addNote(String id, Note note) async {
-  //   try {
-  //     await _db.collection('projects').doc(id).update({
-  //       "notes": FieldValue.arrayUnion([note])
-  //     });
-  //   } on Exception catch (e) {
-  //     log(e.toString());
-  //   }
-  // }
+  Future<void> deleteNote(String projectId, Note note) async {
+    note.path = null;
+    try {
+      await _db.collection('projects').doc(projectId).update({
+        "notes": FieldValue.arrayRemove([note])
+      });
+    } on Exception catch (e) {
+      log(e.toString());
+    }
+  }
 
   Future<void> addCollaborator(String id, List<String> emails) async {
     await _db.collection('projects').doc(id).update({"collaborators": emails});

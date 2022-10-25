@@ -13,7 +13,6 @@ import 'package:location/location.dart';
 import 'package:qualnote/app/data/models/coordinate.dart';
 import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/data/models/project.dart';
-import 'package:qualnote/app/data/services/firestore_db.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
 import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
@@ -112,6 +111,11 @@ class MapGetxController extends GetxController {
     return selectedProject;
   }
 
+  void removeNote(int index) {
+    notes.removeAt(index);
+    Get.back();
+  }
+
   Future<Project> saveRouteLocaly(String title) async {
     final cameraGetx = Get.find<CameraGetxController>();
     final audioGetx = Get.find<AudioRecordingController>();
@@ -137,7 +141,7 @@ class MapGetxController extends GetxController {
       consentsLength: addMediaController.consentsPaths.length.toInt(),
     );
 
-    await Get.find<HiveDb>().saveProject(newProject);
+    await Get.find<HiveDb>().saveOrUpdateProject(newProject);
     addMediaController.consentsPaths.clear();
     cameraGetx.videoPaths.clear();
     audioGetx.audioPaths.clear();
@@ -166,24 +170,24 @@ class MapGetxController extends GetxController {
     notes.value.addAll(project.notes!);
   }
 
-  getProjectFromUrl() async {
-    var data = Get.parameters;
-    String? id = data["id"];
-    if (id == null) return;
-    Project? result;
-    if (kIsWeb) {
-      result = await Get.find<FirebaseDatabase>().getProjectForWeb(id);
-    } else {
-      result = (await Get.find<HiveDb>().getProject(id));
-    }
-    if (kDebugMode) {
-      print(result);
-    }
-    if (result == null) return;
-    selectProject(result);
-    currentLocation.value = result.routePoints!.first.toLatLng();
-    mapController.move(result.routePoints!.first.toLatLng(), 15);
-  }
+  // getProjectFromUrl() async {
+  //   var data = Get.parameters;
+  //   String? id = data["id"];
+  //   if (id == null) return;
+  //   Project? result;
+  //   if (kIsWeb) {
+  //     result = await Get.find<FirebaseDatabase>().getProjectForWeb(id);
+  //   } else {
+  //     result = (await Get.find<HiveDb>().getProject(id));
+  //   }
+  //   if (kDebugMode) {
+  //     print(result);
+  //   }
+  //   if (result == null) return;
+  //   selectProject(result);
+  //   currentLocation.value = result.routePoints!.first.toLatLng();
+  //   mapController.move(result.routePoints!.first.toLatLng(), 15);
+  // }
 
   void triggerRebuild() => rebuild.value = !rebuild.value;
 
@@ -308,8 +312,8 @@ class MapGetxController extends GetxController {
     //   latitude *= ((90 - rotationDeg) / 90);
     // }
     animatedMapMove(
-        LatLng(note.coordinate!.latitude! - 0.0015,
-            note.coordinate!.longitude! + 0.0015),
+        LatLng(
+            note.coordinate!.latitude! - 0.0015, note.coordinate!.longitude!),
         17,
         vsync!);
     // mapController.move(
@@ -387,24 +391,26 @@ class MapGetxController extends GetxController {
     //   return;
     // }
 
-    if (dbController.lastKnownLocation != LatLng(0, 0)) {
-      currentLocation.value = dbController.lastKnownLocation;
-    } else {
-      currentLocation.value = await getCurrentLocation();
+    if (!kIsWeb) {
+      if (dbController.lastKnownLocation != LatLng(0, 0)) {
+        currentLocation.value = dbController.lastKnownLocation;
+      } else {
+        currentLocation.value = await getCurrentLocation();
+      }
+      center.value = currentLocation.value;
+      locationStream = location.onLocationChanged.asBroadcastStream().listen(
+        (LocationData data) {
+          var location =
+              LatLng(data.latitude ?? 59.3293, data.longitude ?? 18.0686);
+          currentLocation.value = location;
+          dbController.saveLastKnownLocation(location);
+          if (isMapping.value) {
+            routePoints.add(location);
+            log(location.toString());
+          }
+        },
+      );
     }
-    center.value = currentLocation.value;
-    locationStream = location.onLocationChanged.asBroadcastStream().listen(
-      (LocationData data) {
-        var location =
-            LatLng(data.latitude ?? 59.3293, data.longitude ?? 18.0686);
-        currentLocation.value = location;
-        dbController.saveLastKnownLocation(location);
-        if (isMapping.value) {
-          routePoints.add(location);
-          log(location.toString());
-        }
-      },
-    );
   }
 
   @override

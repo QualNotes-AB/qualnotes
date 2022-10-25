@@ -155,7 +155,7 @@ class HomeView extends GetView<HomeController> {
                         },
                       );
                     }
-                    return const SizedBox();
+                    return const CircularProgressIndicator();
                   },
                 ))
         ],

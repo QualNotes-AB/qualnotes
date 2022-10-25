@@ -147,7 +147,11 @@ class AddMediaController extends GetxController {
     final filePath =
         "${appDocDir.path}/consents/Consent${dateFormat.format(DateTime.now())}.png";
     log(filePath);
-    await File.fromRawPath(data!).rename(filePath);
+    try {
+      await File.fromRawPath(data!).copy(filePath);
+    } on Exception catch (e) {
+      log(e.toString());
+    }
     consentsPaths.add(filePath);
   }
 

@@ -101,9 +101,8 @@ class NoteBottomSheet extends StatelessWidget {
                               padding: const EdgeInsets.only(right: 10),
                               child: BlueTextButton(
                                 title: 'Delete',
-                                onPressed: () async {
-                                  //TODO Delete
-                                },
+                                onPressed: () async =>
+                                    mapGetxController.removeNote(index),
                               ),
                             ),
                             note.type != NoteType.text.toString()
@@ -142,7 +141,7 @@ class NoteBottomSheet extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: displayMedia(),
+                    child: Center(child: displayMedia()),
                   ),
                   const Text('Notes:', style: AppTextStyle.semiBold13Black),
                   Padding(
@@ -181,9 +180,9 @@ class NoteBottomSheet extends StatelessWidget {
     if (note.type == NoteType.photo.toString()) {
       return kIsWeb ? Image.network(note.path!) : Image.file(File(note.path!));
     }
-    if (kIsWeb) {
-      return const SizedBox();
-    }
+    // if (kIsWeb) {
+    //   return const SizedBox();
+    // }
     if (note.type == NoteType.document.toString() || kIsWeb) {}
     if (note.type == NoteType.video.toString()) {
       return VideoPlayerWidget(path: note.path!);

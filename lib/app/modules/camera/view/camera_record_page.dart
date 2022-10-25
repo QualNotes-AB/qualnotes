@@ -84,16 +84,16 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
                       }
                       Get.back();
 
-                      if (Get.find<MapGetxController>().type.value ==
-                          RecordingType.video) {
-                        Get.find<CameraGetxController>()
-                            .startVideoRecording(isMainRecording: true);
-                      }
-                      if (Get.find<MapGetxController>().type.value ==
-                          RecordingType.audio) {
-                        Get.find<AudioRecordingController>()
-                            .startRecorder(isMainRecording: true);
-                      }
+                      // if (Get.find<MapGetxController>().type.value ==
+                      //     RecordingType.video) {
+                      //   Get.find<CameraGetxController>()
+                      //       .startVideoRecording(isMainRecording: true);
+                      // }
+                      // if (Get.find<MapGetxController>().type.value ==
+                      //     RecordingType.audio) {
+                      //   Get.find<AudioRecordingController>()
+                      //       .startRecorder(isMainRecording: true);
+                      // }
                     },
                   ),
                   Obx(
@@ -135,15 +135,16 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
                         if (widget.isPhoto) {
                           //Take a photo
                           await takePhoto();
+                        } else {
+                          //record a video
+                          secondPress
+                              ? await stopRecordingAndSave()
+                              : controller
+                                  .startVideoRecording()
+                                  .then((value) => setState(() {
+                                        secondPress = true;
+                                      }));
                         }
-                        //Record a video
-                        secondPress
-                            ? await stopRecordingAndSave()
-                            : controller
-                                .startVideoRecording()
-                                .then((value) => setState(() {
-                                      secondPress = true;
-                                    }));
                       },
                     ),
                   ),
@@ -264,13 +265,13 @@ class _CameraRecordPageState extends State<CameraRecordPage> {
       }
     }
     Get.back();
-    if (Get.find<MapGetxController>().type.value == RecordingType.video) {
-      Get.find<CameraGetxController>()
-          .startVideoRecording(isMainRecording: true);
-    }
-    if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
-      Get.find<AudioRecordingController>().startRecorder(isMainRecording: true);
-    }
+    // if (Get.find<MapGetxController>().type.value == RecordingType.video) {
+    //   Get.find<CameraGetxController>()
+    //       .startVideoRecording(isMainRecording: true);
+    // }
+    // if (Get.find<MapGetxController>().type.value == RecordingType.audio) {
+    //   Get.find<AudioRecordingController>().startRecorder(isMainRecording: true);
+    // }
   }
 
   Future<void> takePhoto() async {

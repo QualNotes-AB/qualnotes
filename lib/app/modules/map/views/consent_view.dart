@@ -53,7 +53,7 @@ class _ConsentViewState extends State<ConsentView> {
     });
     await Future.delayed(const Duration(milliseconds: 150));
     final data = await _screenshotController.capture();
-    addMediaController.savePhotoConsent(data);
+    await addMediaController.savePhotoConsent(data);
     Get.back();
     if (widget.noteType == NoteType.audio) {
       addMediaController.addAudioNote();

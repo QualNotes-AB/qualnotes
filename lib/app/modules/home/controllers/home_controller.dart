@@ -79,7 +79,7 @@ class HomeController extends GetxController {
               note.path = path;
             }
           }
-          await Get.find<HiveDb>().saveProject(project);
+          await Get.find<HiveDb>().saveOrUpdateProject(project);
         }
         //if the project was deleted then remove localy as well
         else {

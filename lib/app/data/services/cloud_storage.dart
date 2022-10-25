@@ -3,9 +3,7 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:qualnote/app/modules/home/controllers/progress_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/utils/note_type.dart';
 
@@ -50,14 +48,12 @@ class CloudStorage {
     String storagePath = await getStoragePath(
         fileType: fileType, projectId: projectId, fileName: fileName);
 
-    Get.find<ProgressController>().showProgress('Deleting file', 0);
     try {
       await _storage.ref(storagePath).delete();
     } on Exception catch (e) {
       log(storagePath);
       log(e.toString());
     }
-    Get.find<ProgressController>().showProgress('Deleting file', 1);
   }
 
   Future<void> downloadFileFromWeb({required String storagePath}) async {
