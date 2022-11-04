@@ -12,6 +12,7 @@ import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/firestore_db.dart';
 import 'package:qualnote/app/data/services/internet_availability.dart';
+import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/authentication/login/views/widgets/page_holder.dart';
 import 'package:qualnote/app/modules/dialogs/delete.dart';
 import 'package:qualnote/app/modules/home/controllers/progress_controller.dart';
@@ -77,28 +78,6 @@ class OverviewView extends GetView<OverviewController> {
                                     size: 30,
                                   ),
                                   Text('To Main Menu'),
-                                ],
-                              )),
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: FirebaseAuth.instance.currentUser != null,
-                      child: Transform.translate(
-                        offset: const Offset(-20, 0),
-                        child: SizedBox(
-                          width: 100,
-                          child: TextButton(
-                              onPressed: () {
-                                Get.back();
-                              }, //=>
-                              child: Row(
-                                children: const [
-                                  Icon(
-                                    Icons.keyboard_arrow_left_outlined,
-                                    size: 30,
-                                  ),
-                                  Text('Back'),
                                 ],
                               )),
                         ),
@@ -194,6 +173,8 @@ class OverviewView extends GetView<OverviewController> {
                                               'Uploading project...', 0);
                                       await Get.find<FirebaseDatabase>()
                                           .uploadProject(project);
+                                      Get.find<HiveDb>().saveOrUpdateProject(
+                                          project..isUploaded = true);
                                       Get.find<ProgressController>()
                                           .showProgress(
                                               'Uploading project...', 1);
@@ -202,29 +183,40 @@ class OverviewView extends GetView<OverviewController> {
                             ),
                           ),
                         ),
-                        BlueOverviewButton(
-                          title: 'Delete',
-                          icon: Icons.delete_outline,
-                          onPressed:
-                              Get.find<ProgressController>().inProgress.value
-                                  ? null
-                                  : () async => await deleteDialog(project),
+                        Visibility(
+                          visible: project.authorId ==
+                              FirebaseAuth.instance.currentUser!.uid,
+                          child: BlueOverviewButton(
+                            title: 'Delete',
+                            icon: Icons.delete_outline,
+                            onPressed:
+                                Get.find<ProgressController>().inProgress.value
+                                    ? null
+                                    : () async => await deleteDialog(project),
+                          ),
                         ),
-                        BlueOverviewButton(
-                          title: 'Share',
-                          icon: Icons.share_outlined,
-                          onPressed:
-                              Get.find<InternetAvailability>().isConnected.value
-                                  ? () {
-                                      Get.bottomSheet(
-                                        ShareBottomSheet(project: project),
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30)),
-                                      );
-                                    }
-                                  : null,
+                        Visibility(
+                          visible: project.authorId ==
+                              FirebaseAuth.instance.currentUser!.uid,
+                          child: BlueOverviewButton(
+                            title: 'Share',
+                            icon: Icons.share_outlined,
+                            onPressed: project.isUploaded != null &&
+                                    project.isUploaded! &&
+                                    Get.find<InternetAvailability>()
+                                        .isConnected
+                                        .value
+                                ? () {
+                                    Get.bottomSheet(
+                                      ShareBottomSheet(project: project),
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                    );
+                                  }
+                                : null,
+                          ),
                         ),
                         BlueOverviewButton(
                           title: 'Add final reflection note',

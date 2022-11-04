@@ -48,7 +48,7 @@ class MapView extends GetView<MapGetxController> {
                       onTap: (tapPosition, point) =>
                           controller.addFileOnPoint(point),
                     ),
-                    nonRotatedChildren: [
+                    children: [
                       TileLayer(
                         urlTemplate:
                             'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -65,7 +65,7 @@ class MapView extends GetView<MapGetxController> {
                         ],
                       ),
                       MarkerLayer(
-                        //rotate: true,
+                        rotate: true,
                         markers: [
                           Marker(
                             point: controller.currentLocation.value,

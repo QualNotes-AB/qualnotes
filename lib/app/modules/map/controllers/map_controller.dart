@@ -15,7 +15,6 @@ import 'package:qualnote/app/data/models/note.dart';
 import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
-import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/dialogs/enter_note_number.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/note_bottom_sheet.dart';
@@ -71,7 +70,8 @@ class MapGetxController extends GetxController {
     isPreview.value = false;
   }
 
-  void recenter() async => mapController.move(currentLocation.value, 17);
+  void recenter() async => animatedMapMove(currentLocation.value, 17,
+      vsync!); //mapController.move(currentLocation.value, 17);
 
   void zoomIn() {
     final bounds = mapController.bounds!;
@@ -117,8 +117,8 @@ class MapGetxController extends GetxController {
   }
 
   Future<Project> saveRouteLocaly(String title) async {
-    final cameraGetx = Get.find<CameraGetxController>();
-    final audioGetx = Get.find<AudioRecordingController>();
+    // final cameraGetx = Get.find<CameraGetxController>();
+    // final audioGetx = Get.find<AudioRecordingController>();
     final addMediaController = Get.find<AddMediaController>();
     // audioGetx.audioPaths.removeAt(0);
     Project newProject = Project(
@@ -128,23 +128,24 @@ class MapGetxController extends GetxController {
       totalTime: duration,
       type: type.value.toString(),
       author: FirebaseAuth.instance.currentUser!.displayName ?? 'No username',
+      authorId: FirebaseAuth.instance.currentUser!.uid,
       date: DateTime.now(),
       distance: calculateRouteDistance(routePoints.value),
       notes: notes.value.toList(),
       routePoints:
           routePoints.value.map((e) => Coordinate.fromLatLng(e)).toList(),
-      routeVideos: cameraGetx.videoPaths.toList(),
-      routeAudios: audioGetx.audioPaths.toList(),
+      // routeVideos: cameraGetx.videoPaths.toList(),
+      // routeAudios: audioGetx.audioPaths.toList(),
       consents: addMediaController.consentsPaths.toList(),
-      routeAudiosLength: audioGetx.audioPaths.length.toInt(),
-      routeVideosLength: cameraGetx.videoPaths.length.toInt(),
+      // routeAudiosLength: audioGetx.audioPaths.length.toInt(),
+      // routeVideosLength: cameraGetx.videoPaths.length.toInt(),
       consentsLength: addMediaController.consentsPaths.length.toInt(),
     );
 
     await Get.find<HiveDb>().saveOrUpdateProject(newProject);
     addMediaController.consentsPaths.clear();
-    cameraGetx.videoPaths.clear();
-    audioGetx.audioPaths.clear();
+    // cameraGetx.videoPaths.clear();
+    // audioGetx.audioPaths.clear();
     notes.clear();
     resetFields();
     // audioGetxController.resetRecorder();
@@ -302,6 +303,7 @@ class MapGetxController extends GetxController {
     Get.bottomSheet(
       NoteBottomSheet(note: note, index: index),
       barrierColor: Colors.transparent,
+      isScrollControlled: true,
     );
     // final rotationDeg = mapController.rotation.abs();
     // log(mapController.rotation.toString());
@@ -316,23 +318,39 @@ class MapGetxController extends GetxController {
             note.coordinate!.latitude! - 0.0015, note.coordinate!.longitude!),
         17,
         vsync!);
-    // mapController.move(
-    //     LatLng(
-    //         note.coordinate!.latitude! - 0.0015, note.coordinate!.longitude!),
-    //     17);
   }
 
   void animatedMapMove(
       LatLng destLocation, double destZoom, TickerProvider vsync) {
-    // Create some tweens. These serve to split up the transition from one location to another.
-    // In our case, we want to split the transition be<tween> our current map center and the destination.
     final latTween = Tween<double>(
         begin: mapController.center.latitude, end: destLocation.latitude);
     final lngTween = Tween<double>(
         begin: mapController.center.longitude, end: destLocation.longitude);
     final zoomTween = Tween<double>(begin: mapController.zoom, end: destZoom);
 
-    // Create a animation controller that has a duration and a TickerProvider.
+    //calculates rotate tween
+    Tween<double> rotateTween;
+    if (mapController.rotation.isNegative) {
+      double val = mapController.rotation.toInt() / 180 * -1;
+
+      if (val.floor() == 0) {
+        rotateTween = Tween<double>(begin: mapController.rotation, end: 0);
+      } else {
+        rotateTween =
+            Tween<double>(begin: mapController.rotation % 360, end: 0);
+      }
+      log(val.floor().toString());
+    } else {
+      double val = mapController.rotation.toInt() / 180;
+      if (val.floor() == 0) {
+        rotateTween = Tween<double>(begin: mapController.rotation, end: 0);
+      } else {
+        rotateTween = Tween<double>(
+            begin: (360 - (mapController.rotation % 360)) * -1, end: 0);
+      }
+      log(val.floor().toString());
+    }
+
     final controller = AnimationController(
         duration: const Duration(milliseconds: 500), vsync: vsync);
     // The animation determines what path the animation will take. You can try different Curves values, although I found
@@ -341,6 +359,7 @@ class MapGetxController extends GetxController {
         CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
 
     controller.addListener(() {
+      mapController.rotate(rotateTween.evaluate(animation));
       mapController.move(
           LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
           zoomTween.evaluate(animation));
@@ -379,7 +398,7 @@ class MapGetxController extends GetxController {
       log('Got location');
       return LatLng(location.latitude ?? 0, location.longitude ?? 0);
     }
-    return LatLng(0, 0); //LatLng(59.3293, 18.0686);
+    return LatLng(0, 0);
   }
 
   Future<void> init() async {

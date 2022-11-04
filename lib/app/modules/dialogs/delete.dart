@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/data/models/project.dart';
@@ -45,46 +47,60 @@ deleteDialog(Project project) async {
               thickness: 1,
               color: Colors.orange,
             ),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () async {
-                  Get.off(() => const HomeView());
-                  await Get.find<FirebaseDatabase>().deleteProject(project);
-                  snackbar();
-                },
-                child: const Text(
-                  'Delete from Cloud',
-                  style: TextStyle(color: Colors.orange),
+            Visibility(
+              visible:
+                  project.authorId == FirebaseAuth.instance.currentUser!.uid,
+              child: SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () async {
+                    Get.off(() => const HomeView());
+                    await Get.find<FirebaseDatabase>().deleteProject(project);
+                    if (!kIsWeb) {
+                      await Get.find<HiveDb>()
+                          .saveOrUpdateProject(project..isUploaded = false);
+                    }
+                    snackbar();
+                  },
+                  child: const Text(
+                    'Delete from Cloud',
+                    style: TextStyle(color: Colors.orange),
+                  ),
                 ),
               ),
             ),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () async {
-                  Get.off(() => const HomeView());
-                  await Get.find<HiveDb>().deleteProjectLocaly(project.id!);
-                  snackbar();
-                },
-                child: const Text(
-                  'Delete localy',
-                  style: TextStyle(color: Colors.orange),
+            Visibility(
+              visible: !kIsWeb,
+              child: SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () async {
+                    Get.off(() => const HomeView());
+                    await Get.find<HiveDb>().deleteProjectLocaly(project.id!);
+                    snackbar();
+                  },
+                  child: const Text(
+                    'Delete localy',
+                    style: TextStyle(color: Colors.orange),
+                  ),
                 ),
               ),
             ),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () async {
-                  Get.off(() => const HomeView());
-                  await Get.find<HiveDb>().deleteProjectLocaly(project.id!);
-                  await Get.find<FirebaseDatabase>().deleteProject(project);
-                  snackbar();
-                },
-                child: const Text(
-                  'Delete all',
-                  style: TextStyle(color: Colors.orange),
+            Visibility(
+              visible: !kIsWeb,
+              child: SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () async {
+                    Get.off(() => const HomeView());
+                    await Get.find<HiveDb>().deleteProjectLocaly(project.id!);
+                    await Get.find<FirebaseDatabase>().deleteProject(project);
+                    snackbar();
+                  },
+                  child: const Text(
+                    'Delete all',
+                    style: TextStyle(color: Colors.orange),
+                  ),
                 ),
               ),
             ),

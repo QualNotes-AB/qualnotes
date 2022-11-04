@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/firestore_db.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
+import 'package:qualnote/app/routes/app_pages.dart';
 
 class OverviewController extends GetxController {
   bool isLocal = false;
@@ -30,11 +32,10 @@ class OverviewController extends GetxController {
     } else {
       result = (await Get.find<HiveDb>().getProject(id));
     }
-    if (kDebugMode) {
-      print(result);
-    }
+    if (kDebugMode) {}
 
     if (result == null) {
+      Get.offNamed(Routes.PROJECT_NOT_FOUND);
       loaded.value = false;
     } else {
       project.value = result;
@@ -55,6 +56,9 @@ class OverviewController extends GetxController {
 
   @override
   void onInit() async {
+    if (kIsWeb && FirebaseAuth.instance.currentUser == null) {
+      Get.offNamed(Routes.LOGIN);
+    }
     await getProjectFromUrl();
 
     super.onInit();

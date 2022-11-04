@@ -10,6 +10,7 @@ import 'package:qualnote/app/data/models/project.dart';
 import 'package:qualnote/app/data/services/cloud_storage.dart';
 import 'package:qualnote/app/data/services/local_db.dart';
 import 'package:qualnote/app/modules/home/controllers/progress_controller.dart';
+import 'package:qualnote/app/routes/app_pages.dart';
 import 'package:qualnote/app/utils/note_type.dart';
 
 class FirebaseDatabase extends GetxController {
@@ -32,12 +33,28 @@ class FirebaseDatabase extends GetxController {
 
   Future<Project?> getProjectForWeb(String projectId) async {
     // Get.find<ProgressController>().showProgress('Downloading project...', 0);
-    Project project = Project();
-    await _db.collection('projects').doc(projectId).get().then(
-        (snapshot) => project = Project.fromJson(snapshot.data()!, projectId));
+    Project? project = Project();
+    try {
+      await _db.collection('projects').doc(projectId).get().then((snapshot) {
+        if (snapshot.data() == null) {
+          project = null;
+        } else {
+          project = Project.fromJson(snapshot.data()!, projectId);
+        }
+      });
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        Get.offNamed(Routes.LOGIN);
+      }
+      log(e.code);
+    }
 
-    for (int i = 0; i < project.notes!.length; i++) {
-      var note = project.notes![i];
+    if (project == null) {
+      return project;
+    }
+
+    for (int i = 0; i < project!.notes!.length; i++) {
+      var note = project!.notes![i];
       if (note.type == NoteType.text.toString()) {
         continue;
       }
@@ -47,17 +64,20 @@ class FirebaseDatabase extends GetxController {
         fileType: note.type!,
         downloadUrl: true,
       );
-      project.notes![i].path = filePath;
+      project!.notes![i].path = filePath;
     }
 
-    for (int i = 1; i <= project.consentsLength!; i++) {
+    for (int i = 1; i <= project!.consentsLength!; i++) {
       var filePath = await _storage.getStoragePath(
         projectId: projectId,
         fileName: 'Consent$i',
         fileType: 'consent',
         downloadUrl: true,
       );
-      project.consents!.add(filePath);
+      if (project!.consents == null) {
+        project!.consents = [];
+      }
+      project!.consents!.add(filePath);
     }
 
     // if (project.type == RecordingType.video.toString()) {
@@ -84,7 +104,8 @@ class FirebaseDatabase extends GetxController {
     //   }
     // }
     // Get.find<ProgressController>().showProgress('Downloading project...', 1);
-    return project;
+    project!.isUploaded = true;
+    return project!;
   }
 
   Future<void> getProject(String projectId) async {
@@ -140,7 +161,7 @@ class FirebaseDatabase extends GetxController {
       //     project.routeAudios!.add(filePath);
       //   }
       // }
-      await Get.find<HiveDb>().saveOrUpdateProject(project);
+      await Get.find<HiveDb>().saveOrUpdateProject(project..isUploaded = true);
     } on Exception catch (e) {
       log(e.toString());
     }
@@ -148,25 +169,29 @@ class FirebaseDatabase extends GetxController {
 
   Future<void> deleteProject(Project project) async {
     Get.find<ProgressController>().showProgress('Deleting project', 0);
-    await _db.collection('projects').doc(project.id).delete();
-    //delete all notes to cloud storage
-    for (var element in project.notes!) {
-      if (element.type == NoteType.text.toString()) {
-        continue;
+    try {
+      await _db.collection('projects').doc(project.id).delete();
+      //delete all notes to cloud storage
+      for (var element in project.notes!) {
+        if (element.type == NoteType.text.toString()) {
+          continue;
+        }
+        await _storage.deleteFile(
+          projectId: project.id!,
+          fileName: element.title!,
+          fileType: element.type!,
+        );
       }
-      await _storage.deleteFile(
-        projectId: project.id!,
-        fileName: element.title!,
-        fileType: element.type!,
-      );
-    }
 
-    for (int i = 1; i <= project.consentsLength!; i++) {
-      await _storage.deleteFile(
-        projectId: project.id!,
-        fileName: 'Consent$i',
-        fileType: 'consent',
-      );
+      for (int i = 1; i <= project.consentsLength!; i++) {
+        await _storage.deleteFile(
+          projectId: project.id!,
+          fileName: 'Consent$i',
+          fileType: 'consent',
+        );
+      }
+    } on Exception catch (e) {
+      log(e.toString());
     }
 
     //delete main route recordings

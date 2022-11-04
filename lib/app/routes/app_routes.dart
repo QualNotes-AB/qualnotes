@@ -14,6 +14,7 @@ abstract class Routes {
   static const CONSENT = _Paths.CONSENT;
   static const OVERVIEW = _Paths.OVERVIEW;
   static const REFLECTION = _Paths.REFLECTION;
+  static const PROJECT_NOT_FOUND = _Paths.PROJECT_NOT_FOUND;
 }
 
 abstract class _Paths {
@@ -27,4 +28,5 @@ abstract class _Paths {
   static const CONSENT = '/consent';
   static const OVERVIEW = '/overview';
   static const REFLECTION = '/reflection';
+  static const PROJECT_NOT_FOUND = '/not-found';
 }

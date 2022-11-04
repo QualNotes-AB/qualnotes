@@ -77,12 +77,18 @@ class _ConsentViewState extends State<ConsentView> {
       body: Center(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
             child: Stack(
               children: [
-                Screenshot(
-                    controller: _screenshotController,
-                    child: buildConsentDocument()),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 50),
+                  child: Screenshot(
+                      controller: _screenshotController,
+                      child: buildConsentDocument()),
+                ),
+                Align(
+                    alignment: Alignment.bottomCenter,
+                    child: buildBottomButtons()),
               ],
             ),
           ),
@@ -202,7 +208,6 @@ class _ConsentViewState extends State<ConsentView> {
             ),
           ),
         ),
-        buildBottomButtons()
       ],
     );
   }

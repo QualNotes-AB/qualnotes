@@ -135,11 +135,11 @@ class HomeView extends GetView<HomeController> {
                       .collabProjects
                       .asBroadcastStream(),
                   builder: (context, snapshot) {
-                    log("collab" + snapshot.data!.docs.length.toString());
                     if (snapshot.hasData) {
                       if (snapshot.data == null) {
                         return const SizedBox();
                       }
+                      log("collab" + snapshot.data!.docs.length.toString());
                       return ListView.builder(
                         shrinkWrap: true,
                         itemCount: snapshot.data!.docs.length,

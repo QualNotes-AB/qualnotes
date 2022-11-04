@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
-import 'package:qualnote/app/modules/audio_recording/controllers/audio_recording_controller.dart';
-import 'package:qualnote/app/modules/camera/controller/camera_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/modules/overview/controllers/overview_controller.dart';
 import 'package:qualnote/app/modules/overview/views/overview_view.dart';
 
 finishedDialog() {
   var mapGetxController = Get.find<MapGetxController>();
-  var cameraGetxController = Get.find<CameraGetxController>();
-  var audioGetxController = Get.find<AudioRecordingController>();
+  // var cameraGetxController = Get.find<CameraGetxController>();
+  // var audioGetxController = Get.find<AudioRecordingController>();
   String? title;
   mapGetxController.isMapping.value
       ? {
           mapGetxController.stopMapping(),
-          cameraGetxController.pauseVideoRecording(),
-          audioGetxController.pause(),
+          // cameraGetxController.pauseVideoRecording(),
+          // audioGetxController.pause(),
           Get.dialog(
               Dialog(
                 insetPadding: EdgeInsets.zero,
@@ -50,8 +48,8 @@ finishedDialog() {
                               child: TextButton(
                                 onPressed: () {
                                   mapGetxController.resumeMapping();
-                                  cameraGetxController.resumeVideoRecording();
-                                  audioGetxController.resume();
+                                  // cameraGetxController.resumeVideoRecording();
+                                  // audioGetxController.resume();
                                   Get.back();
                                 },
                                 child: const Center(
@@ -76,13 +74,13 @@ finishedDialog() {
                                           } else {
                                             mapGetxController
                                                 .isFinishing.value = true;
-                                            await cameraGetxController
-                                                .stopVideoRecording(
-                                                    isFinish: true,
-                                                    isMainRecording: true);
-                                            await audioGetxController
-                                                .stopRecorder(
-                                                    isMainRecording: true);
+                                            // await cameraGetxController
+                                            //     .stopVideoRecording(
+                                            //         isFinish: true,
+                                            //         isMainRecording: true);
+                                            // await audioGetxController
+                                            //     .stopRecorder(
+                                            //         isMainRecording: true);
                                             final newProject =
                                                 await mapGetxController
                                                     .saveRouteLocaly(title!);

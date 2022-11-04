@@ -35,13 +35,15 @@ class ProjectAdapter extends TypeAdapter<Project> {
       consentsLength: fields[15] as int?,
       collaborators: (fields[16] as List?)?.cast<String>(),
       reflectionNotes: (fields[17] as List?)?.cast<Note>(),
+      authorId: fields[18] as String?,
+      isUploaded: fields[19] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Project obj) {
     writer
-      ..writeByte(18)
+      ..writeByte(20)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -77,7 +79,11 @@ class ProjectAdapter extends TypeAdapter<Project> {
       ..writeByte(16)
       ..write(obj.collaborators)
       ..writeByte(17)
-      ..write(obj.reflectionNotes);
+      ..write(obj.reflectionNotes)
+      ..writeByte(18)
+      ..write(obj.authorId)
+      ..writeByte(19)
+      ..write(obj.isUploaded);
   }
 
   @override

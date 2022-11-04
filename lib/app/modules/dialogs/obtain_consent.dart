@@ -34,7 +34,7 @@ Future<dynamic> obtainConsent({required NoteType noteType}) async {
             ),
             Expanded(
               child: TextButton(
-                onPressed: () => Get.to(() => const EthicsPage()),
+                onPressed: () => Get.off(() => EthicsPage(noteType: noteType)),
                 child: const Center(
                   child: Text(
                     'Open ethics form from docs',

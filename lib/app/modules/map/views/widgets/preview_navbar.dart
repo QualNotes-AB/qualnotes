@@ -4,6 +4,7 @@ import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/data/services/firestore_db.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/modules/map/views/widgets/nav_button.dart';
+import 'package:qualnote/app/routes/app_pages.dart';
 
 class PreviewNavbar extends StatelessWidget {
   const PreviewNavbar({
@@ -75,11 +76,15 @@ class PreviewNavbar extends StatelessWidget {
         NavButton(
           onPressed: () {
             // mapGetxController.getUpdatedProject();
-            Get.find<FirebaseDatabase>()
-                .updateProject(mapGetxController.getUpdatedProject());
+            try {
+              Get.find<FirebaseDatabase>()
+                  .updateProject(mapGetxController.getUpdatedProject());
 
-            Get.back();
-            mapGetxController.selectedNoteIndex.value = -1;
+              Get.back();
+              mapGetxController.selectedNoteIndex.value = -1;
+            } catch (e) {
+              Get.offNamed(Routes.HOME);
+            }
           },
           title: 'Finish',
           icon: const Icon(

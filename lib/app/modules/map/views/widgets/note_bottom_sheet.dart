@@ -31,139 +31,138 @@ class NoteBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     log(note.path ?? 'null');
-    return Container(
-      margin: kIsWeb
-          ? EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width / 4)
-          : EdgeInsets.zero,
-      padding: const EdgeInsets.only(left: 15, right: 15),
-      decoration: const BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30), topRight: Radius.circular(30))),
-      child: Column(
-        children: [
-          Container(
-            height: 5,
-            width: 120,
-            margin: const EdgeInsets.only(top: 5, bottom: 20),
-            color: AppColors.grey,
-          ),
-          Flexible(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return DraggableScrollableSheet(
+      initialChildSize: 0.5,
+      minChildSize: 0.3,
+      builder: (context, scrollController) => Container(
+        margin: kIsWeb
+            ? EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width / 4)
+            : EdgeInsets.zero,
+        padding: const EdgeInsets.only(left: 15, right: 15),
+        decoration: const BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30), topRight: Radius.circular(30))),
+        child: ListView(
+          controller: scrollController,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 5,
+                  width: 120,
+                  margin: const EdgeInsets.only(top: 5, bottom: 20),
+                  color: AppColors.grey,
+                ),
+              ],
+            ),
+            TextField(
+              controller:
+                  TextEditingController(text: note.noteTitle ?? 'Note title'),
+              onChanged: (value) =>
+                  mapGetxController.updateNoteTitle(value, index),
+              maxLines: 2,
+              autocorrect: false,
+              style: AppTextStyle.medium22Black,
+              decoration: const InputDecoration(
+                  border: InputBorder.none, contentPadding: EdgeInsets.all(0)),
+              scrollPadding: EdgeInsets.zero,
+            ),
+            // Text(
+            //   note.title!,
+            //   style: AppTextStyle.medium22Black,
+            // ),
+            Text(
+              'by ${note.author} on ${date.format(mapGetxController.selectedProject.date ?? DateTime.now())}',
+              style: AppTextStyle.regular12Black,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextField(
-                    controller: TextEditingController(
-                        text: note.noteTitle ?? 'Note title'),
-                    onChanged: (value) =>
-                        mapGetxController.updateNoteTitle(value, index),
-                    maxLines: 2,
-                    autocorrect: false,
-                    style: AppTextStyle.medium22Black,
-                    decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(0)),
-                    scrollPadding: EdgeInsets.zero,
+                  Visibility(
+                    visible: true,
+                    child: BlueTextButton(
+                      title: 'Prev',
+                      onPressed: () {
+                        Get.back();
+                        mapGetxController.previousNote();
+                      },
+                      // mapGetxController.openRecording(
+                      //     index: index,
+                      //     isMainRecording: true,
+                      //     forward: false),
+                    ),
                   ),
-                  // Text(
-                  //   note.title!,
-                  //   style: AppTextStyle.medium22Black,
-                  // ),
-                  Text(
-                    'by ${note.author} on ${date.format(mapGetxController.selectedProject.date ?? DateTime.now())}',
-                    style: AppTextStyle.regular12Black,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Visibility(
-                          visible: true,
-                          child: BlueTextButton(
-                            title: 'Prev',
-                            onPressed: () {
-                              Get.back();
-                              mapGetxController.previousNote();
-                            },
-                            // mapGetxController.openRecording(
-                            //     index: index,
-                            //     isMainRecording: true,
-                            //     forward: false),
-                          ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: BlueTextButton(
+                          title: 'Delete',
+                          onPressed: () async =>
+                              mapGetxController.removeNote(index),
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Padding(
+                      ),
+                      note.type != NoteType.text.toString()
+                          ? Padding(
                               padding: const EdgeInsets.only(right: 10),
                               child: BlueTextButton(
-                                title: 'Delete',
-                                onPressed: () async =>
-                                    mapGetxController.removeNote(index),
-                              ),
-                            ),
-                            note.type != NoteType.text.toString()
-                                ? Padding(
-                                    padding: const EdgeInsets.only(right: 10),
-                                    child: BlueTextButton(
-                                      title: 'Open file',
-                                      onPressed: () async {
-                                        if (note.path != null) {
-                                          OpenFileUtil().openFile(note.path!);
-                                        }
-                                      },
-                                    ),
-                                  )
-                                : const SizedBox(),
-                            Text(
-                                '${index + 1}/${mapGetxController.notes.length}  '),
-                            Visibility(
-                              visible: index != mapGetxController.notes.length,
-                              child: BlueTextButton(
-                                title: 'Next',
-                                onPressed: () {
-                                  Get.back();
-                                  mapGetxController.nextNote();
+                                title: 'Open file',
+                                onPressed: () async {
+                                  if (note.path != null) {
+                                    OpenFileUtil().openFile(note.path!);
+                                  }
                                 },
-                                // mapGetxController.openRecording(
-                                //     index: index,
-                                //     isMainRecording: true,
-                                //     forward: true),
                               ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: Center(child: displayMedia()),
-                  ),
-                  const Text('Notes:', style: AppTextStyle.semiBold13Black),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 30),
-                    child: TextField(
-                      controller: TextEditingController(text: note.description),
-                      minLines: 3,
-                      maxLines: 10,
-                      autocorrect: false,
-                      onChanged: (value) =>
-                          mapGetxController.updateNoteDescription(value, index),
-                      style: AppTextStyle.regular13BlackHeight,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
+                            )
+                          : const SizedBox(),
+                      Text('${index + 1}/${mapGetxController.notes.length}  '),
+                      Visibility(
+                        visible: index != mapGetxController.notes.length,
+                        child: BlueTextButton(
+                          title: 'Next',
+                          onPressed: () {
+                            Get.back();
+                            mapGetxController.nextNote();
+                          },
+                          // mapGetxController.openRecording(
+                          //     index: index,
+                          //     isMainRecording: true,
+                          //     forward: true),
+                        ),
                       ),
-                    ),
-                  ),
+                    ],
+                  )
                 ],
               ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              child: Center(child: displayMedia()),
+            ),
+            const Text('Notes:', style: AppTextStyle.semiBold13Black),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 30),
+              child: TextField(
+                controller: TextEditingController(text: note.description),
+                minLines: 3,
+                maxLines: 10,
+                autocorrect: false,
+                onChanged: (value) =>
+                    mapGetxController.updateNoteDescription(value, index),
+                style: AppTextStyle.regular13BlackHeight,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

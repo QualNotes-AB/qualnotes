@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/modules/dialogs/add_text_note.dart';
-import 'package:qualnote/app/modules/dialogs/camera_alert.dart';
+import 'package:qualnote/app/modules/dialogs/requires_consent.dart';
 import 'package:qualnote/app/modules/map/controllers/add_media_controller.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/utils/note_type.dart';
@@ -42,9 +42,9 @@ addMediaDialog() {
                     child: Expanded(
                       child: TextButton(
                         onPressed: () {
-                          if (kIsWeb) return;
-                          Get.back();
-                          cameraAlertDialog(noteType: NoteType.photo);
+                          Get.find<AddMediaController>().addPhotoNote();
+
+                          //cameraAlertDialog(noteType: NoteType.photo);
                         },
                         child: const Center(
                           child: Text(
@@ -64,7 +64,8 @@ addMediaDialog() {
                         onPressed: () {
                           if (kIsWeb) return;
                           Get.back();
-                          cameraAlertDialog(noteType: NoteType.video);
+                          requiresParticipantDialog(noteType: NoteType.video);
+                          //  cameraAlertDialog(noteType: NoteType.video);
                         },
                         child: const Center(
                           child: Text(
@@ -81,9 +82,10 @@ addMediaDialog() {
                     visible: !kIsWeb,
                     child: Expanded(
                       child: TextButton(
-                        onPressed: () {
+                        onPressed: () async {
                           Get.back();
-                          cameraAlertDialog(noteType: NoteType.audio);
+                          // cameraAlertDialog(noteType: NoteType.audio);
+                          requiresParticipantDialog(noteType: NoteType.audio);
                         },
                         child: const Center(
                           child: Text(

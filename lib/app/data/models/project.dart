@@ -42,6 +42,10 @@ class Project {
   List<String>? collaborators;
   @HiveField(17)
   List<Note>? reflectionNotes;
+  @HiveField(18)
+  String? authorId;
+  @HiveField(19)
+  bool? isUploaded;
 
   Project({
     this.id,
@@ -62,10 +66,13 @@ class Project {
     this.consentsLength,
     this.collaborators,
     this.reflectionNotes,
+    this.authorId,
+    this.isUploaded = false,
   });
 
   Project.fromJson(Map<String, dynamic> json, String docId) {
     id = docId;
+    authorId = json['authorId'];
     title = json['title'];
     description = json['description'];
     totalTime = json['totalTime'];
@@ -105,6 +112,7 @@ class Project {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
+    data['authorId'] = authorId;
     data['title'] = title;
     data['description'] = description;
     data['totalTime'] = totalTime;

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:qualnote/app/modules/overview/views/widgets/project_not_found.dart';
 
 import '../modules/audio_recording/bindings/audio_recording_binding.dart';
 import '../modules/audio_recording/views/audio_recording_view.dart';
@@ -64,6 +65,10 @@ class AppPages {
       name: _Paths.REFLECTION,
       page: () => const ReflectionView(),
       binding: ReflectionBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROJECT_NOT_FOUND,
+      page: () => const ProjectNotFound(),
     ),
   ];
 }

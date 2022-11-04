@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:qualnote/app/config/colors.dart';
 import 'package:qualnote/app/modules/map/controllers/map_controller.dart';
 import 'package:qualnote/app/routes/app_pages.dart';
@@ -44,11 +45,24 @@ recordMethodDialog() {
             ),
             Expanded(
               child: TextButton(
-                onPressed: () {
+                onPressed: () async {
+                  final permission = await Permission.microphone.request();
+                  if (permission != PermissionStatus.granted) {
+                    Get.snackbar(
+                      'Sorry',
+                      'We need microphone permission to continue!',
+                      backgroundColor: Colors.orange,
+                      duration: const Duration(milliseconds: 1500),
+                      colorText: Colors.white,
+                    );
+                    Get.back();
+                    return;
+                  }
                   Get.back();
                   controller.selectRecordingType(RecordingType.justMapping);
                   controller.resetFields();
                   controller.startMapping();
+
                   Get.toNamed(Routes.MAP);
                 },
                 child: const Center(
