@@ -1,79 +1,152 @@
-import 'package:flutter/material.dart';
-import 'package:qualnotes/pages/privacy_policy.dart';
-import './pages/live_location.dart';
+// Copyright 2023 Jose Berengeueres
+// Adapted from get-to-know-flutter and
+// found in the LICENSE file.
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
 import 'firebase_options.dart';
-import 'dart:async';
+import 'src/app_state.dart';
+import 'src/home/home_page.dart';
+import 'src/project/project_tab_page.dart';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  runApp(ChangeNotifierProvider(
+    create: (context) => ApplicationState(),
+    builder: ((context, child) => const App()),
+  ));
 }
 
-class MyApp extends StatelessWidget {
-  final Future<FirebaseApp>  _fbApp = Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
+final _router = GoRouter(
+  routes: [
+    GoRoute(
+      name: 'root',
+      path: '/',
+      builder: (context, state) => HomePage(),
+      routes: [
+        GoRoute(
+          name: 'sign-in',
+          path: 'sign-in',
+          builder: (context, state) {
+            return SignInScreen(
+              actions: [
+                ForgotPasswordAction(((context, email) {
+                  final uri = Uri(
+                    path: '/sign-in/forgot-password',
+                    queryParameters: <String, String?>{
+                      'email': email,
+                    },
+                  );
+                  context.push(uri.toString());
+                })),
+                AuthStateChangeAction(((context, state) {
+                  if (state is SignedIn || state is UserCreated) {
+                    var user = (state is SignedIn)
+                        ? state.user
+                        : (state as UserCreated).credential.user;
+                    if (user == null) {
+                      return;
+                    }
+                    if (state is UserCreated) {
+                      user.updateDisplayName(user.email!.split('@')[0]);
+                    }
+                    if (!user.emailVerified) {
+                      user.sendEmailVerification();
+                      const snackBar = SnackBar(
+                          content: Text(
+                              'Please check your email to verify your email address'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
+                    context.replace('/');
+                  }
+                })),
+              ],
+            );
+          },
+          routes: [
+            GoRoute(
+              name: 'forgot-password',
+              path: 'forgot-password',
+              builder: (context, state) {
+                final arguments = state.queryParams;
+                return ForgotPasswordScreen(
+                  email: arguments['email'],
+                  headerMaxExtent: 200,
+                );
+              },
+            ),
+          ],
+        ),
+        GoRoute(
+          name: 'project',
+          path: 'project-page',
+          builder: (context, state) => ProjectPage(
+            prj_id: state.queryParams['prj_id'],
+          ),
+        ),
+        GoRoute(
+          name: 'profile',
+          path: 'profile',
+          builder: (context, state) {
+            return Consumer<ApplicationState>(
+              builder: (context, appState, _) => ProfileScreen(
+                key: ValueKey(appState.emailVerified),
+                providers: const [],
+                actions: [
+                  SignedOutAction(
+                    ((context) {
+                      context.replace('/');
+                    }),
+                  ),
+                ],
+                children: [
+                  Visibility(
+                      visible: !appState.emailVerified,
+                      child: OutlinedButton(
+                        child: const Text('Recheck Verification State'),
+                        onPressed: () {
+                          appState.refreshLoggedInUser();
+                        },
+                      ))
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    ),
+  ],
+);
 
-  MyApp({Key? key}) : super(key: key);
+class App extends StatelessWidget {
+  const App({super.key});
 
-
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return
-      FutureBuilder(
-        future: _fbApp,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            //printDebug("error");
-            print("erorr");
-            return Text("error");
-          } else if (snapshot.hasData) {
-            return MaterialApp(
-                title: 'QualNote',
-                theme: ThemeData(
-                  primarySwatch: mapBoxBlue,
-                ),
-                home:  MyWebView(),
-                routes: <String, WidgetBuilder>{
-                  LiveLocationPage.route: (context) => const LiveLocationPage(),
-                  MyWebView.route: (context) => MyWebView(),
-                  // PhotoElicitation .... LiveLocationPage.route: (context) => const LiveLocationPage(),
-                  // AutoE .... LiveLocationPage.route: (context) => const LiveLocationPage(),
-                  // About
-                  // Privacy
-                  // Tutorials
-                  // Examples
-                  // My account
-                }
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        } // builder
-      );
+    return MaterialApp.router(
+      title: 'NotesQual',
+      theme: ThemeData(
+        buttonTheme: Theme.of(context).buttonTheme.copyWith(
+              highlightColor: Colors.green,
+            ),
+        primarySwatch: Colors.blueGrey,
+        secondaryHeaderColor: Colors.green,
+        textTheme: GoogleFonts.robotoTextTheme(
+          Theme.of(context).textTheme,
+        ),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      routerConfig: _router,
+    );
   }
 }
-
-// Generated using Material Design Palette/Theme Generator
-// http://mcg.mbitson.com/
-// https://github.com/mbitson/mcg
-const int _bluePrimary = 0xFF395afa;
-const MaterialColor mapBoxBlue = MaterialColor(
-  _bluePrimary,
-  <int, Color>{
-    50: Color(0xFFE7EBFE),
-    100: Color(0xFFC4CEFE),
-    200: Color(0xFF9CADFD),
-    300: Color(0xFF748CFC),
-    400: Color(0xFF5773FB),
-    500: Color(_bluePrimary),
-    600: Color(0xFF3352F9),
-    700: Color(0xFF2C48F9),
-    800: Color(0xFF243FF8),
-    900: Color(0xFF172EF6),
-  },
-);

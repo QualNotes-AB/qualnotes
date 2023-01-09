@@ -23,15 +23,20 @@ dependencies:
   record: ^4.3.2
   audioplayers: ^1.0.1
   flutter_map: ^2.2.0
-  firebase_core: ^1.19.0
-  firebase_auth: ^3.4.0
   google_sign_in: ^5.4.1
-  firebase_storage: ^10.3.0
   share_plus: ^4.0.10+1
   hash: ^1.0.4
   webview_flutter: ^3.0.4
   url_launcher: ^6.1.5
-
+  cupertino_icons: ^1.0.2
+  google_fonts: ^3.0.1
+  go_router: ^5.2.1
+  cloud_firestore: ^4.1.0
+  firebase_auth: ^4.1.4
+  firebase_core: ^2.3.0
+  provider: ^6.0.4
+  firebase_ui_auth: ^1.1.0
+  firebase_storage: ^11.0.10
 
 
 flutter:
